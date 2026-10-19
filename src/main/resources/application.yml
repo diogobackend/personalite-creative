@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: diad-auth-service
+
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/diad_auth}
+    username: ${DATABASE_USERNAME:diad_auth}
+    password: ${DATABASE_PASSWORD:diad_auth}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+
+  flyway:
+    enabled: true
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs
+
+security:
+  jwt:
+    secret: ${JWT_SECRET}
+    expiration-ms: 900000
+
+server:
+  port: ${PORT:8080}
