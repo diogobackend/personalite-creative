@@ -77,7 +77,10 @@ class SecurityConfiguration(
     fun corsConfigurationSource(): CorsConfigurationSource {
         val configuration =
             CorsConfiguration().apply {
-                allowedOrigins = listOf("http://localhost:3000")
+                allowedOrigins = listOf(
+                "http://localhost:3000",
+                "https://personalite-creative-web.vercel.app",
+            )
                 allowedMethods = listOf("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
                 allowedHeaders = listOf("*")
             }
