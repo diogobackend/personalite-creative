@@ -63,6 +63,10 @@ class SecurityConfiguration(
                     .hasAnyRole(
                         SCHOOL_ADMIN.name,
                         PLATFORM_ADMIN.name,
+                    ).requestMatchers(POST, "/products")
+                    .hasAnyRole(
+                        SCHOOL_ADMIN.name,
+                        PLATFORM_ADMIN.name,
                     ).anyRequest()
                     .authenticated()
             }.addFilterBefore(
@@ -77,10 +81,11 @@ class SecurityConfiguration(
     fun corsConfigurationSource(): CorsConfigurationSource {
         val configuration =
             CorsConfiguration().apply {
-                allowedOrigins = listOf(
-                "http://localhost:3000",
-                "https://personalite-creative-web.vercel.app",
-            )
+                allowedOrigins =
+                    listOf(
+                        "http://localhost:3000",
+                        "https://personalite-creative-web.vercel.app",
+                    )
                 allowedMethods = listOf("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
                 allowedHeaders = listOf("*")
             }
