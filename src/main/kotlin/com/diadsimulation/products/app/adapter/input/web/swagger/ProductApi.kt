@@ -126,77 +126,77 @@ interface ProductApi {
     )
     fun getProducts(
         @Parameter(description = "Código comercial de três dígitos. Ignora todos os demais filtros.")
-        @RequestParam(required = false)
+        @RequestParam(name = "code", required = false)
         code: String?,
         @Parameter(description = "Busca parcial pelo nome do produto.")
-        @RequestParam(required = false)
+        @RequestParam(name = "name", required = false)
         name: String?,
         @Parameter(description = "Busca parcial pela descrição do produto.")
-        @RequestParam(required = false)
+        @RequestParam(name = "description", required = false)
         description: String?,
         @Parameter(description = "Categoria exata do produto.")
-        @RequestParam(required = false)
+        @RequestParam(name = "category", required = false)
         category: ProductCategory?,
         @Parameter(description = "Situação do produto. Quando omitido, inclui ativos e inativos.")
-        @RequestParam(required = false)
+        @RequestParam(name = "active", required = false)
         active: Boolean?,
         @Parameter(description = "Tipo de precificação: FIXED, TIERED ou QUOTE.")
-        @RequestParam(required = false)
+        @RequestParam(name = "pricingType", required = false)
         pricingType: PricingType?,
         @Parameter(description = "Busca parcial pelo nome da taxa.")
-        @RequestParam(required = false)
+        @RequestParam(name = "feeName", required = false)
         feeName: String?,
         @Parameter(description = "Tipo de cobrança: PER_ORDER, PER_UNIT ou FIRST_PURCHASE.")
-        @RequestParam(required = false)
+        @RequestParam(name = "chargeType", required = false)
         chargeType: FeeChargeType?,
         @Parameter(description = "Limite inferior inclusivo da quantidade mínima.")
-        @RequestParam(required = false)
+        @RequestParam(name = "minQuantity", required = false)
         minQuantity: Int?,
         @Parameter(description = "Limite superior inclusivo da quantidade mínima.")
-        @RequestParam(required = false)
+        @RequestParam(name = "maxQuantity", required = false)
         maxQuantity: Int?,
         @Parameter(description = "Validade mínima do produto em dias.")
-        @RequestParam(required = false)
+        @RequestParam(name = "minShelfLifeDays", required = false)
         minShelfLifeDays: Int?,
         @Parameter(description = "Validade máxima do produto em dias.")
-        @RequestParam(required = false)
+        @RequestParam(name = "maxShelfLifeDays", required = false)
         maxShelfLifeDays: Int?,
         @Parameter(description = "Preço unitário mínimo de uma faixa de preço.")
-        @RequestParam(required = false)
+        @RequestParam(name = "minPrice", required = false)
         minPrice: BigDecimal?,
         @Parameter(description = "Preço unitário máximo de uma faixa de preço.")
-        @RequestParam(required = false)
+        @RequestParam(name = "maxPrice", required = false)
         maxPrice: BigDecimal?,
         @Parameter(description = "Valor mínimo da taxa.")
-        @RequestParam(required = false)
+        @RequestParam(name = "minFeeAmount", required = false)
         minFeeAmount: BigDecimal?,
         @Parameter(description = "Valor máximo da taxa.")
-        @RequestParam(required = false)
+        @RequestParam(name = "maxFeeAmount", required = false)
         maxFeeAmount: BigDecimal?,
         @Parameter(description = "Filtra produtos que possuem ou não taxas cadastradas.")
-        @RequestParam(required = false)
+        @RequestParam(name = "hasFees", required = false)
         hasFees: Boolean?,
         @Parameter(description = "Data inicial de cadastro no formato ISO 8601.")
-        @RequestParam(required = false)
+        @RequestParam(name = "createdFrom", required = false)
         @DateTimeFormat(iso = DATE_TIME)
         createdFrom: OffsetDateTime?,
         @Parameter(description = "Data final de cadastro no formato ISO 8601.")
-        @RequestParam(required = false)
+        @RequestParam(name = "createdTo", required = false)
         @DateTimeFormat(iso = DATE_TIME)
         createdTo: OffsetDateTime?,
         @Parameter(description = "Página solicitada, começando em zero. Padrão: 0.")
-        @RequestParam(defaultValue = "0")
+        @RequestParam(name = "page", defaultValue = "0")
         page: Int,
         @Parameter(description = "Quantidade por página. Padrão: 20. Máximo: 100.")
-        @RequestParam(defaultValue = "20")
+        @RequestParam(name = "size", defaultValue = "20")
         size: Int,
         @Parameter(
             description = "Campo de ordenação: name, code, createdAt, updatedAt, minimumQuantity, shelfLifeDays ou price.",
         )
-        @RequestParam(defaultValue = "name")
+        @RequestParam(name = "sortBy", defaultValue = "name")
         sortBy: String,
         @Parameter(description = "Direção da ordenação: ASC ou DESC.")
-        @RequestParam(defaultValue = "ASC")
+        @RequestParam(name = "sortDirection", defaultValue = "ASC")
         sortDirection: String,
     ): ResponseEntity<ProductsPageResponse>
 }
