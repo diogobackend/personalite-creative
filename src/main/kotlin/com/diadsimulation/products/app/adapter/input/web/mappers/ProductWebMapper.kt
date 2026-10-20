@@ -4,9 +4,11 @@ import com.diadsimulation.products.app.adapter.input.web.dtos.requests.CreatePro
 import com.diadsimulation.products.app.adapter.input.web.dtos.responses.ProductFeeResponse
 import com.diadsimulation.products.app.adapter.input.web.dtos.responses.ProductPriceResponse
 import com.diadsimulation.products.app.adapter.input.web.dtos.responses.ProductResponse
+import com.diadsimulation.products.app.adapter.input.web.dtos.responses.ProductsPageResponse
 import com.diadsimulation.products.core.domain.model.Product
 import com.diadsimulation.products.core.domain.model.ProductFee
 import com.diadsimulation.products.core.domain.model.ProductPrice
+import com.diadsimulation.products.core.domain.model.ProductsPage
 import org.springframework.stereotype.Component
 
 @Component
@@ -80,5 +82,15 @@ class ProductWebMapper {
                 },
             createdAt = product.createdAt,
             updatedAt = product.updatedAt,
+        )
+
+    fun toPageResponse(productsPage: ProductsPage): ProductsPageResponse =
+        ProductsPageResponse(
+            content = productsPage.content.map(::toResponse),
+            page = productsPage.page,
+            size = productsPage.size,
+            totalElementsThisPage = productsPage.totalElementsThisPage.toLong(),
+            totalElements = productsPage.totalElements,
+            totalPages = productsPage.totalPages,
         )
 }

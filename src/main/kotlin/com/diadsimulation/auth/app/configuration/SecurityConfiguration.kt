@@ -6,7 +6,6 @@ import com.diadsimulation.auth.app.adapter.input.web.security.JwtAuthenticationF
 import com.diadsimulation.auth.core.domain.enums.UserRole.CANDIDATE
 import com.diadsimulation.auth.core.domain.enums.UserRole.PLATFORM_ADMIN
 import com.diadsimulation.auth.core.domain.enums.UserRole.SCHOOL_ADMIN
-import org.hibernate.internal.util.collections.CollectionHelper.listOf
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod.GET
@@ -64,6 +63,10 @@ class SecurityConfiguration(
                         SCHOOL_ADMIN.name,
                         PLATFORM_ADMIN.name,
                     ).requestMatchers(POST, "/products")
+                    .hasAnyRole(
+                        SCHOOL_ADMIN.name,
+                        PLATFORM_ADMIN.name,
+                    ).requestMatchers(GET, "/products")
                     .hasAnyRole(
                         SCHOOL_ADMIN.name,
                         PLATFORM_ADMIN.name,
