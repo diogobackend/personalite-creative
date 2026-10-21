@@ -9,6 +9,7 @@ import com.diadsimulation.auth.core.common.Messages.NAME_REQUIRED
 import com.diadsimulation.auth.core.common.Messages.REQUEST_CONFLICT
 import com.diadsimulation.auth.core.common.Messages.USER_NOT_FOUND
 import com.diadsimulation.auth.core.domain.exceptions.UserAlreadyExistsException
+import com.diadsimulation.products.core.domain.exceptions.ProductNotFoundException
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.BAD_REQUEST
@@ -161,6 +162,17 @@ class GlobalExceptionHandler {
         buildResponse(
             status = FORBIDDEN,
             message = exception.message ?: ACCESS_DENIED,
+            request = request,
+        )
+
+    @ExceptionHandler(ProductNotFoundException::class)
+    fun handleProductNotFound(
+        exception: ProductNotFoundException,
+        request: HttpServletRequest,
+    ): ResponseEntity<ApiErrorResponse> =
+        buildResponse(
+            status = NOT_FOUND,
+            message = exception.message ?: "Produto não encontrado",
             request = request,
         )
 }

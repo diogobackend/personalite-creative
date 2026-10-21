@@ -11,6 +11,7 @@ import com.diadsimulation.products.core.domain.enums.PricingType
 import com.diadsimulation.products.core.domain.enums.ProductCategory
 import com.diadsimulation.products.core.domain.model.GetProductsFilter
 import com.diadsimulation.products.core.port.input.CreateProductInputPort
+import com.diadsimulation.products.core.port.input.GetProductByIdInputPort
 import com.diadsimulation.products.core.port.input.GetProductsInputPort
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.http.ResponseEntity
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import java.math.BigDecimal
 import java.time.OffsetDateTime
+import java.util.UUID
 
 @RestController
 @RequestMapping("/products")
@@ -27,6 +29,7 @@ class ProductController(
     private val createProductInputPort: CreateProductInputPort,
     private val getProductsInputPort: GetProductsInputPort,
     private val productWebMapper: ProductWebMapper,
+    private val getProductByIdInputPort: GetProductByIdInputPort,
 ) : ProductApi {
     @PostMapping
     override fun create(request: CreateProductRequest): ResponseEntity<ProductResponse> {
@@ -95,6 +98,15 @@ class ProductController(
 
         return ResponseEntity.ok(
             productWebMapper.toPageResponse(productsPage),
+        )
+    }
+
+    @GetMapping("/{productId}")
+    override fun getProductById(productId: UUID): ResponseEntity<ProductResponse> {
+        val product = getProductByIdInputPort.execute(productId)
+
+        return ResponseEntity.ok(
+            productWebMapper.toResponse(product),
         )
     }
 }

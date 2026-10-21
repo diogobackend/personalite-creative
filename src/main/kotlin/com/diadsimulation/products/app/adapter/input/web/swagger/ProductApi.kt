@@ -18,10 +18,12 @@ import jakarta.validation.Valid
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.format.annotation.DateTimeFormat.ISO.DATE_TIME
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestParam
 import java.math.BigDecimal
 import java.time.OffsetDateTime
+import java.util.UUID
 
 @Tag(
     name = "Products",
@@ -199,4 +201,36 @@ interface ProductApi {
         @RequestParam(name = "sortDirection", defaultValue = "ASC")
         sortDirection: String,
     ): ResponseEntity<ProductsPageResponse>
+
+    @Operation(
+        summary = "Buscar produto por ID",
+        description = "Retorna um produto pelo seu identificador.",
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Produto encontrado",
+                content = [
+                    Content(
+                        mediaType = "application/json",
+                        schema = Schema(implementation = ProductResponse::class),
+                    ),
+                ],
+            ),
+            ApiResponse(
+                responseCode = "404",
+                description = "Produto não encontrado",
+                content = [
+                    Content(
+                        mediaType = "application/json",
+                        schema = Schema(implementation = ApiErrorResponse::class),
+                    ),
+                ],
+            ),
+        ],
+    )
+    fun getProductById(
+        @PathVariable productId: UUID,
+    ): ResponseEntity<ProductResponse>
 }
