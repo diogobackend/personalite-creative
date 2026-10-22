@@ -1,5 +1,7 @@
 package com.diadsimulation.products.app.adapter.output.persistence.adapters
 
+import com.diadsimulation.products.app.adapter.output.persistence.entities.ProductFeeEntity
+import com.diadsimulation.products.app.adapter.output.persistence.entities.ProductPriceEntity
 import com.diadsimulation.products.app.adapter.output.persistence.mappers.ProductPersistenceMapper
 import com.diadsimulation.products.app.adapter.output.persistence.repositories.ProductJpaRepository
 import com.diadsimulation.products.app.adapter.output.persistence.repositories.ProductSpecifications
@@ -52,14 +54,27 @@ class ProductPersistenceAdapter(
             updatedAt = product.updatedAt
         }
 
-        product.prices.forEach { price ->
-            val existing =
-                entity.prices.find { it.id == price.id }
-                    ?: throw IllegalArgumentException(
-                        "Faixa de preço não encontrada: ${price.id}",
-                    )
+        val priceIds = product.prices.map { it.id }.toSet()
 
-            if (
+        entity.prices.removeIf { existing ->
+            existing.id !in priceIds
+        }
+
+        product.prices.forEach { price ->
+            val existing = entity.prices.find { it.id == price.id }
+
+            if (existing == null) {
+                entity.prices.add(
+                    ProductPriceEntity(
+                        id = price.id,
+                        product = entity,
+                        minimumQuantity = price.minimumQuantity,
+                        unitPrice = price.unitPrice,
+                        createdAt = price.createdAt,
+                        updatedAt = price.updatedAt,
+                    ),
+                )
+            } else if (
                 existing.minimumQuantity != price.minimumQuantity ||
                 existing.unitPrice.compareTo(price.unitPrice) != 0
             ) {
@@ -69,14 +84,30 @@ class ProductPersistenceAdapter(
             }
         }
 
-        product.fees.forEach { fee ->
-            val existing =
-                entity.fees.find { it.id == fee.id }
-                    ?: throw IllegalArgumentException(
-                        "Taxa não encontrada: ${fee.id}",
-                    )
+        val feeIds = product.fees.map { it.id }.toSet()
 
-            if (
+        entity.fees.removeIf { existing ->
+            existing.id !in feeIds
+        }
+
+        product.fees.forEach { fee ->
+            val existing = entity.fees.find { it.id == fee.id }
+
+            if (existing == null) {
+                entity.fees.add(
+                    ProductFeeEntity(
+                        id = fee.id,
+                        product = entity,
+                        name = fee.name,
+                        amount = fee.amount,
+                        chargeType = fee.chargeType,
+                        required = fee.required,
+                        active = fee.active,
+                        createdAt = fee.createdAt,
+                        updatedAt = fee.updatedAt,
+                    ),
+                )
+            } else if (
                 existing.name != fee.name ||
                 existing.amount.compareTo(fee.amount) != 0 ||
                 existing.chargeType != fee.chargeType ||

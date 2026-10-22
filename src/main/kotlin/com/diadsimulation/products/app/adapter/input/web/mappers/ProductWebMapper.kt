@@ -9,6 +9,8 @@ import com.diadsimulation.products.app.adapter.input.web.dtos.responses.Products
 import com.diadsimulation.products.core.domain.enums.FeeChargeType
 import com.diadsimulation.products.core.domain.enums.PricingType
 import com.diadsimulation.products.core.domain.enums.ProductCategory
+import com.diadsimulation.products.core.domain.model.CreateProductFeeCommand
+import com.diadsimulation.products.core.domain.model.CreateProductPriceCommand
 import com.diadsimulation.products.core.domain.model.Product
 import com.diadsimulation.products.core.domain.model.ProductFee
 import com.diadsimulation.products.core.domain.model.ProductPrice
@@ -19,6 +21,7 @@ import com.diadsimulation.products.core.domain.model.UpdateProductPriceCommand
 import com.diadsimulation.products.core.utils.PatchField
 import com.fasterxml.jackson.databind.JsonNode
 import org.springframework.stereotype.Component
+import java.math.BigDecimal
 import java.util.UUID
 
 @Component
@@ -56,59 +59,77 @@ class ProductWebMapper {
 
     fun toCommand(request: UpdateProductRequest): UpdateProductCommand =
         UpdateProductCommand(
-            name = patch(request.name) { it.asText() },
+            name = patch(request.name) { text(it) },
             category =
                 patch(request.category) {
-                    ProductCategory.valueOf(it.asText())
+                    enumValue<ProductCategory>(it)
                 },
-            description = nullablePatch(request.description) { it.asText() },
-            minimumQuantity = nullablePatch(request.minimumQuantity) { it.intValue() },
+            description = nullablePatch(request.description) { text(it) },
+            minimumQuantity = nullablePatch(request.minimumQuantity) { integer(it) },
             pricingType =
                 patch(request.pricingType) {
-                    PricingType.valueOf(it.asText())
+                    enumValue<PricingType>(it)
                 },
-            shelfLifeDays = nullablePatch(request.shelfLifeDays) { it.intValue() },
+            shelfLifeDays = nullablePatch(request.shelfLifeDays) { integer(it) },
             productionLeadTimeMinDays =
-                nullablePatch(request.productionLeadTimeMinDays) { it.intValue() },
+                nullablePatch(request.productionLeadTimeMinDays) { integer(it) },
             productionLeadTimeMaxDays =
-                nullablePatch(request.productionLeadTimeMaxDays) { it.intValue() },
-            active = patch(request.active) { it.booleanValue() },
+                nullablePatch(request.productionLeadTimeMaxDays) { integer(it) },
+            active = patch(request.active) { boolean(it) },
             prices =
                 patch(request.prices) { node ->
-                    require(node.isArray) { "prices deve ser uma lista." }
-
-                    node.map { price ->
+                    array(node).map { price ->
                         UpdateProductPriceCommand(
-                            id = UUID.fromString(price.required("id").asText()),
+                            id = uuid(required(price, "id")),
                             minimumQuantity =
                                 patch(price.get("minimumQuantity")) {
-                                    it.intValue()
+                                    integer(it)
                                 },
                             unitPrice =
                                 patch(price.get("unitPrice")) {
-                                    it.decimalValue()
+                                    decimal(it)
                                 },
                         )
                     }
                 },
             fees =
                 patch(request.fees) { node ->
-                    require(node.isArray) { "fees deve ser uma lista." }
-
-                    node.map { fee ->
+                    array(node).map { fee ->
                         UpdateProductFeeCommand(
-                            id = UUID.fromString(fee.required("id").asText()),
-                            name = patch(fee.get("name")) { it.asText() },
-                            amount = patch(fee.get("amount")) { it.decimalValue() },
+                            id = uuid(required(fee, "id")),
+                            name = patch(fee.get("name")) { text(it) },
+                            amount = patch(fee.get("amount")) { decimal(it) },
                             chargeType =
                                 patch(fee.get("chargeType")) {
-                                    FeeChargeType.valueOf(it.asText())
+                                    enumValue<FeeChargeType>(it)
                                 },
-                            required = patch(fee.get("required")) { it.booleanValue() },
-                            active = patch(fee.get("active")) { it.booleanValue() },
+                            required = patch(fee.get("required")) { boolean(it) },
+                            active = patch(fee.get("active")) { boolean(it) },
                         )
                     }
                 },
+            addPrices =
+                optionalArray(request.addPrices).map { price ->
+                    CreateProductPriceCommand(
+                        minimumQuantity = integer(required(price, "minimumQuantity")),
+                        unitPrice = decimal(required(price, "unitPrice")),
+                    )
+                },
+            removePriceIds = optionalArray(request.removePriceIds).map(::uuid),
+            addFees =
+                optionalArray(request.addFees).map { fee ->
+                    CreateProductFeeCommand(
+                        name = text(required(fee, "name")),
+                        amount = decimal(required(fee, "amount")),
+                        chargeType =
+                            enumValue<FeeChargeType>(
+                                required(fee, "chargeType"),
+                            ),
+                        required = fee.get("required")?.let(::boolean) ?: false,
+                        active = fee.get("active")?.let(::boolean) ?: true,
+                    )
+                },
+            removeFeeIds = optionalArray(request.removeFeeIds).map(::uuid),
         )
 
     private fun <T> patch(
@@ -134,6 +155,69 @@ class ProductWebMapper {
             node.isNull -> PatchField.Present(null)
             else -> PatchField.Present(convert(node))
         }
+
+    private fun array(node: JsonNode): List<JsonNode> {
+        require(node.isArray) { "O campo deve ser uma lista." }
+        return node.toList()
+    }
+
+    private fun optionalArray(node: JsonNode?): List<JsonNode> =
+        when {
+            node == null -> emptyList()
+
+            node.isNull -> throw IllegalArgumentException(
+                "A lista não pode ser nula.",
+            )
+
+            else -> array(node)
+        }
+
+    private fun required(
+        node: JsonNode,
+        field: String,
+    ): JsonNode {
+        require(node.isObject && node.hasNonNull(field)) {
+            "O campo $field é obrigatório."
+        }
+        return node.get(field)
+    }
+
+    private fun text(node: JsonNode): String {
+        require(node.isTextual) { "O campo deve ser um texto." }
+        return node.textValue()
+    }
+
+    private fun integer(node: JsonNode): Int {
+        require(node.isIntegralNumber && node.canConvertToInt()) {
+            "O campo deve ser um número inteiro válido."
+        }
+        return node.intValue()
+    }
+
+    private fun decimal(node: JsonNode): BigDecimal {
+        require(node.isNumber) { "O campo deve ser numérico." }
+        return node.decimalValue()
+    }
+
+    private fun boolean(node: JsonNode): Boolean {
+        require(node.isBoolean) { "O campo deve ser booleano." }
+        return node.booleanValue()
+    }
+
+    private fun uuid(node: JsonNode): UUID {
+        val value = text(node)
+        return try {
+            UUID.fromString(value)
+        } catch (exception: IllegalArgumentException) {
+            throw IllegalArgumentException("UUID inválido: $value")
+        }
+    }
+
+    private inline fun <reified T : Enum<T>> enumValue(node: JsonNode): T {
+        val value = text(node)
+        return enumValues<T>().firstOrNull { it.name == value }
+            ?: throw IllegalArgumentException("Valor inválido: $value")
+    }
 
     fun toResponse(product: Product): ProductResponse =
         ProductResponse(

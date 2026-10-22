@@ -14,4 +14,8 @@ data class UpdateProductRequest(
     val active: JsonNode? = null,
     val prices: JsonNode? = null,
     val fees: JsonNode? = null,
+    val addPrices: JsonNode? = null,
+    val removePriceIds: JsonNode? = null,
+    val addFees: JsonNode? = null,
+    val removeFeeIds: JsonNode? = null,
 )
