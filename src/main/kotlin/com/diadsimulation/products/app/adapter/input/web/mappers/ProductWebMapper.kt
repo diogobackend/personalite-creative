@@ -19,8 +19,8 @@ import com.diadsimulation.products.core.domain.model.UpdateProductCommand
 import com.diadsimulation.products.core.domain.model.UpdateProductFeeCommand
 import com.diadsimulation.products.core.domain.model.UpdateProductPriceCommand
 import com.diadsimulation.products.core.utils.PatchField
-import com.fasterxml.jackson.databind.JsonNode
 import org.springframework.stereotype.Component
+import tools.jackson.databind.JsonNode
 import java.math.BigDecimal
 import java.util.UUID
 

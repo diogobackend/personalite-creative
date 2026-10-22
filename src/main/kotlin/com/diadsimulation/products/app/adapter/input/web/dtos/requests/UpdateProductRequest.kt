@@ -1,6 +1,6 @@
 package com.diadsimulation.products.app.adapter.input.web.dtos.requests
 
-import com.fasterxml.jackson.databind.JsonNode
+import tools.jackson.databind.JsonNode
 
 data class UpdateProductRequest(
     val name: JsonNode? = null,
