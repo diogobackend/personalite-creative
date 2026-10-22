@@ -3,6 +3,7 @@ package com.diadsimulation.products.app.adapter.output.persistence.adapters
 import com.diadsimulation.products.app.adapter.output.persistence.mappers.ProductPersistenceMapper
 import com.diadsimulation.products.app.adapter.output.persistence.repositories.ProductJpaRepository
 import com.diadsimulation.products.app.adapter.output.persistence.repositories.ProductSpecifications
+import com.diadsimulation.products.core.domain.exceptions.ProductNotFoundException
 import com.diadsimulation.products.core.domain.model.GetProductsFilter
 import com.diadsimulation.products.core.domain.model.Product
 import com.diadsimulation.products.core.domain.model.ProductsPage
@@ -29,6 +30,71 @@ class ProductPersistenceAdapter(
         val savedEntity = productJpaRepository.save(entity)
 
         return productPersistenceMapper.toDomain(savedEntity)
+    }
+
+    @Transactional
+    override fun update(product: Product): Product {
+        val entity =
+            productJpaRepository
+                .findById(product.id)
+                .orElseThrow { ProductNotFoundException(product.id) }
+
+        entity.apply {
+            name = product.name
+            category = product.category
+            description = product.description
+            minimumQuantity = product.minimumQuantity
+            pricingType = product.pricingType
+            shelfLifeDays = product.shelfLifeDays
+            productionLeadTimeMinDays = product.productionLeadTimeMinDays
+            productionLeadTimeMaxDays = product.productionLeadTimeMaxDays
+            active = product.active
+            updatedAt = product.updatedAt
+        }
+
+        product.prices.forEach { price ->
+            val existing =
+                entity.prices.find { it.id == price.id }
+                    ?: throw IllegalArgumentException(
+                        "Faixa de preço não encontrada: ${price.id}",
+                    )
+
+            if (
+                existing.minimumQuantity != price.minimumQuantity ||
+                existing.unitPrice.compareTo(price.unitPrice) != 0
+            ) {
+                existing.minimumQuantity = price.minimumQuantity
+                existing.unitPrice = price.unitPrice
+                existing.updatedAt = price.updatedAt
+            }
+        }
+
+        product.fees.forEach { fee ->
+            val existing =
+                entity.fees.find { it.id == fee.id }
+                    ?: throw IllegalArgumentException(
+                        "Taxa não encontrada: ${fee.id}",
+                    )
+
+            if (
+                existing.name != fee.name ||
+                existing.amount.compareTo(fee.amount) != 0 ||
+                existing.chargeType != fee.chargeType ||
+                existing.required != fee.required ||
+                existing.active != fee.active
+            ) {
+                existing.name = fee.name
+                existing.amount = fee.amount
+                existing.chargeType = fee.chargeType
+                existing.required = fee.required
+                existing.active = fee.active
+                existing.updatedAt = fee.updatedAt
+            }
+        }
+
+        return productPersistenceMapper.toDomain(
+            productJpaRepository.saveAndFlush(entity),
+        )
     }
 
     override fun existsByCode(code: String): Boolean = productJpaRepository.existsByCode(code)

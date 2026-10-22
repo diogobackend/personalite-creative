@@ -8,6 +8,8 @@ import java.util.UUID
 interface ProductRepositoryOutputPort {
     fun save(product: Product): Product
 
+    fun update(product: Product): Product
+
     fun findAll(filter: GetProductsFilter): ProductsPage
 
     fun existsByCode(code: String): Boolean

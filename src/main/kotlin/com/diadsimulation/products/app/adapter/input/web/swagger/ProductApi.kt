@@ -2,6 +2,7 @@ package com.diadsimulation.products.app.adapter.input.web.swagger
 
 import com.diadsimulation.auth.app.adapter.input.web.exception.ApiErrorResponse
 import com.diadsimulation.products.app.adapter.input.web.dtos.requests.CreateProductRequest
+import com.diadsimulation.products.app.adapter.input.web.dtos.requests.UpdateProductRequest
 import com.diadsimulation.products.app.adapter.input.web.dtos.responses.ProductResponse
 import com.diadsimulation.products.app.adapter.input.web.dtos.responses.ProductsPageResponse
 import com.diadsimulation.products.core.domain.enums.FeeChargeType
@@ -232,5 +233,51 @@ interface ProductApi {
     )
     fun getProductById(
         @PathVariable productId: UUID,
+    ): ResponseEntity<ProductResponse>
+
+    @Operation(
+        summary = "Atualizar produto",
+        description =
+            "Atualiza parcialmente os dados do produto, suas faixas de preço e taxas. " +
+                "Campos não informados permanecem inalterados. " +
+                "O código comercial não pode ser alterado.",
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Produto atualizado com sucesso",
+                content = [
+                    Content(
+                        mediaType = "application/json",
+                        schema = Schema(implementation = ProductResponse::class),
+                    ),
+                ],
+            ),
+            ApiResponse(
+                responseCode = "400",
+                description = "Dados inválidos",
+                content = [
+                    Content(
+                        mediaType = "application/json",
+                        schema = Schema(implementation = ApiErrorResponse::class),
+                    ),
+                ],
+            ),
+            ApiResponse(
+                responseCode = "404",
+                description = "Produto não encontrado",
+                content = [
+                    Content(
+                        mediaType = "application/json",
+                        schema = Schema(implementation = ApiErrorResponse::class),
+                    ),
+                ],
+            ),
+        ],
+    )
+    fun updateProduct(
+        @PathVariable productId: UUID,
+        @Valid @RequestBody request: UpdateProductRequest,
     ): ResponseEntity<ProductResponse>
 }

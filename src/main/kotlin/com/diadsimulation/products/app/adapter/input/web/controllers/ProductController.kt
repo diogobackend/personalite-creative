@@ -2,6 +2,7 @@
 package com.diadsimulation.products.app.adapter.input.web.controllers
 
 import com.diadsimulation.products.app.adapter.input.web.dtos.requests.CreateProductRequest
+import com.diadsimulation.products.app.adapter.input.web.dtos.requests.UpdateProductRequest
 import com.diadsimulation.products.app.adapter.input.web.dtos.responses.ProductResponse
 import com.diadsimulation.products.app.adapter.input.web.dtos.responses.ProductsPageResponse
 import com.diadsimulation.products.app.adapter.input.web.mappers.ProductWebMapper
@@ -13,9 +14,11 @@ import com.diadsimulation.products.core.domain.model.GetProductsFilter
 import com.diadsimulation.products.core.port.input.CreateProductInputPort
 import com.diadsimulation.products.core.port.input.GetProductByIdInputPort
 import com.diadsimulation.products.core.port.input.GetProductsInputPort
+import com.diadsimulation.products.core.port.input.UpdateProductInputPort
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -30,6 +33,7 @@ class ProductController(
     private val getProductsInputPort: GetProductsInputPort,
     private val productWebMapper: ProductWebMapper,
     private val getProductByIdInputPort: GetProductByIdInputPort,
+    private val updateProductInputPort: UpdateProductInputPort,
 ) : ProductApi {
     @PostMapping
     override fun create(request: CreateProductRequest): ResponseEntity<ProductResponse> {
@@ -107,6 +111,24 @@ class ProductController(
 
         return ResponseEntity.ok(
             productWebMapper.toResponse(product),
+        )
+    }
+
+    @PatchMapping("/{productId}")
+    override fun updateProduct(
+        productId: UUID,
+        request: UpdateProductRequest,
+    ): ResponseEntity<ProductResponse> {
+        val command = productWebMapper.toCommand(request)
+
+        val updatedProduct =
+            updateProductInputPort.execute(
+                productId = productId,
+                request = command,
+            )
+
+        return ResponseEntity.ok(
+            productWebMapper.toResponse(updatedProduct),
         )
     }
 }
