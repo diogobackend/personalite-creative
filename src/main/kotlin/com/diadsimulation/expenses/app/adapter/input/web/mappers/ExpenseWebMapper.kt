@@ -10,6 +10,7 @@ import com.diadsimulation.expenses.core.domain.model.ExpenseProduct
 import com.diadsimulation.expenses.core.domain.model.ExpensesPage
 import com.diadsimulation.expenses.core.domain.model.GetExpensesFilter
 import org.springframework.stereotype.Component
+import java.time.OffsetDateTime.now
 
 @Component
 class ExpenseWebMapper {
@@ -30,6 +31,7 @@ class ExpenseWebMapper {
                     )
                 },
             expenseDate = request.expenseDate,
+            createdAt = request.createdAt ?: now(),
         )
 
     fun toFilter(request: GetExpensesRequest): GetExpensesFilter =

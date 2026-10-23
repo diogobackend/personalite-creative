@@ -10,8 +10,11 @@ import jakarta.validation.constraints.DecimalMin
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Size
+import org.springframework.format.annotation.DateTimeFormat
+import org.springframework.format.annotation.DateTimeFormat.ISO.DATE_TIME
 import java.math.BigDecimal
 import java.time.LocalDate
+import java.time.OffsetDateTime
 import java.util.Collections.emptyList
 
 data class CreateExpenseRequest(
@@ -29,4 +32,6 @@ data class CreateExpenseRequest(
     @field:Valid
     val products: List<ExpenseProductRequest> = emptyList(),
     val expenseDate: LocalDate,
+    @field:DateTimeFormat(iso = DATE_TIME)
+    val createdAt: OffsetDateTime? = null,
 )
