@@ -175,4 +175,10 @@ class GlobalExceptionHandler {
             message = exception.message ?: "Produto não encontrado",
             request = request,
         )
+
+    @ExceptionHandler(NoSuchElementException::class)
+    fun handleNotFound(exception: NoSuchElementException): ResponseEntity<Map<String, String>> =
+        ResponseEntity
+            .status(HttpStatus.NOT_FOUND)
+            .body(mapOf("message" to (exception.message ?: "Recurso não encontrado")))
 }
