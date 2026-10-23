@@ -8,6 +8,7 @@ import org.springframework.data.jpa.domain.Specification
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.OffsetDateTime
+import java.time.ZoneOffset.UTC
 import java.util.UUID
 
 object ExpenseSpecifications {
@@ -103,6 +104,20 @@ object ExpenseSpecifications {
                         root.get("expenseDate"),
                         it,
                     )
+            }
+
+            filter.createdAt?.let { date ->
+                predicates.add(
+                    cb.between(
+                        root.get("createdAt"),
+                        date.atStartOfDay().atOffset(UTC),
+                        date
+                            .plusDays(1)
+                            .atStartOfDay()
+                            .atOffset(UTC)
+                            .minusNanos(1),
+                    ),
+                )
             }
 
             filter.expenseDateTo?.let {

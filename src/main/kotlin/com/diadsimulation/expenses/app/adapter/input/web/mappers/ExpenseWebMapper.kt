@@ -53,6 +53,7 @@ class ExpenseWebMapper {
             createdTo = request.createdTo,
             updatedFrom = request.updatedFrom,
             updatedTo = request.updatedTo,
+            createdAt = request.createdAt,
             page = request.page,
             size = request.size,
             sortBy = request.sortBy,

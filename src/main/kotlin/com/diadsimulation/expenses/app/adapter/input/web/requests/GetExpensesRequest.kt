@@ -30,6 +30,8 @@ data class GetExpensesRequest(
     val expenseDateFrom: LocalDate? = null,
     @field:DateTimeFormat(iso = DATE)
     val expenseDateTo: LocalDate? = null,
+    @field:DateTimeFormat(iso = DATE)
+    val createdAt: LocalDate? = null,
     @field:DateTimeFormat(iso = DATE_TIME)
     val createdFrom: OffsetDateTime? = null,
     @field:DateTimeFormat(iso = DATE_TIME)

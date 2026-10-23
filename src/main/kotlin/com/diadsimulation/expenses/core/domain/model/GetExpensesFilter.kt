@@ -24,6 +24,7 @@ data class GetExpensesFilter(
     val expenseDate: LocalDate? = null,
     val expenseDateFrom: LocalDate? = null,
     val expenseDateTo: LocalDate? = null,
+    val createdAt: LocalDate? = null,
     val createdFrom: OffsetDateTime? = null,
     val createdTo: OffsetDateTime? = null,
     val updatedFrom: OffsetDateTime? = null,
