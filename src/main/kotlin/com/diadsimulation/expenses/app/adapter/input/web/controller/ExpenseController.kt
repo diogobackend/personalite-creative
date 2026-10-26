@@ -11,7 +11,7 @@ import com.diadsimulation.expenses.core.ports.input.CreateExpenseInputPort
 import com.diadsimulation.expenses.core.ports.input.GetExpenseByIdInputPort
 import com.diadsimulation.expenses.core.ports.input.GetExpensesInputPort
 import com.diadsimulation.expenses.core.ports.input.UpdateExpenseInputPort
-import com.fasterxml.jackson.databind.JsonNode
+import tools.jackson.databind.JsonNode
 import jakarta.validation.Validator
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.http.ResponseEntity
