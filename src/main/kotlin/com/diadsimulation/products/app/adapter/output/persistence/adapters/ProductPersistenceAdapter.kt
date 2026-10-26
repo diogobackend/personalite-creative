@@ -269,4 +269,16 @@ class ProductPersistenceAdapter(
 
             criteriaBuilder.conjunction()
         }
+
+    @Transactional
+    override fun deleteById(id: UUID) {
+        val product =
+            productJpaRepository
+                .findById(id)
+                .orElseThrow {
+                    ProductNotFoundException(id)
+                }
+
+        productJpaRepository.delete(product)
+    }
 }

@@ -47,12 +47,17 @@ class UserAccessAuthorization(
                 userRepositoryOutputPort.findById(userId)
                     ?: throw AccessDeniedException(ACCESS_DENIED)
 
-            if (targetUser.role == CANDIDATE) return
+            if (targetUser.role != PLATFORM_ADMIN) return
 
             throw AccessDeniedException(ACCESS_DENIED)
         }
 
-        if (authenticatedUserId != userId) {
+        val isCandidate =
+            authentication.authorities.any {
+                it.authority == "ROLE_${CANDIDATE.name}"
+            }
+
+        if (!isCandidate || authenticatedUserId != userId) {
             throw AccessDeniedException(ACCESS_DENIED)
         }
     }
@@ -86,6 +91,6 @@ class UserAccessAuthorization(
             authentication.principal as? UUID
                 ?: throw AccessDeniedException(ACCESS_DENIED)
 
-        return CANDIDATE to authenticatedUserId
+        return PLATFORM_ADMIN to authenticatedUserId
     }
 }

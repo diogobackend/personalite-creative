@@ -280,4 +280,28 @@ interface ProductApi {
         @PathVariable productId: UUID,
         @Valid @RequestBody request: UpdateProductRequest,
     ): ResponseEntity<ProductResponse>
+
+    @Operation(
+        summary = "Excluir produto",
+        description = "Exclui permanentemente um produto pelo ID.",
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "204",
+                description = "Produto excluído com sucesso",
+            ),
+            ApiResponse(
+                responseCode = "404",
+                description = "Produto não encontrado",
+            ),
+            ApiResponse(
+                responseCode = "409",
+                description = "Produto vinculado a outros registros",
+            ),
+        ],
+    )
+    fun deleteProduct(
+        @PathVariable productId: UUID,
+    ): ResponseEntity<Void>
 }

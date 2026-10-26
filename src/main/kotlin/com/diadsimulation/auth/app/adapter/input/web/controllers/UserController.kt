@@ -118,7 +118,6 @@ class UserController(
                 cpf = request.cpf,
                 rg = request.rg,
             )
-        userAccessAuthorization.authorize(user.userId)
         return ResponseEntity.ok(
             FindUserMapper.toResponse(user),
         )

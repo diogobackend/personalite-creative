@@ -66,11 +66,11 @@ class UserPersistenceAdapter(
             Specification<UserEntity> { root, _, builder ->
                 val predicates = mutableListOf<Predicate>()
 
-                if (criteria.allowedRole != null && criteria.allowedUserId != null) {
+                if (criteria.allowedRole != null) {
                     predicates.add(
-                        builder.or(
-                            builder.equal(root.get<UserRole>("role"), criteria.allowedRole),
-                            builder.equal(root.get<UUID>("userId"), criteria.allowedUserId),
+                        builder.notEqual(
+                            root.get<UserRole>("role"),
+                            criteria.allowedRole,
                         ),
                     )
                 }

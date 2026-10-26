@@ -12,11 +12,13 @@ import com.diadsimulation.products.core.domain.enums.PricingType
 import com.diadsimulation.products.core.domain.enums.ProductCategory
 import com.diadsimulation.products.core.domain.model.GetProductsFilter
 import com.diadsimulation.products.core.port.input.CreateProductInputPort
+import com.diadsimulation.products.core.port.input.DeleteProductInputPort
 import com.diadsimulation.products.core.port.input.GetProductByIdInputPort
 import com.diadsimulation.products.core.port.input.GetProductsInputPort
 import com.diadsimulation.products.core.port.input.UpdateProductInputPort
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PostMapping
@@ -34,6 +36,7 @@ class ProductController(
     private val productWebMapper: ProductWebMapper,
     private val getProductByIdInputPort: GetProductByIdInputPort,
     private val updateProductInputPort: UpdateProductInputPort,
+    private val deleteProductInputPort: DeleteProductInputPort,
 ) : ProductApi {
     @PostMapping
     override fun create(request: CreateProductRequest): ResponseEntity<ProductResponse> {
@@ -130,5 +133,12 @@ class ProductController(
         return ResponseEntity.ok(
             productWebMapper.toResponse(updatedProduct),
         )
+    }
+
+    @DeleteMapping("/{productId}")
+    override fun deleteProduct(productId: UUID): ResponseEntity<Void> {
+        deleteProductInputPort.execute(productId)
+
+        return ResponseEntity.noContent().build()
     }
 }

@@ -8,12 +8,14 @@ import com.diadsimulation.expenses.app.adapter.input.web.responses.ExpenseRespon
 import com.diadsimulation.expenses.app.adapter.input.web.responses.ExpensesPageResponse
 import com.diadsimulation.expenses.app.adapter.input.web.swagger.ExpenseApi
 import com.diadsimulation.expenses.core.ports.input.CreateExpenseInputPort
+import com.diadsimulation.expenses.core.ports.input.DeleteExpenseInputPort
 import com.diadsimulation.expenses.core.ports.input.GetExpenseByIdInputPort
 import com.diadsimulation.expenses.core.ports.input.GetExpensesInputPort
 import com.diadsimulation.expenses.core.ports.input.UpdateExpenseInputPort
 import jakarta.validation.Validator
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.ModelAttribute
 import org.springframework.web.bind.annotation.PatchMapping
@@ -34,6 +36,7 @@ class ExpenseController(
     private val updateExpenseInputPort: UpdateExpenseInputPort,
     private val objectMapper: ObjectMapper,
     private val validator: Validator,
+    private val deleteExpenseInputPort: DeleteExpenseInputPort,
 ) : ExpenseApi {
     @PostMapping
     override fun create(request: CreateExpenseRequest): ResponseEntity<ExpenseResponse> {
@@ -120,5 +123,12 @@ class ExpenseController(
         return ResponseEntity.ok(
             expenseWebMapper.toResponse(updatedExpense),
         )
+    }
+
+    @DeleteMapping("/{id}")
+    override fun delete(id: UUID): ResponseEntity<Void> {
+        deleteExpenseInputPort.execute(id)
+
+        return ResponseEntity.noContent().build()
     }
 }

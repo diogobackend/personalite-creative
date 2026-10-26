@@ -12,6 +12,7 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
+import java.util.NoSuchElementException
 import java.util.UUID
 
 @Component
@@ -137,5 +138,19 @@ class ExpensePersistenceAdapter(
             totalElementsThisPage = result.numberOfElements,
             totalPages = result.totalPages,
         )
+    }
+
+    @Transactional
+    override fun deleteById(id: UUID) {
+        val expense =
+            expenseJpaRepository
+                .findById(id)
+                .orElseThrow {
+                    NoSuchElementException(
+                        "Despesa não encontrada para o ID: $id",
+                    )
+                }
+
+        expenseJpaRepository.delete(expense)
     }
 }

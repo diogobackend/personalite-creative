@@ -62,16 +62,16 @@ class SecurityConfiguration(
                     .hasAnyRole(
                         SCHOOL_ADMIN.name,
                         PLATFORM_ADMIN.name,
-                    ).requestMatchers(POST, "/products")
+                    ).requestMatchers("/products", "/products/**")
                     .hasAnyRole(
                         SCHOOL_ADMIN.name,
                         PLATFORM_ADMIN.name,
-                    ).requestMatchers(GET, "/products")
+                    ).requestMatchers("/expenses", "/expenses/**")
                     .hasAnyRole(
                         SCHOOL_ADMIN.name,
                         PLATFORM_ADMIN.name,
                     ).anyRequest()
-                    .authenticated()
+                    .hasRole(PLATFORM_ADMIN.name)
             }.addFilterBefore(
                 jwtAuthenticationFilter,
                 UsernamePasswordAuthenticationFilter::class.java,

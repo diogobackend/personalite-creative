@@ -13,4 +13,6 @@ interface ExpenseRepositoryOutputPort {
     fun findByProductId(productId: UUID): List<Expense>
 
     fun findAll(filter: GetExpensesFilter): ExpensesPage
+
+    fun deleteById(id: UUID)
 }

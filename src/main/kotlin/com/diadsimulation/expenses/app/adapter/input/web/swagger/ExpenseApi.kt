@@ -90,4 +90,24 @@ interface ExpenseApi {
         @PathVariable id: UUID,
         @RequestBody request: JsonNode,
     ): ResponseEntity<ExpenseResponse>
+
+    @Operation(
+        summary = "Excluir despesa",
+        description = "Exclui permanentemente uma despesa pelo ID.",
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "204",
+                description = "Despesa excluída com sucesso",
+            ),
+            ApiResponse(
+                responseCode = "404",
+                description = "Despesa não encontrada",
+            ),
+        ],
+    )
+    fun delete(
+        @PathVariable id: UUID,
+    ): ResponseEntity<Void>
 }

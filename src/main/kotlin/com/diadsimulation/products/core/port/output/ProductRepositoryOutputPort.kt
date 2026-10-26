@@ -17,4 +17,6 @@ interface ProductRepositoryOutputPort {
     fun findByCode(code: String): Product?
 
     fun findById(id: UUID): Product?
+
+    fun deleteById(id: UUID)
 }

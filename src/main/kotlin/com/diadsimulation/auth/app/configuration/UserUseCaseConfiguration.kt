@@ -1,5 +1,6 @@
 package com.diadsimulation.auth.app.configuration
 
+import com.diadsimulation.auth.app.adapter.input.web.security.UserAccessAuthorization
 import com.diadsimulation.auth.core.port.input.AuthenticateUserInputPort
 import com.diadsimulation.auth.core.port.input.DeleteUserInputPort
 import com.diadsimulation.auth.core.port.input.FindUserInputPort
@@ -33,8 +34,14 @@ class UserUseCaseConfiguration {
         ListUsersUseCaseImplementation(userRepositoryOutputPort)
 
     @Bean
-    fun findUserUseCase(userRepositoryOutputPort: UserRepositoryOutputPort): FindUserInputPort =
-        FindUserUseCaseImplementation(userRepositoryOutputPort)
+    fun findUserUseCase(
+        userRepositoryOutputPort: UserRepositoryOutputPort,
+        userAccessAuthorization: UserAccessAuthorization,
+    ): FindUserInputPort =
+        FindUserUseCaseImplementation(
+            userRepositoryOutputPort,
+            userAccessAuthorization,
+        )
 
     @Bean
     fun updateUserUseCase(
