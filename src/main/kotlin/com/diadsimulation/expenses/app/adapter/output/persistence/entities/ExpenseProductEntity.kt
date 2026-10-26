@@ -32,5 +32,5 @@ class ExpenseProductEntity(
         precision = 15,
         scale = 2,
     )
-    val allocatedValue: BigDecimal,
+    var allocatedValue: BigDecimal,
 )

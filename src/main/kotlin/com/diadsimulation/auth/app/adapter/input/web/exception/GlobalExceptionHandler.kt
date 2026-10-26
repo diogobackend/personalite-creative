@@ -10,6 +10,7 @@ import com.diadsimulation.auth.core.common.Messages.REQUEST_CONFLICT
 import com.diadsimulation.auth.core.common.Messages.USER_NOT_FOUND
 import com.diadsimulation.auth.core.domain.exceptions.UserAlreadyExistsException
 import com.diadsimulation.products.core.domain.exceptions.ProductNotFoundException
+import com.fasterxml.jackson.core.JsonProcessingException
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.BAD_REQUEST
@@ -173,6 +174,17 @@ class GlobalExceptionHandler {
         buildResponse(
             status = NOT_FOUND,
             message = exception.message ?: "Produto não encontrado",
+            request = request,
+        )
+
+    @ExceptionHandler(JsonProcessingException::class)
+    fun handleJsonProcessing(
+        exception: JsonProcessingException,
+        request: HttpServletRequest,
+    ): ResponseEntity<ApiErrorResponse> =
+        buildResponse(
+            status = BAD_REQUEST,
+            message = INVALID_REQUEST_DATA,
             request = request,
         )
 }

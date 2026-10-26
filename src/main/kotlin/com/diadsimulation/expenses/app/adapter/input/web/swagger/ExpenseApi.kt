@@ -4,6 +4,7 @@ import com.diadsimulation.expenses.app.adapter.input.web.requests.CreateExpenseR
 import com.diadsimulation.expenses.app.adapter.input.web.requests.GetExpensesRequest
 import com.diadsimulation.expenses.app.adapter.input.web.responses.ExpenseResponse
 import com.diadsimulation.expenses.app.adapter.input.web.responses.ExpensesPageResponse
+import com.fasterxml.jackson.databind.JsonNode
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
@@ -63,5 +64,30 @@ interface ExpenseApi {
     )
     fun findById(
         @PathVariable id: UUID,
+    ): ResponseEntity<ExpenseResponse>
+
+    @Operation(
+        summary = "Atualizar despesa",
+        description = "Atualiza parcialmente uma despesa, incluindo seus dados e alocações de produtos.",
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Despesa atualizada com sucesso",
+            ),
+            ApiResponse(
+                responseCode = "400",
+                description = "Dados inválidos",
+            ),
+            ApiResponse(
+                responseCode = "404",
+                description = "Despesa não encontrada",
+            ),
+        ],
+    )
+    fun update(
+        @PathVariable id: UUID,
+        @RequestBody request: JsonNode,
     ): ResponseEntity<ExpenseResponse>
 }

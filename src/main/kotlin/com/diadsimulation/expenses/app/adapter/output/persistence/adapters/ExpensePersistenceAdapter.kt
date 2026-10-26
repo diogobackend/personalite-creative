@@ -1,5 +1,6 @@
 package com.diadsimulation.expenses.app.adapter.output.persistence.adapters
 
+import com.diadsimulation.expenses.app.adapter.output.persistence.entities.ExpenseProductEntity
 import com.diadsimulation.expenses.app.adapter.output.persistence.mappers.ExpensePersistenceMapper
 import com.diadsimulation.expenses.app.adapter.output.persistence.repositories.ExpenseJpaRepository
 import com.diadsimulation.expenses.app.adapter.output.persistence.specifications.ExpenseSpecifications
@@ -20,10 +21,60 @@ class ExpensePersistenceAdapter(
 ) : ExpenseRepositoryOutputPort {
     @Transactional
     override fun save(expense: Expense): Expense {
-        val entity = expensePersistenceMapper.toEntity(expense)
-        val savedEntity = expenseJpaRepository.save(entity)
+        val existingEntity = expenseJpaRepository.findById(expense.id).orElse(null)
 
-        return expensePersistenceMapper.toDomain(savedEntity)
+        if (existingEntity == null) {
+            return expensePersistenceMapper.toDomain(
+                expenseJpaRepository.save(
+                    expensePersistenceMapper.toEntity(expense),
+                ),
+            )
+        }
+
+        existingEntity.apply {
+            name = expense.name
+            description = expense.description
+            value = expense.value
+            category = expense.category
+            allocationType = expense.allocationType
+            status = expense.status
+            quantity = expense.quantity
+            expenseDate = expense.expenseDate
+            updatedAt = expense.updatedAt
+        }
+
+        val updatedProducts = expense.products.associateBy { it.productId }
+
+        existingEntity.products.removeIf { product ->
+            product.productId !in updatedProducts
+        }
+
+        expense.products.forEach { product ->
+            val existingProduct =
+                existingEntity.products.find {
+                    it.productId == product.productId
+                }
+
+            when {
+                existingProduct == null -> {
+                    existingEntity.products.add(
+                        ExpenseProductEntity(
+                            expense = existingEntity,
+                            productId = product.productId,
+                            allocatedValue = product.allocatedValue,
+                        ),
+                    )
+                }
+
+                existingProduct.allocatedValue.compareTo(product.allocatedValue) != 0 -> {
+                    existingProduct.allocatedValue = product.allocatedValue
+                }
+            }
+        }
+
+        return expensePersistenceMapper.toDomain(
+            expenseJpaRepository.save(existingEntity),
+        )
     }
 
     @Transactional(readOnly = true)
