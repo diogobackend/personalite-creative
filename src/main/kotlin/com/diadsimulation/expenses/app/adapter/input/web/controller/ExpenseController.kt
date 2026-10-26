@@ -11,7 +11,6 @@ import com.diadsimulation.expenses.core.ports.input.CreateExpenseInputPort
 import com.diadsimulation.expenses.core.ports.input.GetExpenseByIdInputPort
 import com.diadsimulation.expenses.core.ports.input.GetExpensesInputPort
 import com.diadsimulation.expenses.core.ports.input.UpdateExpenseInputPort
-import tools.jackson.databind.JsonNode
 import jakarta.validation.Validator
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.http.ResponseEntity
@@ -21,6 +20,7 @@ import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import tools.jackson.databind.JsonNode
 import tools.jackson.databind.ObjectMapper
 import java.util.UUID
 
@@ -87,7 +87,7 @@ class ExpenseController(
                 "expenseDate",
             )
 
-        val fieldsPresent = request.fieldNames().asSequence().toSet()
+        val fieldsPresent = request.properties().map { it.key }.toSet()
 
         require(fieldsPresent.all { it in allowedFields }) {
             "A requisição contém campos não permitidos."

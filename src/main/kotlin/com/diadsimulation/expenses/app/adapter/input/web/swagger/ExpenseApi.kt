@@ -4,7 +4,6 @@ import com.diadsimulation.expenses.app.adapter.input.web.requests.CreateExpenseR
 import com.diadsimulation.expenses.app.adapter.input.web.requests.GetExpensesRequest
 import com.diadsimulation.expenses.app.adapter.input.web.responses.ExpenseResponse
 import com.diadsimulation.expenses.app.adapter.input.web.responses.ExpensesPageResponse
-import com.fasterxml.jackson.databind.JsonNode
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
@@ -14,6 +13,7 @@ import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestBody
+import tools.jackson.databind.JsonNode
 import java.util.UUID
 
 @Tag(name = "Expenses", description = "Gerenciamento de despesas")
