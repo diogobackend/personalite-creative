@@ -8,7 +8,7 @@ import com.diadsimulation.inventory.core.ports.output.InventoryMovementRepositor
 import com.diadsimulation.inventory.core.ports.output.InventoryRepositoryOutputPort
 import org.springframework.transaction.annotation.Transactional
 
-class RegisterInventoryUseCaseImplementation(
+open class RegisterInventoryUseCaseImplementation(
     private val inventoryRepositoryOutputPort: InventoryRepositoryOutputPort,
     private val inventoryMovementRepositoryOutputPort: InventoryMovementRepositoryOutputPort,
 ) : RegisterInventoryInputPort {
