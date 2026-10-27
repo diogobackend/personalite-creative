@@ -7,6 +7,7 @@ import com.diadsimulation.inventory.app.adapter.input.web.swagger.InventoryApi
 import com.diadsimulation.inventory.core.domain.enums.InventorySize
 import com.diadsimulation.inventory.core.domain.enums.InventoryUnit
 import com.diadsimulation.inventory.core.domain.model.GetInventoryFilter
+import com.diadsimulation.inventory.core.ports.input.GetInventoryByIdInputPort
 import com.diadsimulation.inventory.core.ports.input.GetInventoryInputPort
 import com.diadsimulation.inventory.core.ports.input.RegisterInventoryInputPort
 import com.diadsimulation.products.core.domain.enums.ProductCategory
@@ -15,12 +16,14 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import java.time.LocalDate
+import java.util.UUID
 
 @RestController
 @RequestMapping("/inventory")
 class InventoryController(
     private val registerInventoryInputPort: RegisterInventoryInputPort,
     private val getInventoryInputPort: GetInventoryInputPort,
+    private val getInventoryByIdInputPort: GetInventoryByIdInputPort,
 ) : InventoryApi {
     override fun register(request: RegisterInventoryRequest): ResponseEntity<RegisterInventoryResponse> {
         val inventory = RegisterInventoryMapper.toDomain(request)
@@ -88,6 +91,14 @@ class InventoryController(
                 totalElementsThisPage = result.totalElementsThisPage,
                 totalPages = result.totalPages,
             ),
+        )
+    }
+
+    override fun getInventoryById(id: UUID): ResponseEntity<RegisterInventoryResponse> {
+        val inventory = getInventoryByIdInputPort.execute(id)
+
+        return ResponseEntity.ok(
+            RegisterInventoryMapper.toResponse(inventory),
         )
     }
 }

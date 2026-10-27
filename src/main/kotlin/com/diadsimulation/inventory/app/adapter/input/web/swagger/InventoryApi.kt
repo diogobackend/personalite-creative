@@ -8,16 +8,19 @@ import com.diadsimulation.inventory.core.domain.enums.InventoryUnit
 import com.diadsimulation.products.core.domain.enums.ProductCategory
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.format.annotation.DateTimeFormat.ISO.DATE
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestParam
 import java.time.LocalDate
+import java.util.UUID
 
 @Tag(
     name = "Inventory",
@@ -103,4 +106,20 @@ interface InventoryApi {
         @RequestParam(defaultValue = "ASC")
         sortDirection: String,
     ): ResponseEntity<InventoryPageResponse>
+
+    @Operation(
+        summary = "Consultar item do estoque por ID",
+        description = "Retorna os dados completos de um item do estoque pelo seu identificador.",
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "Item encontrado"),
+            ApiResponse(responseCode = "400", description = "ID inválido"),
+            ApiResponse(responseCode = "404", description = "Item não encontrado"),
+        ],
+    )
+    @GetMapping("/{id}")
+    fun getInventoryById(
+        @PathVariable id: UUID,
+    ): ResponseEntity<RegisterInventoryResponse>
 }
