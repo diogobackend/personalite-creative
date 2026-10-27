@@ -70,6 +70,10 @@ class SecurityConfiguration(
                     .hasAnyRole(
                         SCHOOL_ADMIN.name,
                         PLATFORM_ADMIN.name,
+                    ).requestMatchers("/inventory", "/inventory/**")
+                    .hasAnyRole(
+                        SCHOOL_ADMIN.name,
+                        PLATFORM_ADMIN.name,
                     ).anyRequest()
                     .hasRole(PLATFORM_ADMIN.name)
             }.addFilterBefore(

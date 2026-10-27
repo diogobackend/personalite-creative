@@ -1,4 +1,4 @@
-package com.diadsimulation.expenses.app.adapter.config
+package com.diadsimulation.expenses.app.config
 
 import com.diadsimulation.expenses.core.ports.input.CreateExpenseInputPort
 import com.diadsimulation.expenses.core.ports.input.DeleteExpenseInputPort
