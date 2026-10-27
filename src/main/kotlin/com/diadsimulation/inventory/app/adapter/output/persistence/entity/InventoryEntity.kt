@@ -1,7 +1,12 @@
 package com.diadsimulation.inventory.app.adapter.output.persistence.entity
 
+import com.diadsimulation.inventory.core.domain.enums.InventorySize
+import com.diadsimulation.inventory.core.domain.enums.InventoryUnit
+import com.diadsimulation.products.core.domain.enums.ProductCategory
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
+import jakarta.persistence.EnumType.STRING
+import jakarta.persistence.Enumerated
 import jakarta.persistence.Id
 import jakarta.persistence.Table
 import jakarta.persistence.UniqueConstraint
@@ -24,8 +29,9 @@ class InventoryEntity(
     val inventoryId: UUID,
     @Column(name = "name", nullable = false)
     var name: String,
+    @Enumerated(STRING)
     @Column(name = "category", nullable = false)
-    var category: String,
+    var category: ProductCategory,
     @Column(name = "description", columnDefinition = "TEXT")
     var description: String?,
     @Column(name = "product_id")
@@ -34,12 +40,14 @@ class InventoryEntity(
     var quantity: Int,
     @Column(name = "minimum_quantity")
     var minimumQuantity: Int?,
-    @Column(name = "unit", nullable = false)
-    var unit: String,
+    @Enumerated(STRING)
+    @Column(name = "unit")
+    var unit: InventoryUnit?,
     @Column(name = "color")
     var color: String?,
+    @Enumerated(STRING)
     @Column(name = "size")
-    var size: String?,
+    var size: InventorySize?,
     @Column(name = "material")
     var material: String?,
     @Column(name = "brand")

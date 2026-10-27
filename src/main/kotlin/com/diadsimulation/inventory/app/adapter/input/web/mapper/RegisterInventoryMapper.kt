@@ -1,7 +1,7 @@
 package com.diadsimulation.inventory.app.adapter.input.web.mapper
 
-import com.diadsimulation.inventory.app.adapter.input.web.request.RegisterInventoryRequest
-import com.diadsimulation.inventory.app.adapter.input.web.response.RegisterInventoryResponse
+import com.diadsimulation.inventory.app.adapter.input.web.dtos.request.RegisterInventoryRequest
+import com.diadsimulation.inventory.app.adapter.input.web.dtos.response.RegisterInventoryResponse
 import com.diadsimulation.inventory.core.domain.model.Inventory
 
 object RegisterInventoryMapper {
@@ -13,7 +13,7 @@ object RegisterInventoryMapper {
             productId = request.productId,
             quantity = request.quantity,
             minimumQuantity = request.minimumQuantity,
-            unit = request.unit.toString(),
+            unit = request.unit,
             color = request.color,
             size = request.size,
             material = request.material,
