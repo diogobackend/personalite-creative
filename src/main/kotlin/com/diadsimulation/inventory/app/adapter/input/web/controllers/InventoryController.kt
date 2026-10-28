@@ -1,5 +1,6 @@
 package com.diadsimulation.inventory.app.adapter.input.web.controllers
 import com.diadsimulation.inventory.app.adapter.input.web.dtos.request.RegisterInventoryRequest
+import com.diadsimulation.inventory.app.adapter.input.web.dtos.request.UpdateInventoryRequest
 import com.diadsimulation.inventory.app.adapter.input.web.dtos.response.InventoryPageResponse
 import com.diadsimulation.inventory.app.adapter.input.web.dtos.response.RegisterInventoryResponse
 import com.diadsimulation.inventory.app.adapter.input.web.mapper.RegisterInventoryMapper
@@ -7,9 +8,11 @@ import com.diadsimulation.inventory.app.adapter.input.web.swagger.InventoryApi
 import com.diadsimulation.inventory.core.domain.enums.InventorySize
 import com.diadsimulation.inventory.core.domain.enums.InventoryUnit
 import com.diadsimulation.inventory.core.domain.model.GetInventoryFilter
+import com.diadsimulation.inventory.core.domain.model.UpdateInventory
 import com.diadsimulation.inventory.core.ports.input.GetInventoryByIdInputPort
 import com.diadsimulation.inventory.core.ports.input.GetInventoryInputPort
 import com.diadsimulation.inventory.core.ports.input.RegisterInventoryInputPort
+import com.diadsimulation.inventory.core.ports.input.UpdateInventoryInputPort
 import com.diadsimulation.products.core.domain.enums.ProductCategory
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.http.ResponseEntity
@@ -24,6 +27,7 @@ class InventoryController(
     private val registerInventoryInputPort: RegisterInventoryInputPort,
     private val getInventoryInputPort: GetInventoryInputPort,
     private val getInventoryByIdInputPort: GetInventoryByIdInputPort,
+    private val updateInventoryInputPort: UpdateInventoryInputPort,
 ) : InventoryApi {
     override fun register(request: RegisterInventoryRequest): ResponseEntity<RegisterInventoryResponse> {
         val inventory = RegisterInventoryMapper.toDomain(request)
@@ -99,6 +103,32 @@ class InventoryController(
 
         return ResponseEntity.ok(
             RegisterInventoryMapper.toResponse(inventory),
+        )
+    }
+
+    override fun updateInventory(
+        id: UUID,
+        request: UpdateInventoryRequest,
+    ): ResponseEntity<RegisterInventoryResponse> {
+        val update =
+            UpdateInventory(
+                name = request.name,
+                category = request.category,
+                description = request.description,
+                quantity = request.quantity,
+                minimumQuantity = request.minimumQuantity,
+                unit = request.unit,
+                color = request.color,
+                size = request.size,
+                material = request.material,
+                brand = request.brand,
+                model = request.model,
+            )
+
+        val updatedInventory = updateInventoryInputPort.execute(id, update)
+
+        return ResponseEntity.ok(
+            RegisterInventoryMapper.toResponse(updatedInventory),
         )
     }
 }

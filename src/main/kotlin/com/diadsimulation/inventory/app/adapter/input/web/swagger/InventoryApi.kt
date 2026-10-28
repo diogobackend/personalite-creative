@@ -1,6 +1,7 @@
 package com.diadsimulation.inventory.app.adapter.input.web.swagger
 
 import com.diadsimulation.inventory.app.adapter.input.web.dtos.request.RegisterInventoryRequest
+import com.diadsimulation.inventory.app.adapter.input.web.dtos.request.UpdateInventoryRequest
 import com.diadsimulation.inventory.app.adapter.input.web.dtos.response.InventoryPageResponse
 import com.diadsimulation.inventory.app.adapter.input.web.dtos.response.RegisterInventoryResponse
 import com.diadsimulation.inventory.core.domain.enums.InventorySize
@@ -15,6 +16,7 @@ import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.format.annotation.DateTimeFormat.ISO.DATE
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -121,5 +123,22 @@ interface InventoryApi {
     @GetMapping("/{id}")
     fun getInventoryById(
         @PathVariable id: UUID,
+    ): ResponseEntity<RegisterInventoryResponse>
+
+    @Operation(
+        summary = "Atualizar item do estoque",
+        description = "Atualiza parcialmente um item, preservando os campos não informados.",
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "Item atualizado com sucesso"),
+            ApiResponse(responseCode = "400", description = "Dados inválidos"),
+            ApiResponse(responseCode = "404", description = "Item não encontrado"),
+        ],
+    )
+    @PatchMapping("/{id}")
+    fun updateInventory(
+        @PathVariable id: UUID,
+        @RequestBody request: UpdateInventoryRequest,
     ): ResponseEntity<RegisterInventoryResponse>
 }
