@@ -12,7 +12,7 @@ import com.diadsimulation.expenses.core.ports.output.ProductExpenseValidationOut
 import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal.ZERO
 
-class CreateExpenseUseCaseImplementation(
+open class CreateExpenseUseCaseImplementation(
     private val expenseRepositoryOutputPort: ExpenseRepositoryOutputPort,
     private val productExpenseValidationOutputPort: ProductExpenseValidationOutputPort,
     private val expenseStockOutputPort: ExpenseStockOutputPort,
