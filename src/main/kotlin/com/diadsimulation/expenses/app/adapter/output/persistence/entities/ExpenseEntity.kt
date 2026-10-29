@@ -22,6 +22,8 @@ class ExpenseEntity(
     @Id
     @Column(nullable = false, updatable = false)
     val id: UUID = UUID.randomUUID(),
+    @Column(name = "inventory_id")
+    var inventoryId: UUID? = null,
     @Column(nullable = false, length = 150)
     var name: String,
     @Column(columnDefinition = "TEXT")

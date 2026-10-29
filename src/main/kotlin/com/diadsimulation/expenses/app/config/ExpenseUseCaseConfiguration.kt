@@ -6,6 +6,7 @@ import com.diadsimulation.expenses.core.ports.input.GetExpenseByIdInputPort
 import com.diadsimulation.expenses.core.ports.input.GetExpensesInputPort
 import com.diadsimulation.expenses.core.ports.input.UpdateExpenseInputPort
 import com.diadsimulation.expenses.core.ports.output.ExpenseRepositoryOutputPort
+import com.diadsimulation.expenses.core.ports.output.ExpenseStockOutputPort
 import com.diadsimulation.expenses.core.ports.output.ProductExpenseValidationOutputPort
 import com.diadsimulation.expenses.core.usecase.CreateExpenseUseCaseImplementation
 import com.diadsimulation.expenses.core.usecase.DeleteExpenseUseCaseImplementation
@@ -21,10 +22,12 @@ class ExpenseUseCaseConfiguration {
     fun createExpenseInputPort(
         expenseRepositoryOutputPort: ExpenseRepositoryOutputPort,
         productExpenseValidationOutputPort: ProductExpenseValidationOutputPort,
+        expenseStockOutputPort: ExpenseStockOutputPort,
     ): CreateExpenseInputPort =
         CreateExpenseUseCaseImplementation(
             expenseRepositoryOutputPort = expenseRepositoryOutputPort,
             productExpenseValidationOutputPort = productExpenseValidationOutputPort,
+            expenseStockOutputPort = expenseStockOutputPort,
         )
 
     @Bean
@@ -41,10 +44,12 @@ class ExpenseUseCaseConfiguration {
     fun updateExpenseInputPort(
         expenseRepositoryOutputPort: ExpenseRepositoryOutputPort,
         productExpenseValidationOutputPort: ProductExpenseValidationOutputPort,
+        expenseStockOutputPort: ExpenseStockOutputPort,
     ): UpdateExpenseInputPort =
         UpdateExpenseUseCaseImplementation(
             expenseRepositoryOutputPort = expenseRepositoryOutputPort,
             productExpenseValidationOutputPort = productExpenseValidationOutputPort,
+            expenseStockOutputPort = expenseStockOutputPort,
         )
 
     @Bean

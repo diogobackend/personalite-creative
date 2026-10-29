@@ -8,6 +8,7 @@ import com.diadsimulation.expenses.core.domain.model.Expense
 import com.diadsimulation.expenses.core.domain.model.ExpenseUpdate
 import com.diadsimulation.expenses.core.ports.input.UpdateExpenseInputPort
 import com.diadsimulation.expenses.core.ports.output.ExpenseRepositoryOutputPort
+import com.diadsimulation.expenses.core.ports.output.ExpenseStockOutputPort
 import com.diadsimulation.expenses.core.ports.output.ProductExpenseValidationOutputPort
 import java.math.BigDecimal.ZERO
 import java.time.OffsetDateTime
@@ -18,6 +19,7 @@ import java.util.UUID
 class UpdateExpenseUseCaseImplementation(
     private val expenseRepositoryOutputPort: ExpenseRepositoryOutputPort,
     private val productExpenseValidationOutputPort: ProductExpenseValidationOutputPort,
+    private val expenseStockOutputPort: ExpenseStockOutputPort,
 ) : UpdateExpenseInputPort {
     override fun execute(
         id: UUID,
@@ -75,6 +77,12 @@ class UpdateExpenseUseCaseImplementation(
         val updatedExpense =
             currentExpense.copy(
                 name = update.name ?: currentExpense.name,
+                inventoryId =
+                    when {
+                        update.has("inventoryId") -> update.inventoryId
+                        update.category != null && update.category != STOCK -> null
+                        else -> currentExpense.inventoryId
+                    },
                 description =
                     if (update.has("description")) {
                         update.description
@@ -98,7 +106,14 @@ class UpdateExpenseUseCaseImplementation(
 
         validate(updatedExpense)
 
-        return expenseRepositoryOutputPort.save(updatedExpense)
+        val savedExpense = expenseRepositoryOutputPort.save(updatedExpense)
+
+        expenseStockOutputPort.updateEntry(
+            previousExpense = currentExpense,
+            updatedExpense = savedExpense,
+        )
+
+        return savedExpense
     }
 
     private fun validateRequiredFields(update: ExpenseUpdate) {
@@ -149,13 +164,16 @@ class UpdateExpenseUseCaseImplementation(
 
     private fun validateStock(expense: Expense) {
         if (expense.category == STOCK) {
-            require(
-                expense.quantity != null &&
-                    expense.quantity > 0,
-            ) {
+            require(expense.inventoryId != null) {
+                "O item do estoque é obrigatório."
+            }
+            require(expense.quantity != null && expense.quantity > 0) {
                 "Despesas de estoque devem possuir quantidade maior que zero."
             }
         } else {
+            require(expense.inventoryId == null) {
+                "O item do estoque é permitido apenas para despesas de estoque."
+            }
             require(expense.quantity == null) {
                 "A quantidade é permitida apenas para despesas de estoque."
             }

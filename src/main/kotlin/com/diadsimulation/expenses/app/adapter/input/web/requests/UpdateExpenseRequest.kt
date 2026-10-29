@@ -8,10 +8,12 @@ import jakarta.validation.constraints.DecimalMin
 import jakarta.validation.constraints.Size
 import java.math.BigDecimal
 import java.time.LocalDate
+import java.util.UUID
 
 data class UpdateExpenseRequest(
     @field:Size(min = 1, max = 150)
     val name: String? = null,
+    val inventoryId: UUID? = null,
     val description: String? = null,
     @field:DecimalMin("0.01")
     val value: BigDecimal? = null,

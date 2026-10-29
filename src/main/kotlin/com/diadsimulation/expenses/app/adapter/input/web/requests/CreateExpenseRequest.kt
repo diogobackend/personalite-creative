@@ -16,11 +16,13 @@ import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.util.Collections.emptyList
+import java.util.UUID
 
 data class CreateExpenseRequest(
     @field:NotBlank
     @field:Size(max = 150)
     val name: String,
+    val inventoryId: UUID? = null,
     val description: String? = null,
     @field:NotNull
     @field:DecimalMin("0.01")

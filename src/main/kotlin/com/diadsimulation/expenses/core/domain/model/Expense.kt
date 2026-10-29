@@ -13,6 +13,7 @@ import java.util.UUID
 
 data class Expense(
     val id: UUID = UUID.randomUUID(),
+    val inventoryId: UUID? = null,
     val name: String,
     val description: String? = null,
     val value: BigDecimal,

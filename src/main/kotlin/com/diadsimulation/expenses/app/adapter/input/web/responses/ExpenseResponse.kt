@@ -10,6 +10,7 @@ import java.util.UUID
 
 data class ExpenseResponse(
     val id: UUID,
+    val inventoryId: UUID? = null,
     val name: String,
     val description: String?,
     val value: BigDecimal,

@@ -5,9 +5,12 @@ import com.diadsimulation.expenses.core.domain.enums.ExpenseCategory
 import com.diadsimulation.expenses.core.domain.enums.ExpenseStatus
 import java.math.BigDecimal
 import java.time.LocalDate
+import java.util.Collections.emptySet
+import java.util.UUID
 
 data class ExpenseUpdate(
     val name: String? = null,
+    val inventoryId: UUID? = null,
     val description: String? = null,
     val value: BigDecimal? = null,
     val category: ExpenseCategory? = null,

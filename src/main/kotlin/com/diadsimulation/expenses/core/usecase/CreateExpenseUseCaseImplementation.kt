@@ -7,17 +7,27 @@ import com.diadsimulation.expenses.core.domain.enums.ExpenseCategory.STOCK
 import com.diadsimulation.expenses.core.domain.model.Expense
 import com.diadsimulation.expenses.core.ports.input.CreateExpenseInputPort
 import com.diadsimulation.expenses.core.ports.output.ExpenseRepositoryOutputPort
+import com.diadsimulation.expenses.core.ports.output.ExpenseStockOutputPort
 import com.diadsimulation.expenses.core.ports.output.ProductExpenseValidationOutputPort
-import java.math.BigDecimal
+import org.springframework.transaction.annotation.Transactional
+import java.math.BigDecimal.ZERO
 
 class CreateExpenseUseCaseImplementation(
     private val expenseRepositoryOutputPort: ExpenseRepositoryOutputPort,
     private val productExpenseValidationOutputPort: ProductExpenseValidationOutputPort,
+    private val expenseStockOutputPort: ExpenseStockOutputPort,
 ) : CreateExpenseInputPort {
+    @Transactional
     override fun execute(expense: Expense): Expense {
         validate(expense)
 
-        return expenseRepositoryOutputPort.save(expense)
+        val savedExpense = expenseRepositoryOutputPort.save(expense)
+
+        if (savedExpense.category == STOCK) {
+            expenseStockOutputPort.registerEntry(savedExpense)
+        }
+
+        return savedExpense
     }
 
     private fun validate(expense: Expense) {
@@ -25,7 +35,7 @@ class CreateExpenseUseCaseImplementation(
             "O nome da despesa é obrigatório."
         }
 
-        require(expense.value > BigDecimal.ZERO) {
+        require(expense.value > ZERO) {
             "O valor da despesa deve ser maior que zero."
         }
 
@@ -35,10 +45,16 @@ class CreateExpenseUseCaseImplementation(
 
     private fun validateStock(expense: Expense) {
         if (expense.category == STOCK) {
+            require(expense.inventoryId != null) {
+                "O item do estoque é obrigatório."
+            }
             require(expense.quantity != null && expense.quantity > 0) {
                 "Despesas de estoque devem possuir quantidade maior que zero."
             }
         } else {
+            require(expense.inventoryId == null) {
+                "O item do estoque é permitido apenas para despesas de estoque."
+            }
             require(expense.quantity == null) {
                 "A quantidade é permitida apenas para despesas de estoque."
             }
@@ -84,12 +100,12 @@ class CreateExpenseUseCaseImplementation(
             }
         }
 
-        require(products.all { it.allocatedValue > BigDecimal.ZERO }) {
+        require(products.all { it.allocatedValue > ZERO }) {
             "O valor alocado para cada produto deve ser maior que zero."
         }
 
         val totalAllocated =
-            products.fold(BigDecimal.ZERO) { total, product ->
+            products.fold(ZERO) { total, product ->
                 total.add(product.allocatedValue)
             }
 

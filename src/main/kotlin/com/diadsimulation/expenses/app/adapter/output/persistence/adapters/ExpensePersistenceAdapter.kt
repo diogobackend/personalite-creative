@@ -33,6 +33,7 @@ class ExpensePersistenceAdapter(
         }
 
         existingEntity.apply {
+            inventoryId = expense.inventoryId
             name = expense.name
             description = expense.description
             value = expense.value

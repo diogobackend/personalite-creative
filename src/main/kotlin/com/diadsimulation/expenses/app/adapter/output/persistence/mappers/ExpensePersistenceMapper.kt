@@ -12,6 +12,7 @@ class ExpensePersistenceMapper {
         val entity =
             ExpenseEntity(
                 id = expense.id,
+                inventoryId = expense.inventoryId,
                 name = expense.name,
                 description = expense.description,
                 value = expense.value,
@@ -40,6 +41,7 @@ class ExpensePersistenceMapper {
     fun toDomain(entity: ExpenseEntity): Expense =
         Expense(
             id = entity.id,
+            inventoryId = entity.inventoryId,
             name = entity.name,
             description = entity.description,
             value = entity.value,

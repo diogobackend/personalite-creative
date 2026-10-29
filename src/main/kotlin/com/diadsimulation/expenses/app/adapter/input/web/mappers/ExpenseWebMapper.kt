@@ -19,6 +19,7 @@ class ExpenseWebMapper {
     fun toDomain(request: CreateExpenseRequest): Expense =
         Expense(
             name = request.name,
+            inventoryId = request.inventoryId,
             description = request.description,
             value = request.value,
             category = request.category,
@@ -67,6 +68,7 @@ class ExpenseWebMapper {
     fun toResponse(expense: Expense): ExpenseResponse =
         ExpenseResponse(
             id = expense.id,
+            inventoryId = expense.inventoryId,
             name = expense.name,
             description = expense.description,
             value = expense.value,
@@ -102,6 +104,7 @@ class ExpenseWebMapper {
     ): ExpenseUpdate =
         ExpenseUpdate(
             name = request.name,
+            inventoryId = request.inventoryId,
             description = request.description,
             value = request.value,
             category = request.category,
