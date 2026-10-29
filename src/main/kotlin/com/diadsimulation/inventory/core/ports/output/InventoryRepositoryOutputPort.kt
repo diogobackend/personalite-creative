@@ -13,4 +13,6 @@ interface InventoryRepositoryOutputPort {
     fun existsBySku(sku: String): Boolean
 
     fun findAll(filter: GetInventoryFilter): InventoryPage
+
+    fun deleteById(inventoryId: UUID)
 }

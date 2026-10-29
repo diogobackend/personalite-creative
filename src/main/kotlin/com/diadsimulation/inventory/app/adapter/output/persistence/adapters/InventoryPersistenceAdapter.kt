@@ -109,4 +109,9 @@ class InventoryPersistenceAdapter(
             totalPages = result.totalPages,
         )
     }
+
+    @Transactional
+    override fun deleteById(inventoryId: UUID) {
+        inventoryJpaRepository.deleteById(inventoryId)
+    }
 }

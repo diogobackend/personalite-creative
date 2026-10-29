@@ -9,6 +9,7 @@ import com.diadsimulation.inventory.core.domain.enums.InventorySize
 import com.diadsimulation.inventory.core.domain.enums.InventoryUnit
 import com.diadsimulation.inventory.core.domain.model.GetInventoryFilter
 import com.diadsimulation.inventory.core.domain.model.UpdateInventory
+import com.diadsimulation.inventory.core.ports.input.DeleteInventoryInputPort
 import com.diadsimulation.inventory.core.ports.input.GetInventoryByIdInputPort
 import com.diadsimulation.inventory.core.ports.input.GetInventoryInputPort
 import com.diadsimulation.inventory.core.ports.input.RegisterInventoryInputPort
@@ -28,6 +29,7 @@ class InventoryController(
     private val getInventoryInputPort: GetInventoryInputPort,
     private val getInventoryByIdInputPort: GetInventoryByIdInputPort,
     private val updateInventoryInputPort: UpdateInventoryInputPort,
+    private val deleteInventoryInputPort: DeleteInventoryInputPort,
 ) : InventoryApi {
     override fun register(request: RegisterInventoryRequest): ResponseEntity<RegisterInventoryResponse> {
         val inventory = RegisterInventoryMapper.toDomain(request)
@@ -130,5 +132,11 @@ class InventoryController(
         return ResponseEntity.ok(
             RegisterInventoryMapper.toResponse(updatedInventory),
         )
+    }
+
+    override fun deleteInventory(id: UUID): ResponseEntity<Void> {
+        deleteInventoryInputPort.execute(id)
+
+        return ResponseEntity.noContent().build()
     }
 }

@@ -15,6 +15,7 @@ import jakarta.validation.Valid
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.format.annotation.DateTimeFormat.ISO.DATE
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -141,4 +142,20 @@ interface InventoryApi {
         @PathVariable id: UUID,
         @RequestBody request: UpdateInventoryRequest,
     ): ResponseEntity<RegisterInventoryResponse>
+
+    @Operation(
+        summary = "Excluir item do estoque",
+        description = "Remove permanentemente um item do estoque pelo seu identificador.",
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "204", description = "Item excluído com sucesso"),
+            ApiResponse(responseCode = "400", description = "ID inválido"),
+            ApiResponse(responseCode = "404", description = "Item não encontrado"),
+        ],
+    )
+    @DeleteMapping("/{id}")
+    fun deleteInventory(
+        @PathVariable id: UUID,
+    ): ResponseEntity<Void>
 }
