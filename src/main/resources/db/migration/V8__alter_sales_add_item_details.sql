@@ -1,5 +1,7 @@
 ALTER TABLE sales
     ALTER COLUMN delivery_deadline DROP NOT NULL;
+
+ALTER TABLE sales
     ADD COLUMN observation TEXT;
 
 ALTER TABLE sale_items
