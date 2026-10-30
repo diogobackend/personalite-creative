@@ -2,7 +2,9 @@ package com.diadsimulation.sales.app.adapter.output.persistence.mappers
 
 import com.diadsimulation.sales.app.adapter.output.persistence.entity.SaleEntity
 import com.diadsimulation.sales.app.adapter.output.persistence.entity.SaleItemEntity
+import com.diadsimulation.sales.core.domain.enums.PaymentMethod
 import com.diadsimulation.sales.core.domain.model.Sale
+import com.diadsimulation.sales.core.domain.model.SaleItem
 import org.springframework.stereotype.Component
 
 @Component
@@ -36,4 +38,35 @@ class SalePersistenceMapper {
                 model = item.model,
             )
         }
+
+    fun toDomain(
+        entity: SaleEntity,
+        items: List<SaleItemEntity>,
+    ): Sale =
+        Sale(
+            id = entity.id,
+            customerId = entity.customerId,
+            items =
+                items.map { item ->
+                    SaleItem(
+                        id = item.id,
+                        productId = item.productId,
+                        inventoryId = item.inventoryId,
+                        quantity = item.quantity,
+                        color = item.color,
+                        size = item.size,
+                        material = item.material,
+                        brand = item.brand,
+                        model = item.model,
+                    )
+                },
+            deliveryDeadline = entity.deliveryDeadline,
+            totalAmount = entity.totalAmount,
+            downPaymentPercentage = entity.downPaymentPercentage,
+            paidPercentage = entity.paidPercentage,
+            paymentMethod = PaymentMethod.valueOf(entity.paymentMethod),
+            observation = entity.observation,
+            createdAt = entity.createdAt,
+            updatedAt = entity.updatedAt,
+        )
 }

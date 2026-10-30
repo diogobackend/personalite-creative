@@ -4,4 +4,6 @@ import com.diadsimulation.sales.app.adapter.output.persistence.entity.SaleItemEn
 import org.springframework.data.jpa.repository.JpaRepository
 import java.util.UUID
 
-interface SaleItemJpaRepository : JpaRepository<SaleItemEntity, UUID>
+interface SaleItemJpaRepository : JpaRepository<SaleItemEntity, UUID> {
+    fun findAllBySaleId(saleId: UUID): List<SaleItemEntity>
+}

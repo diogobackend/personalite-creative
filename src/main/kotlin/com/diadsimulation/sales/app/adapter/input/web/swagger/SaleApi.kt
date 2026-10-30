@@ -1,14 +1,20 @@
 package com.diadsimulation.sales.app.adapter.input.web.swagger
 
 import com.diadsimulation.sales.app.adapter.input.web.dtos.requests.CreateSaleRequest
+import com.diadsimulation.sales.app.adapter.input.web.dtos.requests.SearchSalesRequest
 import com.diadsimulation.sales.app.adapter.input.web.dtos.responses.CreateSaleResponse
+import com.diadsimulation.sales.app.adapter.input.web.dtos.responses.SearchSalesResponse
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
+import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.ModelAttribute
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestParam
 
 @Tag(
     name = "Sales",
@@ -51,4 +57,42 @@ interface SaleApi {
     fun create(
         @Valid @RequestBody request: CreateSaleRequest,
     ): ResponseEntity<CreateSaleResponse>
+
+    @Operation(
+        summary = "Consultar vendas",
+        description = """
+        Consulta vendas com filtros opcionais e combináveis.
+
+        Permite filtrar por cliente, produto, características,
+        valores financeiros, percentuais, datas e situações.
+
+        Os filtros de produto devem corresponder ao mesmo item da venda.
+        Os resultados são paginados e ordenados.
+    """,
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "Vendas consultadas com sucesso"),
+            ApiResponse(responseCode = "400", description = "Parâmetros de consulta inválidos"),
+        ],
+    )
+    fun searchSales(
+        @ParameterObject
+        @ModelAttribute
+        request: SearchSalesRequest,
+        @Parameter(description = "Página inicial: 0")
+        @RequestParam(defaultValue = "0")
+        page: Int,
+        @Parameter(description = "Quantidade por página, máximo 100")
+        @RequestParam(defaultValue = "20")
+        size: Int,
+        @Parameter(
+            description = "Ordenar por createdAt, totalAmount, remainingAmount, deliveryDeadline ou paidPercentage",
+        )
+        @RequestParam(defaultValue = "createdAt")
+        sortBy: String,
+        @Parameter(description = "Direção ASC ou DESC")
+        @RequestParam(defaultValue = "DESC")
+        sortDirection: String,
+    ): ResponseEntity<SearchSalesResponse>
 }
