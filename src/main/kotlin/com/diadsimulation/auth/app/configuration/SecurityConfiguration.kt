@@ -44,8 +44,10 @@ class SecurityConfiguration(
                         "/v3/api-docs/**",
                         "/actuator/health",
                     ).permitAll()
+                    // Autenticação e cadastro
                     .requestMatchers(POST, "/login", "/users")
                     .permitAll()
+                    // Usuários
                     .requestMatchers(PATCH, "/users/*/access")
                     .hasRole(PLATFORM_ADMIN.name)
                     .requestMatchers(GET, "/users/id")
@@ -62,19 +64,33 @@ class SecurityConfiguration(
                     .hasAnyRole(
                         SCHOOL_ADMIN.name,
                         PLATFORM_ADMIN.name,
-                    ).requestMatchers("/products", "/products/**")
+                    )
+                    // Produtos
+                    .requestMatchers("/products", "/products/**")
                     .hasAnyRole(
                         SCHOOL_ADMIN.name,
                         PLATFORM_ADMIN.name,
-                    ).requestMatchers("/expenses", "/expenses/**")
+                    )
+                    // Despesas
+                    .requestMatchers("/expenses", "/expenses/**")
                     .hasAnyRole(
                         SCHOOL_ADMIN.name,
                         PLATFORM_ADMIN.name,
-                    ).requestMatchers("/inventory", "/inventory/**")
+                    )
+                    // Estoque
+                    .requestMatchers("/inventory", "/inventory/**")
                     .hasAnyRole(
                         SCHOOL_ADMIN.name,
                         PLATFORM_ADMIN.name,
-                    ).anyRequest()
+                    )
+                    // Vendas
+                    .requestMatchers(POST, "/sales")
+                    .hasAnyRole(
+                        SCHOOL_ADMIN.name,
+                        PLATFORM_ADMIN.name,
+                    )
+                    // Demais endpoints
+                    .anyRequest()
                     .hasRole(PLATFORM_ADMIN.name)
             }.addFilterBefore(
                 jwtAuthenticationFilter,
@@ -93,6 +109,7 @@ class SecurityConfiguration(
                         "http://localhost:3000",
                         "https://personalite-creative-web.vercel.app",
                     )
+
                 allowedMethods = listOf("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
                 allowedHeaders = listOf("*")
             }
