@@ -17,11 +17,18 @@ class SaleWebMapper {
             downPaymentPercentage = request.downPaymentPercentage,
             paidPercentage = request.paidPercentage,
             paymentMethod = request.paymentMethod,
+            observation = request.observation,
             items =
                 request.items.map { item ->
                     SaleItem(
                         productId = item.productId,
                         inventoryId = item.inventoryId,
+                        quantity = item.quantity,
+                        color = item.color,
+                        size = item.size,
+                        material = item.material,
+                        brand = item.brand,
+                        model = item.model,
                     )
                 },
         )
@@ -35,12 +42,19 @@ class SaleWebMapper {
             downPaymentPercentage = sale.downPaymentPercentage,
             paidPercentage = sale.paidPercentage,
             paymentMethod = sale.paymentMethod,
+            observation = sale.observation,
             items =
                 sale.items.map { item ->
                     CreateSaleItemResponse(
                         id = item.id,
                         productId = item.productId,
                         inventoryId = item.inventoryId,
+                        quantity = item.quantity,
+                        color = item.color,
+                        size = item.size,
+                        material = item.material,
+                        brand = item.brand,
+                        model = item.model,
                     )
                 },
             createdAt = sale.createdAt,

@@ -24,6 +24,12 @@ class CreateSaleUseCaseImplementation(
             "A venda deve possuir pelo menos um produto."
         }
 
+        sale.items.forEach { item ->
+            require(item.quantity > 0) {
+                "A quantidade do produto deve ser maior que zero."
+            }
+        }
+
         sale.items.map { it.productId }.distinct().forEach { productId ->
             productRepositoryOutputPort.findById(productId)
                 ?: throw NoSuchElementException("Produto não encontrado: $productId")
@@ -37,7 +43,9 @@ class CreateSaleUseCaseImplementation(
             }.forEach { (inventoryId, productId) ->
                 val inventory =
                     inventoryRepositoryOutputPort.findById(inventoryId)
-                        ?: throw NoSuchElementException("Item de estoque não encontrado: $inventoryId")
+                        ?: throw NoSuchElementException(
+                            "Item de estoque não encontrado: $inventoryId",
+                        )
 
                 require(inventory.productId == productId) {
                     "O item de estoque não pertence ao produto informado."

@@ -16,6 +16,7 @@ class SalePersistenceMapper {
             downPaymentPercentage = sale.downPaymentPercentage,
             paidPercentage = sale.paidPercentage,
             paymentMethod = sale.paymentMethod.name,
+            observation = sale.observation,
             createdAt = sale.createdAt,
             updatedAt = sale.updatedAt,
         )
@@ -27,6 +28,12 @@ class SalePersistenceMapper {
                 saleId = sale.id,
                 productId = item.productId,
                 inventoryId = item.inventoryId,
+                quantity = item.quantity,
+                color = item.color,
+                size = item.size,
+                material = item.material,
+                brand = item.brand,
+                model = item.model,
             )
         }
 }

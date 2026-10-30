@@ -18,4 +18,16 @@ class SaleItemEntity(
     val productId: UUID,
     @Column(name = "inventory_id")
     val inventoryId: UUID?,
+    @Column(name = "quantity", nullable = false)
+    val quantity: Int,
+    @Column(name = "color", length = 100)
+    val color: String?,
+    @Column(name = "size", length = 50)
+    val size: String?,
+    @Column(name = "material", length = 100)
+    val material: String?,
+    @Column(name = "brand", length = 100)
+    val brand: String?,
+    @Column(name = "model", length = 100)
+    val model: String?,
 )

@@ -17,8 +17,8 @@ class SaleEntity(
     val id: UUID,
     @Column(name = "customer_id", nullable = false)
     val customerId: UUID,
-    @Column(name = "delivery_deadline", nullable = false)
-    val deliveryDeadline: LocalDate,
+    @Column(name = "delivery_deadline")
+    val deliveryDeadline: LocalDate?,
     @Column(name = "total_amount", nullable = false, precision = 12, scale = 2)
     val totalAmount: BigDecimal,
     @Column(name = "down_payment_percentage", nullable = false, precision = 5, scale = 2)
@@ -27,6 +27,8 @@ class SaleEntity(
     val paidPercentage: BigDecimal,
     @Column(name = "payment_method", nullable = false, length = 30)
     val paymentMethod: String,
+    @Column(name = "observation", columnDefinition = "TEXT")
+    val observation: String?,
     @Column(name = "created_at", nullable = false)
     val createdAt: OffsetDateTime,
     @Column(name = "updated_at", nullable = false)

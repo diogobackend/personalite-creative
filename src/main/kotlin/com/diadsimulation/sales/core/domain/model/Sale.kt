@@ -10,11 +10,12 @@ data class Sale(
     val id: UUID = UUID.randomUUID(),
     val customerId: UUID,
     val items: List<SaleItem>,
-    val deliveryDeadline: LocalDate,
+    val deliveryDeadline: LocalDate? = null,
     val totalAmount: BigDecimal,
     val downPaymentPercentage: BigDecimal,
     val paidPercentage: BigDecimal,
     val paymentMethod: PaymentMethod,
+    val observation: String? = null,
     val createdAt: OffsetDateTime = OffsetDateTime.now(),
     val updatedAt: OffsetDateTime = OffsetDateTime.now(),
 )

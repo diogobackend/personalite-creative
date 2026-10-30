@@ -9,11 +9,12 @@ import java.util.UUID
 data class CreateSaleResponse(
     val id: UUID,
     val customerId: UUID,
-    val deliveryDeadline: LocalDate,
+    val deliveryDeadline: LocalDate?,
     val totalAmount: BigDecimal,
     val downPaymentPercentage: BigDecimal,
     val paidPercentage: BigDecimal,
     val paymentMethod: PaymentMethod,
+    val observation: String?,
     val items: List<CreateSaleItemResponse>,
     val createdAt: OffsetDateTime,
     val updatedAt: OffsetDateTime,
