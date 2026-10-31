@@ -3,6 +3,7 @@ package com.diadsimulation.sales.app.adapter.input.web.swagger
 import com.diadsimulation.sales.app.adapter.input.web.dtos.requests.CreateSaleRequest
 import com.diadsimulation.sales.app.adapter.input.web.dtos.requests.SearchSalesRequest
 import com.diadsimulation.sales.app.adapter.input.web.dtos.responses.CreateSaleResponse
+import com.diadsimulation.sales.app.adapter.input.web.dtos.responses.SaleSummaryResponse
 import com.diadsimulation.sales.app.adapter.input.web.dtos.responses.SearchSalesResponse
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
@@ -13,8 +14,10 @@ import jakarta.validation.Valid
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ModelAttribute
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestParam
+import java.util.UUID
 
 @Tag(
     name = "Sales",
@@ -95,4 +98,29 @@ interface SaleApi {
         @RequestParam(defaultValue = "DESC")
         sortDirection: String,
     ): ResponseEntity<SearchSalesResponse>
+
+    @Operation(
+        summary = "Consultar venda por ID",
+        description = "Consulta uma venda específica pelo ID, incluindo seus produtos e informações financeiras.",
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Venda encontrada com sucesso",
+            ),
+            ApiResponse(
+                responseCode = "400",
+                description = "ID inválido",
+            ),
+            ApiResponse(
+                responseCode = "404",
+                description = "Venda não encontrada",
+            ),
+        ],
+    )
+    fun findById(
+        @Parameter(description = "ID da venda")
+        @PathVariable id: UUID,
+    ): ResponseEntity<SaleSummaryResponse>
 }

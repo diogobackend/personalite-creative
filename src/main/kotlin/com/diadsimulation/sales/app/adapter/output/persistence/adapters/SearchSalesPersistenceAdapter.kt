@@ -7,7 +7,7 @@ import com.diadsimulation.sales.app.adapter.output.persistence.repository.SaleIt
 import com.diadsimulation.sales.app.adapter.output.persistence.repository.SaleJpaRepository
 import com.diadsimulation.sales.app.adapter.output.persistence.specifications.SaleSpecification
 import com.diadsimulation.sales.core.domain.model.SaleSearchFilter
-import com.diadsimulation.sales.core.ports.output.SaleSearchResult
+import com.diadsimulation.sales.core.domain.model.SaleSearchResult
 import com.diadsimulation.sales.core.ports.output.SearchSalesOutputPort
 import jakarta.persistence.EntityManager
 import jakarta.persistence.criteria.Expression

@@ -1,7 +1,7 @@
 package com.diadsimulation.sales.core.usecase
 
 import com.diadsimulation.sales.core.domain.model.SaleSearchFilter
-import com.diadsimulation.sales.core.ports.output.SaleSearchResult
+import com.diadsimulation.sales.core.domain.model.SaleSearchResult
 import com.diadsimulation.sales.core.ports.output.SearchSalesOutputPort
 import java.math.BigDecimal
 import java.math.BigDecimal.ZERO

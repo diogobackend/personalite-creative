@@ -14,8 +14,8 @@ import com.diadsimulation.sales.core.domain.enums.SalePaymentStatus
 import com.diadsimulation.sales.core.domain.model.Sale
 import com.diadsimulation.sales.core.domain.model.SaleFinancialSummary
 import com.diadsimulation.sales.core.domain.model.SaleItem
-import com.diadsimulation.sales.core.ports.output.SaleSearchResult
-import com.diadsimulation.sales.core.usecase.SaleFinancialCalculator
+import com.diadsimulation.sales.core.domain.model.SaleSearchResult
+import com.diadsimulation.sales.core.domain.utils.SaleFinancialCalculator
 import org.springframework.stereotype.Component
 import java.math.BigDecimal
 import java.math.BigDecimal.ZERO
@@ -41,7 +41,7 @@ class SearchSalesWebMapper {
             summary = toSummaryResponse(result.summary),
         )
 
-    private fun toSaleResponse(
+    fun toSaleResponse(
         sale: Sale,
         today: LocalDate,
     ): SaleSummaryResponse =
