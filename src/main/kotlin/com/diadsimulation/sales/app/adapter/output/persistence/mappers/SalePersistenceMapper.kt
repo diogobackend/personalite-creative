@@ -6,6 +6,7 @@ import com.diadsimulation.sales.core.domain.enums.PaymentMethod
 import com.diadsimulation.sales.core.domain.model.Sale
 import com.diadsimulation.sales.core.domain.model.SaleItem
 import org.springframework.stereotype.Component
+import java.math.BigDecimal.ZERO
 
 @Component
 class SalePersistenceMapper {
@@ -31,6 +32,8 @@ class SalePersistenceMapper {
                 productId = item.productId,
                 inventoryId = item.inventoryId,
                 quantity = item.quantity,
+                unitPrice = item.unitPrice,
+                additionalAmount = item.additionalAmount,
                 color = item.color,
                 size = item.size,
                 material = item.material,
@@ -53,6 +56,8 @@ class SalePersistenceMapper {
                         productId = item.productId,
                         inventoryId = item.inventoryId,
                         quantity = item.quantity,
+                        unitPrice = item.unitPrice ?: ZERO,
+                        additionalAmount = item.additionalAmount,
                         color = item.color,
                         size = item.size,
                         material = item.material,

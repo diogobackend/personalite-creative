@@ -28,6 +28,14 @@ class CreateSaleUseCaseImplementation(
             require(item.quantity > 0) {
                 "A quantidade do produto deve ser maior que zero."
             }
+
+            require(item.unitPrice > ZERO) {
+                "O preço unitário do produto deve ser maior que zero."
+            }
+
+            require(item.totalPrice >= ZERO) {
+                "O valor final do produto não pode ser negativo."
+            }
         }
 
         sale.items.map { it.productId }.distinct().forEach { productId ->
@@ -51,6 +59,14 @@ class CreateSaleUseCaseImplementation(
                     "O item de estoque não pertence ao produto informado."
                 }
             }
+
+        val calculatedTotal =
+            sale.items
+                .fold(ZERO) { total, item -> total + item.totalPrice }
+
+        require(calculatedTotal.compareTo(sale.totalAmount) == 0) {
+            "O valor total da venda deve corresponder à soma dos produtos, incluindo acréscimos e descontos."
+        }
 
         require(sale.totalAmount > ZERO) {
             "O valor total deve ser maior que zero."

@@ -4,6 +4,8 @@ import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
 import jakarta.persistence.Table
+import java.math.BigDecimal
+import java.math.BigDecimal.ZERO
 import java.util.UUID
 
 @Entity
@@ -20,6 +22,10 @@ class SaleItemEntity(
     val inventoryId: UUID?,
     @Column(name = "quantity", nullable = false)
     val quantity: Int,
+    @Column(name = "unit_price", precision = 19, scale = 2)
+    val unitPrice: BigDecimal?,
+    @Column(name = "additional_amount", nullable = false, precision = 19, scale = 2)
+    val additionalAmount: BigDecimal = ZERO,
     @Column(name = "color", length = 100)
     val color: String?,
     @Column(name = "size", length = 50)
