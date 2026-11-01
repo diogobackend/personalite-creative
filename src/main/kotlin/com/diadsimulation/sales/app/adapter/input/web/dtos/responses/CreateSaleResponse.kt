@@ -16,6 +16,7 @@ data class CreateSaleResponse(
     val paymentMethod: PaymentMethod,
     val observation: String?,
     val items: List<CreateSaleItemResponse>,
+    val deliveredAt: OffsetDateTime? = null,
     val createdAt: OffsetDateTime,
     val updatedAt: OffsetDateTime,
 )

@@ -16,6 +16,7 @@ data class Sale(
     val paidPercentage: BigDecimal,
     val paymentMethod: PaymentMethod,
     val observation: String? = null,
+    val deliveredAt: OffsetDateTime? = null,
     val createdAt: OffsetDateTime = OffsetDateTime.now(),
     val updatedAt: OffsetDateTime = OffsetDateTime.now(),
 )

@@ -14,4 +14,5 @@ data class UpdateSaleRequest(
     val paidPercentage: BigDecimal? = null,
     val paymentMethod: PaymentMethod? = null,
     val observation: JsonNullable<String?> = JsonNullable.undefined(),
+    val delivered: Boolean? = null,
 )

@@ -110,6 +110,12 @@ class UpdateSaleUseCaseImplementation(
                         is UpdateField.Set -> field.value
                         UpdateField.Unchanged -> currentSale.observation
                     },
+                deliveredAt =
+                    when (update.delivered) {
+                        true -> currentSale.deliveredAt ?: OffsetDateTime.now()
+                        false -> null
+                        null -> currentSale.deliveredAt
+                    },
             )
 
         return updateSaleOutputPort.update(updatedSale)

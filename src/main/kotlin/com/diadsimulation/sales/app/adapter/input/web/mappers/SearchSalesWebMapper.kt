@@ -76,6 +76,7 @@ class SearchSalesWebMapper {
             deadlineStatus = deadlineStatus(sale.deliveryDeadline, today),
             observation = sale.observation,
             items = sale.items.map(::toItemResponse),
+            deliveredAt = sale.deliveredAt,
             createdAt = sale.createdAt,
             updatedAt = sale.updatedAt,
         )

@@ -20,6 +20,7 @@ class SalePersistenceMapper {
             paidPercentage = sale.paidPercentage,
             paymentMethod = sale.paymentMethod.name,
             observation = sale.observation,
+            deliveredAt = sale.deliveredAt,
             createdAt = sale.createdAt,
             updatedAt = sale.updatedAt,
         )
@@ -71,6 +72,7 @@ class SalePersistenceMapper {
             paidPercentage = entity.paidPercentage,
             paymentMethod = PaymentMethod.valueOf(entity.paymentMethod),
             observation = entity.observation,
+            deliveredAt = entity.deliveredAt,
             createdAt = entity.createdAt,
             updatedAt = entity.updatedAt,
         )

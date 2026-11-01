@@ -15,4 +15,5 @@ data class SaleUpdate(
     val paidPercentage: BigDecimal? = null,
     val paymentMethod: PaymentMethod? = null,
     val observation: UpdateField<String?> = UpdateField.Unchanged,
+    val delivered: Boolean? = null,
 )

@@ -24,6 +24,7 @@ data class SaleSummaryResponse(
     val deadlineStatus: SaleDeadlineStatus,
     val observation: String?,
     val items: List<SaleItemSummaryResponse>,
+    val deliveredAt: OffsetDateTime? = null,
     val createdAt: OffsetDateTime,
     val updatedAt: OffsetDateTime,
 )

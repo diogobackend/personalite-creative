@@ -29,6 +29,8 @@ class SaleEntity(
     val paymentMethod: String,
     @Column(name = "observation", columnDefinition = "TEXT")
     val observation: String?,
+    @Column(name = "delivered_at")
+    val deliveredAt: OffsetDateTime? = null,
     @Column(name = "created_at", nullable = false)
     val createdAt: OffsetDateTime,
     @Column(name = "updated_at", nullable = false)

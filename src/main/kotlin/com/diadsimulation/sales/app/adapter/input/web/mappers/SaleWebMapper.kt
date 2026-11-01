@@ -65,6 +65,7 @@ class SaleWebMapper {
                         model = item.model,
                     )
                 },
+            deliveredAt = sale.deliveredAt,
             createdAt = sale.createdAt,
             updatedAt = sale.updatedAt,
         )
@@ -90,6 +91,7 @@ class SaleWebMapper {
             downPaymentPercentage = request.downPaymentPercentage,
             paidPercentage = request.paidPercentage,
             paymentMethod = request.paymentMethod,
+            delivered = request.delivered,
             deliveryDeadline =
                 if (request.deliveryDeadline.isPresent) {
                     UpdateField.Set(request.deliveryDeadline.orElse(null))
