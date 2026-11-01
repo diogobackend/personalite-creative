@@ -41,7 +41,10 @@ object SaleSpecification {
                     if (delivered) {
                         cb.isNotNull(deliveredAt)
                     } else {
-                        cb.isNull(deliveredAt)
+                        cb.and(
+                            cb.isNull(deliveredAt),
+                            cb.isNotNull(root.get<LocalDate>("deliveryDeadline")),
+                        )
                     }
             }
 
