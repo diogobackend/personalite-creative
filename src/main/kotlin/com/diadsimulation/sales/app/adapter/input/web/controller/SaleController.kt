@@ -2,6 +2,7 @@ package com.diadsimulation.sales.app.adapter.input.web.controller
 
 import com.diadsimulation.sales.app.adapter.input.web.dtos.requests.CreateSaleRequest
 import com.diadsimulation.sales.app.adapter.input.web.dtos.requests.SearchSalesRequest
+import com.diadsimulation.sales.app.adapter.input.web.dtos.requests.UpdateSaleRequest
 import com.diadsimulation.sales.app.adapter.input.web.dtos.responses.CreateSaleResponse
 import com.diadsimulation.sales.app.adapter.input.web.dtos.responses.SaleSummaryResponse
 import com.diadsimulation.sales.app.adapter.input.web.dtos.responses.SearchSalesResponse
@@ -10,10 +11,12 @@ import com.diadsimulation.sales.app.adapter.input.web.mappers.SearchSalesWebMapp
 import com.diadsimulation.sales.app.adapter.input.web.swagger.SaleApi
 import com.diadsimulation.sales.core.ports.input.CreateSaleInputPort
 import com.diadsimulation.sales.core.ports.input.FindSaleByIdInputPort
+import com.diadsimulation.sales.core.ports.input.UpdateSaleInputPort
 import com.diadsimulation.sales.core.usecase.SearchSalesUseCaseImplementation
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -28,6 +31,7 @@ class SaleController(
     private val searchSalesUseCaseImplementation: SearchSalesUseCaseImplementation,
     private val searchSalesWebMapper: SearchSalesWebMapper,
     private val findSaleByIdInputPort: FindSaleByIdInputPort,
+    private val updateSaleInputPort: UpdateSaleInputPort,
 ) : SaleApi {
     @PostMapping
     override fun create(request: CreateSaleRequest): ResponseEntity<CreateSaleResponse> {
@@ -67,6 +71,19 @@ class SaleController(
 
         return ResponseEntity.ok(
             searchSalesWebMapper.toSaleResponse(sale, LocalDate.now()),
+        )
+    }
+
+    @PatchMapping("/{id}")
+    override fun update(
+        id: UUID,
+        request: UpdateSaleRequest,
+    ): ResponseEntity<CreateSaleResponse> {
+        val update = saleWebMapper.toUpdateDomain(request)
+        val updatedSale = updateSaleInputPort.execute(id, update)
+
+        return ResponseEntity.ok(
+            saleWebMapper.toResponse(updatedSale),
         )
     }
 }

@@ -6,4 +6,6 @@ import java.util.UUID
 
 interface SaleItemJpaRepository : JpaRepository<SaleItemEntity, UUID> {
     fun findAllBySaleId(saleId: UUID): List<SaleItemEntity>
+
+    fun deleteAllBySaleId(saleId: UUID)
 }

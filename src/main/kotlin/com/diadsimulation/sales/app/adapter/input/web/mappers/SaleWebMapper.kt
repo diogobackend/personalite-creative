@@ -1,10 +1,13 @@
 package com.diadsimulation.sales.app.adapter.input.web.mappers
 
 import com.diadsimulation.sales.app.adapter.input.web.dtos.requests.CreateSaleRequest
+import com.diadsimulation.sales.app.adapter.input.web.dtos.requests.UpdateSaleRequest
 import com.diadsimulation.sales.app.adapter.input.web.dtos.responses.CreateSaleItemResponse
 import com.diadsimulation.sales.app.adapter.input.web.dtos.responses.CreateSaleResponse
 import com.diadsimulation.sales.core.domain.model.Sale
 import com.diadsimulation.sales.core.domain.model.SaleItem
+import com.diadsimulation.sales.core.domain.model.SaleUpdate
+import com.diadsimulation.sales.core.domain.utils.UpdateField
 import org.springframework.stereotype.Component
 
 @Component
@@ -64,5 +67,40 @@ class SaleWebMapper {
                 },
             createdAt = sale.createdAt,
             updatedAt = sale.updatedAt,
+        )
+
+    fun toUpdateDomain(request: UpdateSaleRequest): SaleUpdate =
+        SaleUpdate(
+            customerId = request.customerId,
+            items =
+                request.items?.map { item ->
+                    SaleItem(
+                        productId = item.productId,
+                        inventoryId = item.inventoryId,
+                        quantity = item.quantity,
+                        unitPrice = item.unitPrice,
+                        additionalAmount = item.additionalAmount,
+                        color = item.color,
+                        size = item.size,
+                        material = item.material,
+                        brand = item.brand,
+                        model = item.model,
+                    )
+                },
+            downPaymentPercentage = request.downPaymentPercentage,
+            paidPercentage = request.paidPercentage,
+            paymentMethod = request.paymentMethod,
+            deliveryDeadline =
+                if (request.deliveryDeadline.isPresent) {
+                    UpdateField.Set(request.deliveryDeadline.orElse(null))
+                } else {
+                    UpdateField.Unchanged
+                },
+            observation =
+                if (request.observation.isPresent) {
+                    UpdateField.Set(request.observation.orElse(null))
+                } else {
+                    UpdateField.Unchanged
+                },
         )
 }
