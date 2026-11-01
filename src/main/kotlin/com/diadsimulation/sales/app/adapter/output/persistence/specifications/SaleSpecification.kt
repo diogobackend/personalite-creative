@@ -20,6 +20,7 @@ import jakarta.persistence.criteria.Subquery
 import org.springframework.data.jpa.domain.Specification
 import java.math.BigDecimal
 import java.time.LocalDate
+import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import java.util.UUID
 
@@ -31,7 +32,18 @@ object SaleSpecification {
         today: LocalDate = LocalDate.now(),
     ): Specification<SaleEntity> =
         Specification { root, query, cb ->
-            val predicates = mutableListOf<Predicate>()
+            val predicates: MutableList<Predicate> = mutableListOf()
+
+            val deliveredAt = root.get<OffsetDateTime>("deliveredAt")
+
+            filter.delivered?.let { delivered ->
+                predicates +=
+                    if (delivered) {
+                        cb.isNotNull(deliveredAt)
+                    } else {
+                        cb.isNull(deliveredAt)
+                    }
+            }
 
             filter.saleId?.let {
                 predicates += cb.equal(root.get<UUID>("id"), it)

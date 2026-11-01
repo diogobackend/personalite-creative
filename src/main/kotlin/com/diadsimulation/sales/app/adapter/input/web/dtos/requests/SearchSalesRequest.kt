@@ -43,6 +43,7 @@ data class SearchSalesRequest(
     val paymentStatus: SalePaymentStatus? = null,
     val deadlineStatus: SaleDeadlineStatus? = null,
     val paymentMethod: PaymentMethod? = null,
+    val delivered: Boolean? = null,
 ) {
     fun toFilter() =
         SaleSearchFilter(
@@ -75,5 +76,6 @@ data class SearchSalesRequest(
             paymentStatus = paymentStatus,
             deadlineStatus = deadlineStatus,
             paymentMethod = paymentMethod,
+            delivered = delivered,
         )
 }

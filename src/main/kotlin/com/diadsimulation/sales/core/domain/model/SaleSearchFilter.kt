@@ -37,4 +37,5 @@ data class SaleSearchFilter(
     val paymentStatus: SalePaymentStatus? = null,
     val deadlineStatus: SaleDeadlineStatus? = null,
     val paymentMethod: PaymentMethod? = null,
+    val delivered: Boolean? = null,
 )

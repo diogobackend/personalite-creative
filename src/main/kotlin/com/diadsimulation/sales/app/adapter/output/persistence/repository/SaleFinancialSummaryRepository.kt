@@ -10,7 +10,10 @@ import jakarta.persistence.criteria.Expression
 import jakarta.persistence.criteria.Predicate
 import org.springframework.stereotype.Repository
 import java.math.BigDecimal
+import java.math.BigDecimal.ZERO
+import java.math.RoundingMode.HALF_UP
 import java.time.LocalDate
+import java.time.OffsetDateTime
 
 @Repository
 class SaleFinancialSummaryRepository(
@@ -27,6 +30,8 @@ class SaleFinancialSummaryRepository(
         val paidPercentage = sale.get<BigDecimal>("paidPercentage")
         val totalAmount = sale.get<BigDecimal>("totalAmount")
         val deadline = sale.get<LocalDate>("deliveryDeadline")
+        val deliveredAt = sale.get<OffsetDateTime>("deliveredAt")
+        val notDelivered = cb.isNull(deliveredAt)
 
         val downPaymentAmount =
             percentageAmount(
@@ -75,13 +80,22 @@ class SaleFinancialSummaryRepository(
                 cb.greaterThanOrEqualTo(paidPercentage, HUNDRED),
             ).alias("paidSales"),
             countWhen(
-                cb.lessThan(deadline, today),
+                cb.and(
+                    notDelivered,
+                    cb.lessThan(deadline, today),
+                ),
             ).alias("overdueSales"),
             countWhen(
-                cb.equal(deadline, today),
+                cb.and(
+                    notDelivered,
+                    cb.equal(deadline, today),
+                ),
             ).alias("dueTodaySales"),
             countWhen(
-                cb.greaterThan(deadline, today),
+                cb.and(
+                    notDelivered,
+                    cb.greaterThan(deadline, today),
+                ),
             ).alias("upcomingSales"),
         )
 
@@ -129,8 +143,8 @@ class SaleFinancialSummaryRepository(
     }
 
     private fun jakarta.persistence.Tuple.amount(alias: String): BigDecimal =
-        (get(alias) as? BigDecimal ?: BigDecimal.ZERO)
-            .setScale(2, java.math.RoundingMode.HALF_UP)
+        (get(alias) as? BigDecimal ?: ZERO)
+            .setScale(2, HALF_UP)
 
     private fun jakarta.persistence.Tuple.long(alias: String): Long = (get(alias) as? Number)?.toLong() ?: 0L
 

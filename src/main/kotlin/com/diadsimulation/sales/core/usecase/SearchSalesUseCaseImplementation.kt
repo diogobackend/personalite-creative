@@ -1,5 +1,7 @@
 package com.diadsimulation.sales.core.usecase
 
+import com.diadsimulation.sales.core.domain.enums.SaleDeadlineStatus.DUE_TODAY
+import com.diadsimulation.sales.core.domain.enums.SaleDeadlineStatus.OVERDUE
 import com.diadsimulation.sales.core.domain.model.SaleSearchFilter
 import com.diadsimulation.sales.core.domain.model.SaleSearchResult
 import com.diadsimulation.sales.core.ports.output.SearchSalesOutputPort
@@ -19,27 +21,32 @@ class SearchSalesUseCaseImplementation(
         require(page >= 0) {
             "A página não pode ser negativa."
         }
-
         require(size in 1..100) {
             "O tamanho da página deve estar entre 1 e 100."
         }
-
         require(page.toLong() * size <= Int.MAX_VALUE) {
             "O intervalo da página excede o limite permitido."
         }
-
         require(sortBy in ALLOWED_SORT_FIELDS) {
             "Campo de ordenação inválido."
         }
-
         require(sortDirection.uppercase() in ALLOWED_DIRECTIONS) {
             "Direção de ordenação inválida."
         }
 
         validateFilter(filter)
 
+        val effectiveFilter =
+            if (filter.dueWithinDays != null ||
+                filter.deadlineStatus in ACTIVE_DEADLINE_STATUSES
+            ) {
+                filter.copy(delivered = false)
+            } else {
+                filter
+            }
+
         return searchSalesOutputPort.search(
-            filter = filter,
+            filter = effectiveFilter,
             page = page,
             size = size,
             sortBy = sortBy,
@@ -139,6 +146,12 @@ class SearchSalesUseCaseImplementation(
 
     companion object {
         private val HUNDRED = BigDecimal("100")
+
+        private val ACTIVE_DEADLINE_STATUSES =
+            setOf(
+                OVERDUE,
+                DUE_TODAY,
+            )
 
         private val ALLOWED_SORT_FIELDS =
             setOf(
