@@ -10,11 +10,13 @@ import com.diadsimulation.sales.app.adapter.input.web.mappers.SaleWebMapper
 import com.diadsimulation.sales.app.adapter.input.web.mappers.SearchSalesWebMapper
 import com.diadsimulation.sales.app.adapter.input.web.swagger.SaleApi
 import com.diadsimulation.sales.core.ports.input.CreateSaleInputPort
+import com.diadsimulation.sales.core.ports.input.DeleteSaleInputPort
 import com.diadsimulation.sales.core.ports.input.FindSaleByIdInputPort
 import com.diadsimulation.sales.core.ports.input.UpdateSaleInputPort
 import com.diadsimulation.sales.core.usecase.SearchSalesUseCaseImplementation
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PostMapping
@@ -32,6 +34,7 @@ class SaleController(
     private val searchSalesWebMapper: SearchSalesWebMapper,
     private val findSaleByIdInputPort: FindSaleByIdInputPort,
     private val updateSaleInputPort: UpdateSaleInputPort,
+    private val deleteSaleInputPort: DeleteSaleInputPort,
 ) : SaleApi {
     @PostMapping
     override fun create(request: CreateSaleRequest): ResponseEntity<CreateSaleResponse> {
@@ -85,5 +88,12 @@ class SaleController(
         return ResponseEntity.ok(
             saleWebMapper.toResponse(updatedSale),
         )
+    }
+
+    @DeleteMapping("/{id}")
+    override fun delete(id: UUID): ResponseEntity<Void> {
+        deleteSaleInputPort.execute(id)
+
+        return ResponseEntity.noContent().build()
     }
 }

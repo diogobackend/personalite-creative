@@ -185,4 +185,37 @@ interface SaleApi {
         @PathVariable id: UUID,
         @Valid @RequestBody request: UpdateSaleRequest,
     ): ResponseEntity<CreateSaleResponse>
+
+    @Operation(
+        summary = "Excluir venda",
+        description = """
+        Exclui permanentemente uma venda pelo ID.
+
+        Regras:
+        - A venda deve existir.
+        - Os itens vinculados à venda também são excluídos.
+        - A operação é transacional.
+        - A exclusão não remove o cliente nem os produtos cadastrados.
+    """,
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "204",
+                description = "Venda excluída com sucesso",
+            ),
+            ApiResponse(
+                responseCode = "400",
+                description = "ID inválido",
+            ),
+            ApiResponse(
+                responseCode = "404",
+                description = "Venda não encontrada",
+            ),
+        ],
+    )
+    fun delete(
+        @Parameter(description = "ID da venda que será excluída")
+        @PathVariable id: UUID,
+    ): ResponseEntity<Void>
 }

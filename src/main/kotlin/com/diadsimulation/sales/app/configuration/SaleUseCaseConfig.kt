@@ -4,13 +4,16 @@ import com.diadsimulation.auth.core.port.output.UserRepositoryOutputPort
 import com.diadsimulation.inventory.core.ports.output.InventoryRepositoryOutputPort
 import com.diadsimulation.products.core.port.output.ProductRepositoryOutputPort
 import com.diadsimulation.sales.core.ports.input.CreateSaleInputPort
+import com.diadsimulation.sales.core.ports.input.DeleteSaleInputPort
 import com.diadsimulation.sales.core.ports.input.FindSaleByIdInputPort
 import com.diadsimulation.sales.core.ports.input.UpdateSaleInputPort
 import com.diadsimulation.sales.core.ports.output.CreateSaleOutputPort
+import com.diadsimulation.sales.core.ports.output.DeleteSaleOutputPort
 import com.diadsimulation.sales.core.ports.output.FindSaleByIdOutputPort
 import com.diadsimulation.sales.core.ports.output.SearchSalesOutputPort
 import com.diadsimulation.sales.core.ports.output.UpdateSaleOutputPort
 import com.diadsimulation.sales.core.usecase.CreateSaleUseCaseImplementation
+import com.diadsimulation.sales.core.usecase.DeleteSaleUseCaseImplementation
 import com.diadsimulation.sales.core.usecase.FindSaleByIdUseCaseImplementation
 import com.diadsimulation.sales.core.usecase.SearchSalesUseCaseImplementation
 import com.diadsimulation.sales.core.usecase.UpdateSaleUseCaseImplementation
@@ -55,5 +58,15 @@ class SaleUseCaseConfig {
             userRepositoryOutputPort = userRepositoryOutputPort,
             productRepositoryOutputPort = productRepositoryOutputPort,
             inventoryRepositoryOutputPort = inventoryRepositoryOutputPort,
+        )
+
+    @Bean
+    fun deleteSaleUseCase(
+        findSaleByIdInputPort: FindSaleByIdInputPort,
+        deleteSaleOutputPort: DeleteSaleOutputPort,
+    ): DeleteSaleInputPort =
+        DeleteSaleUseCaseImplementation(
+            findSaleByIdInputPort = findSaleByIdInputPort,
+            deleteSaleOutputPort = deleteSaleOutputPort,
         )
 }
