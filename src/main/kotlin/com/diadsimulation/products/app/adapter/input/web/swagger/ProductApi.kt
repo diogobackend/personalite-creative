@@ -187,6 +187,21 @@ interface ProductApi {
         @RequestParam(name = "createdTo", required = false)
         @DateTimeFormat(iso = DATE_TIME)
         createdTo: OffsetDateTime?,
+        @Parameter(description = "Filtra produtos por cores.")
+        @RequestParam(name = "colors", required = false)
+        colors: List<String>?,
+        @Parameter(description = "Filtra produtos por tamanhos.")
+        @RequestParam(name = "sizes", required = false)
+        sizes: List<String>?,
+        @Parameter(description = "Filtra produtos por marcas.")
+        @RequestParam(name = "brands", required = false)
+        brands: List<String>?,
+        @Parameter(description = "Filtra produtos por modelos.")
+        @RequestParam(name = "models", required = false)
+        models: List<String>?,
+        @Parameter(description = "Filtra produtos por materiais.")
+        @RequestParam(name = "materials", required = false)
+        materials: List<String>?,
         @Parameter(description = "Página solicitada, começando em zero. Padrão: 0.")
         @RequestParam(name = "page", defaultValue = "0")
         page: Int,

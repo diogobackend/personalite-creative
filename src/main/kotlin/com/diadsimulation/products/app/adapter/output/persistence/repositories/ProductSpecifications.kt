@@ -204,6 +204,44 @@ object ProductSpecifications {
                     }
             }
 
+            val characteristicFilters =
+                mapOf(
+                    "colors" to filter.colors,
+                    "sizes" to filter.sizes,
+                    "brands" to filter.brands,
+                    "models" to filter.models,
+                    "materials" to filter.materials,
+                )
+
+            characteristicFilters.forEach { (field, values) ->
+                val selectedValues =
+                    values
+                        .orEmpty()
+                        .map(String::trim)
+                        .filter(String::isNotEmpty)
+                        .distinct()
+
+                if (selectedValues.isNotEmpty()) {
+                    val subquery = query.subquery(Int::class.java)
+                    val productRoot = subquery.from(ProductEntity::class.java)
+                    val characteristic = productRoot.join<ProductEntity, String>(field)
+
+                    subquery
+                        .select(criteriaBuilder.literal(1))
+                        .where(
+                            criteriaBuilder.equal(
+                                productRoot.get<Any>("id"),
+                                root.get<Any>("id"),
+                            ),
+                            criteriaBuilder
+                                .lower(characteristic)
+                                .`in`(selectedValues.map(String::lowercase)),
+                        )
+
+                    predicates += criteriaBuilder.exists(subquery)
+                }
+            }
+
             criteriaBuilder.and(*predicates.toTypedArray())
         }
 }
