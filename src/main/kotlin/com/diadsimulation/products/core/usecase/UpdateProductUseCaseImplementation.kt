@@ -41,6 +41,11 @@ class UpdateProductUseCaseImplementation(
                 active = request.active.resolve(product.active),
                 prices = updatePrices(product.prices, request, now),
                 fees = updateFees(product.fees, request, now),
+                colors = request.colors.resolve(product.colors),
+                sizes = request.sizes.resolve(product.sizes),
+                brands = request.brands.resolve(product.brands),
+                models = request.models.resolve(product.models),
+                materials = request.materials.resolve(product.materials),
                 updatedAt = now,
             )
 

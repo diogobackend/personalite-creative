@@ -22,4 +22,9 @@ data class UpdateProductCommand(
     val removePriceIds: List<UUID> = emptyList(),
     val addFees: List<CreateProductFeeCommand> = emptyList(),
     val removeFeeIds: List<UUID> = emptyList(),
+    val colors: PatchField<List<String>> = PatchField.Absent,
+    val sizes: PatchField<List<String>> = PatchField.Absent,
+    val brands: PatchField<List<String>> = PatchField.Absent,
+    val models: PatchField<List<String>> = PatchField.Absent,
+    val materials: PatchField<List<String>> = PatchField.Absent,
 )

@@ -135,6 +135,26 @@ class ProductWebMapper {
                     )
                 },
             removeFeeIds = optionalArray(request.removeFeeIds).map(::uuid),
+            colors =
+                patch(request.colors) { node ->
+                    array(node).map(::text)
+                },
+            sizes =
+                patch(request.sizes) { node ->
+                    array(node).map(::text)
+                },
+            brands =
+                patch(request.brands) { node ->
+                    array(node).map(::text)
+                },
+            models =
+                patch(request.models) { node ->
+                    array(node).map(::text)
+                },
+            materials =
+                patch(request.materials) { node ->
+                    array(node).map(::text)
+                },
         )
 
     private fun <T> patch(

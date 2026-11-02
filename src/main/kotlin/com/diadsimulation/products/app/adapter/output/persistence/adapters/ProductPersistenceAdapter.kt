@@ -51,6 +51,16 @@ class ProductPersistenceAdapter(
             productionLeadTimeMinDays = product.productionLeadTimeMinDays
             productionLeadTimeMaxDays = product.productionLeadTimeMaxDays
             active = product.active
+            colors.clear()
+            colors.addAll(product.colors)
+            sizes.clear()
+            sizes.addAll(product.sizes)
+            brands.clear()
+            brands.addAll(product.brands)
+            models.clear()
+            models.addAll(product.models)
+            materials.clear()
+            materials.addAll(product.materials)
             updatedAt = product.updatedAt
         }
 

@@ -18,4 +18,9 @@ data class UpdateProductRequest(
     val removePriceIds: JsonNode? = null,
     val addFees: JsonNode? = null,
     val removeFeeIds: JsonNode? = null,
+    val colors: JsonNode? = null,
+    val sizes: JsonNode? = null,
+    val brands: JsonNode? = null,
+    val models: JsonNode? = null,
+    val materials: JsonNode? = null,
 )
