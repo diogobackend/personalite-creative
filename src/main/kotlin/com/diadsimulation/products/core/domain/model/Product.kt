@@ -2,10 +2,8 @@ package com.diadsimulation.products.core.domain.model
 
 import com.diadsimulation.products.core.domain.enums.PricingType
 import com.diadsimulation.products.core.domain.enums.ProductCategory
-import com.diadsimulation.products.core.domain.model.ProductFee
-import com.diadsimulation.products.core.domain.model.ProductPrice
 import java.time.OffsetDateTime
-import java.util.Collections
+import java.util.Collections.emptyList
 import java.util.UUID
 
 data class Product(
@@ -20,8 +18,13 @@ data class Product(
     val productionLeadTimeMinDays: Int? = null,
     val productionLeadTimeMaxDays: Int? = null,
     val active: Boolean = true,
-    val prices: List<ProductPrice> = Collections.emptyList(),
-    val fees: List<ProductFee> = Collections.emptyList(),
+    val prices: List<ProductPrice> = emptyList(),
+    val fees: List<ProductFee> = emptyList(),
     val createdAt: OffsetDateTime = OffsetDateTime.now(),
     val updatedAt: OffsetDateTime = OffsetDateTime.now(),
+    val colors: List<String> = emptyList(),
+    val sizes: List<String> = emptyList(),
+    val brands: List<String> = emptyList(),
+    val models: List<String> = emptyList(),
+    val materials: List<String> = emptyList(),
 )

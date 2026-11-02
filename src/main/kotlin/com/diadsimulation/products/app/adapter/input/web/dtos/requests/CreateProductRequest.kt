@@ -34,4 +34,9 @@ data class CreateProductRequest(
     val prices: List<CreateProductPriceRequest> = emptyList(),
     @field:Valid
     val fees: List<CreateProductFeeRequest> = emptyList(),
+    val colors: List<String> = emptyList(),
+    val sizes: List<String> = emptyList(),
+    val brands: List<String> = emptyList(),
+    val models: List<String> = emptyList(),
+    val materials: List<String> = emptyList(),
 )

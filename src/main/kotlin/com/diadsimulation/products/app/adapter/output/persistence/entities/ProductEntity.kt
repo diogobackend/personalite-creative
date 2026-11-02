@@ -3,11 +3,14 @@ package com.diadsimulation.products.app.adapter.output.persistence.entities
 import com.diadsimulation.products.core.domain.enums.PricingType
 import com.diadsimulation.products.core.domain.enums.ProductCategory
 import jakarta.persistence.CascadeType.ALL
+import jakarta.persistence.CollectionTable
 import jakarta.persistence.Column
+import jakarta.persistence.ElementCollection
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType.STRING
 import jakarta.persistence.Enumerated
 import jakarta.persistence.Id
+import jakarta.persistence.JoinColumn
 import jakarta.persistence.OneToMany
 import jakarta.persistence.Table
 import java.time.OffsetDateTime
@@ -53,6 +56,26 @@ class ProductEntity(
         orphanRemoval = true,
     )
     val fees: MutableList<ProductFeeEntity> = mutableListOf(),
+    @ElementCollection
+    @CollectionTable(name = "product_colors", joinColumns = [JoinColumn(name = "product_id")])
+    @Column(name = "color", nullable = false)
+    val colors: MutableList<String> = mutableListOf(),
+    @ElementCollection
+    @CollectionTable(name = "product_sizes", joinColumns = [JoinColumn(name = "product_id")])
+    @Column(name = "size", nullable = false)
+    val sizes: MutableList<String> = mutableListOf(),
+    @ElementCollection
+    @CollectionTable(name = "product_brands", joinColumns = [JoinColumn(name = "product_id")])
+    @Column(name = "brand", nullable = false)
+    val brands: MutableList<String> = mutableListOf(),
+    @ElementCollection
+    @CollectionTable(name = "product_models", joinColumns = [JoinColumn(name = "product_id")])
+    @Column(name = "model", nullable = false)
+    val models: MutableList<String> = mutableListOf(),
+    @ElementCollection
+    @CollectionTable(name = "product_materials", joinColumns = [JoinColumn(name = "product_id")])
+    @Column(name = "material", nullable = false)
+    val materials: MutableList<String> = mutableListOf(),
     @Column(name = "created_at", nullable = false, updatable = false)
     val createdAt: OffsetDateTime = OffsetDateTime.now(),
     @Column(name = "updated_at", nullable = false)

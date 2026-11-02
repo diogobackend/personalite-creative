@@ -35,6 +35,7 @@ class CreateProductUseCaseImplementation(
         validatePrices(product)
         validateFees(product)
         validateLeadTime(product)
+        validateVariations(product)
     }
 
     private fun validatePrices(product: Product) {
@@ -128,6 +129,24 @@ class CreateProductUseCaseImplementation(
         if (minimum != null && maximum != null) {
             require(maximum >= minimum) {
                 "O prazo máximo não pode ser inferior ao prazo mínimo."
+            }
+        }
+    }
+
+    private fun validateVariations(product: Product) {
+        mapOf(
+            "cores" to product.colors,
+            "tamanhos" to product.sizes,
+            "marcas" to product.brands,
+            "modelos" to product.models,
+            "materiais" to product.materials,
+        ).forEach { (field, values) ->
+            require(values.all { it.isNotBlank() }) {
+                "O campo $field não permite valores vazios."
+            }
+
+            require(values.map { it.trim().lowercase() }.distinct().size == values.size) {
+                "O campo $field não permite valores duplicados."
             }
         }
     }

@@ -38,6 +38,11 @@ class ProductWebMapper {
             productionLeadTimeMinDays = request.productionLeadTimeMinDays,
             productionLeadTimeMaxDays = request.productionLeadTimeMaxDays,
             active = request.active,
+            colors = request.colors,
+            sizes = request.sizes,
+            brands = request.brands,
+            models = request.models,
+            materials = request.materials,
             prices =
                 request.prices.map { price ->
                     ProductPrice(
@@ -232,6 +237,11 @@ class ProductWebMapper {
             productionLeadTimeMinDays = product.productionLeadTimeMinDays,
             productionLeadTimeMaxDays = product.productionLeadTimeMaxDays,
             active = product.active,
+            colors = product.colors,
+            sizes = product.sizes,
+            brands = product.brands,
+            models = product.models,
+            materials = product.materials,
             prices =
                 product.prices.map { price ->
                     ProductPriceResponse(

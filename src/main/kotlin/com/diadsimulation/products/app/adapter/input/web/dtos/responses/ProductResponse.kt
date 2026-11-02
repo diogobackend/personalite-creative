@@ -19,6 +19,11 @@ data class ProductResponse(
     val active: Boolean,
     val prices: List<ProductPriceResponse>,
     val fees: List<ProductFeeResponse>,
+    val colors: List<String>,
+    val sizes: List<String>,
+    val brands: List<String>,
+    val models: List<String>,
+    val materials: List<String>,
     val createdAt: OffsetDateTime,
     val updatedAt: OffsetDateTime,
 )
