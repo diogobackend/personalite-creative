@@ -208,10 +208,30 @@ object SaleSpecification {
 
                 predicates +=
                     when (status) {
-                        NO_DEADLINE -> cb.isNull(deadline)
-                        ON_TIME -> cb.greaterThan(deadline, today)
-                        DUE_TODAY -> cb.equal(deadline, today)
-                        OVERDUE -> cb.lessThan(deadline, today)
+                        NO_DEADLINE -> {
+                            cb.isNull(deadline)
+                        }
+
+                        ON_TIME -> {
+                            cb.and(
+                                cb.isNull(deliveredAt),
+                                cb.greaterThan(deadline, today),
+                            )
+                        }
+
+                        DUE_TODAY -> {
+                            cb.and(
+                                cb.isNull(deliveredAt),
+                                cb.equal(deadline, today),
+                            )
+                        }
+
+                        OVERDUE -> {
+                            cb.and(
+                                cb.isNull(deliveredAt),
+                                cb.lessThan(deadline, today),
+                            )
+                        }
                     }
             }
 
