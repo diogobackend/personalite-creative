@@ -4,7 +4,6 @@ import com.diadsimulation.inventory.app.adapter.input.web.dtos.request.RegisterI
 import com.diadsimulation.inventory.app.adapter.input.web.dtos.request.UpdateInventoryRequest
 import com.diadsimulation.inventory.app.adapter.input.web.dtos.response.InventoryPageResponse
 import com.diadsimulation.inventory.app.adapter.input.web.dtos.response.RegisterInventoryResponse
-import com.diadsimulation.inventory.core.domain.enums.InventorySize
 import com.diadsimulation.inventory.core.domain.enums.InventoryUnit
 import com.diadsimulation.products.core.domain.enums.ProductCategory
 import io.swagger.v3.oas.annotations.Operation
@@ -84,7 +83,7 @@ interface InventoryApi {
         @RequestParam(required = false)
         color: String?,
         @RequestParam(required = false)
-        size: InventorySize?,
+        size: String?,
         @RequestParam(required = false)
         material: String?,
         @RequestParam(required = false)

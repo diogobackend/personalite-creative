@@ -1,6 +1,5 @@
 package com.diadsimulation.inventory.app.adapter.output.persistence.entity
 
-import com.diadsimulation.inventory.core.domain.enums.InventorySize
 import com.diadsimulation.inventory.core.domain.enums.InventoryUnit
 import com.diadsimulation.products.core.domain.enums.ProductCategory
 import jakarta.persistence.Column
@@ -45,9 +44,8 @@ class InventoryEntity(
     var unit: InventoryUnit?,
     @Column(name = "color")
     var color: String?,
-    @Enumerated(STRING)
     @Column(name = "size")
-    var size: InventorySize?,
+    var size: String?,
     @Column(name = "material")
     var material: String?,
     @Column(name = "brand")

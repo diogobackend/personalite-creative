@@ -1,6 +1,5 @@
 package com.diadsimulation.inventory.app.adapter.input.web.dtos.response
 
-import com.diadsimulation.inventory.core.domain.enums.InventorySize
 import com.diadsimulation.inventory.core.domain.enums.InventoryUnit
 import com.diadsimulation.products.core.domain.enums.ProductCategory
 import java.time.OffsetDateTime
@@ -16,7 +15,7 @@ data class RegisterInventoryResponse(
     val minimumQuantity: Int?,
     val unit: InventoryUnit?,
     val color: String?,
-    val size: InventorySize?,
+    val size: String?,
     val material: String?,
     val brand: String?,
     val model: String?,

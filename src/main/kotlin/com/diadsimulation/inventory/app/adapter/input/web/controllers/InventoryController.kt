@@ -5,7 +5,6 @@ import com.diadsimulation.inventory.app.adapter.input.web.dtos.response.Inventor
 import com.diadsimulation.inventory.app.adapter.input.web.dtos.response.RegisterInventoryResponse
 import com.diadsimulation.inventory.app.adapter.input.web.mapper.RegisterInventoryMapper
 import com.diadsimulation.inventory.app.adapter.input.web.swagger.InventoryApi
-import com.diadsimulation.inventory.core.domain.enums.InventorySize
 import com.diadsimulation.inventory.core.domain.enums.InventoryUnit
 import com.diadsimulation.inventory.core.domain.model.GetInventoryFilter
 import com.diadsimulation.inventory.core.domain.model.UpdateInventory
@@ -50,7 +49,7 @@ class InventoryController(
         maxQuantity: Int?,
         unit: InventoryUnit?,
         color: String?,
-        size: InventorySize?,
+        size: String?,
         material: String?,
         brand: String?,
         model: String?,

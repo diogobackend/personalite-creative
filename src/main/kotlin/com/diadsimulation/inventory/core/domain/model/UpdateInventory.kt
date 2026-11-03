@@ -1,6 +1,5 @@
 package com.diadsimulation.inventory.core.domain.model
 
-import com.diadsimulation.inventory.core.domain.enums.InventorySize
 import com.diadsimulation.inventory.core.domain.enums.InventoryUnit
 import com.diadsimulation.products.core.domain.enums.ProductCategory
 
@@ -12,7 +11,7 @@ data class UpdateInventory(
     val minimumQuantity: Int? = null,
     val unit: InventoryUnit? = null,
     val color: String? = null,
-    val size: InventorySize? = null,
+    val size: String? = null,
     val material: String? = null,
     val brand: String? = null,
     val model: String? = null,

@@ -1,7 +1,6 @@
 package com.diadsimulation.inventory.app.adapter.output.persistence.specifications
 
 import com.diadsimulation.inventory.app.adapter.output.persistence.entity.InventoryEntity
-import com.diadsimulation.inventory.core.domain.enums.InventorySize
 import com.diadsimulation.inventory.core.domain.enums.InventoryUnit
 import com.diadsimulation.inventory.core.domain.model.GetInventoryFilter
 import com.diadsimulation.products.core.domain.enums.ProductCategory
@@ -53,9 +52,7 @@ object InventorySpecifications {
                 predicates += cb.equal(root.get<InventoryUnit>("unit"), it)
             }
 
-            filter.size?.let {
-                predicates += cb.equal(root.get<InventorySize>("size"), it)
-            }
+            contains("size", filter.size)
 
             filter.quantity?.let {
                 predicates += cb.equal(root.get<Int>("quantity"), it)
