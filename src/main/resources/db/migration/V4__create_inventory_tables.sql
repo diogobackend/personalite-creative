@@ -1,43 +1,50 @@
--- PRODUCTS
-ALTER TABLE products
-    ALTER COLUMN category TYPE VARCHAR(150),
-    ADD COLUMN category_id UUID;
+CREATE TABLE inventory (
+    inventory_id UUID PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    category VARCHAR(255) NOT NULL,
+    description TEXT,
+    product_id UUID,
+    quantity INTEGER NOT NULL DEFAULT 0,
+    minimum_quantity INTEGER,
+    unit VARCHAR(255),
+    color VARCHAR(255),
+    size VARCHAR(255),
+    material VARCHAR(255),
+    brand VARCHAR(255),
+    model VARCHAR(255),
+    sku VARCHAR(255),
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL,
 
-ALTER TABLE products
-    ADD CONSTRAINT fk_products_category
-    FOREIGN KEY (category_id)
-    REFERENCES categories(id)
-    ON DELETE SET NULL;
+    CONSTRAINT uk_inventory_sku UNIQUE (sku),
+    CONSTRAINT ck_inventory_quantity CHECK (quantity >= 0),
+    CONSTRAINT ck_inventory_minimum_quantity
+        CHECK (minimum_quantity IS NULL OR minimum_quantity >= 0)
+);
 
-CREATE INDEX idx_products_category_id
-    ON products(category_id);
+CREATE TABLE inventory_movements (
+    movement_id UUID PRIMARY KEY,
+    inventory_id UUID NOT NULL,
+    type VARCHAR(50) NOT NULL,
+    quantity INTEGER NOT NULL,
+    reason VARCHAR(255) NOT NULL,
+    expense_id UUID,
+    sale_id UUID,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL,
 
+    CONSTRAINT fk_inventory_movements_inventory
+        FOREIGN KEY (inventory_id)
+        REFERENCES inventory(inventory_id),
 
--- INVENTORY
-ALTER TABLE inventory
-    ALTER COLUMN category TYPE VARCHAR(150),
-    ADD COLUMN category_id UUID;
+    CONSTRAINT ck_inventory_movements_quantity
+        CHECK (quantity > 0),
 
-ALTER TABLE inventory
-    ADD CONSTRAINT fk_inventory_category
-    FOREIGN KEY (category_id)
-    REFERENCES categories(id)
-    ON DELETE SET NULL;
+    CONSTRAINT ck_inventory_movements_type
+        CHECK (type IN ('IN', 'OUT', 'ADJUSTMENT'))
+);
 
-CREATE INDEX idx_inventory_category_id
-    ON inventory(category_id);
+CREATE INDEX idx_inventory_product_id
+    ON inventory(product_id);
 
-
--- EXPENSES
-ALTER TABLE expenses
-    ALTER COLUMN category TYPE VARCHAR(150),
-    ADD COLUMN category_id UUID;
-
-ALTER TABLE expenses
-    ADD CONSTRAINT fk_expenses_category
-    FOREIGN KEY (category_id)
-    REFERENCES categories(id)
-    ON DELETE SET NULL;
-
-CREATE INDEX idx_expenses_category_id
-    ON expenses(category_id);
+CREATE INDEX idx_inventory_movements_inventory_id
+    ON inventory_movements(inventory_id);
