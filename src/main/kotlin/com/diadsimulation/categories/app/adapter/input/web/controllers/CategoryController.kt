@@ -7,10 +7,12 @@ import com.diadsimulation.categories.app.adapter.input.web.mappers.CategoryWebMa
 import com.diadsimulation.categories.app.adapter.input.web.swagger.CategoryApi
 import com.diadsimulation.categories.core.domain.enums.CategoryType
 import com.diadsimulation.categories.core.ports.input.CreateCategoryInputPort
+import com.diadsimulation.categories.core.ports.input.DeleteCategoryInputPort
 import com.diadsimulation.categories.core.ports.input.GetCategoriesInputPort
 import com.diadsimulation.categories.core.ports.input.UpdateCategoryInputPort
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PostMapping
@@ -25,6 +27,7 @@ class CategoryController(
     private val categoryWebMapper: CategoryWebMapper,
     private val getCategoriesInputPort: GetCategoriesInputPort,
     private val updateCategoryInputPort: UpdateCategoryInputPort,
+    private val deleteCategoryInputPort: DeleteCategoryInputPort,
 ) : CategoryApi {
     @PostMapping
     override fun create(request: CreateCategoryRequest): ResponseEntity<CategoryResponse> {
@@ -60,4 +63,10 @@ class CategoryController(
                 updateCategoryInputPort.execute(id, request.name),
             ),
         )
+
+    @DeleteMapping("/{id}")
+    override fun delete(id: UUID): ResponseEntity<Void> {
+        deleteCategoryInputPort.execute(id)
+        return ResponseEntity.noContent().build()
+    }
 }

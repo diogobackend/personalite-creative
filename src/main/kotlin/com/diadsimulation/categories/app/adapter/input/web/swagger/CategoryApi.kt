@@ -90,4 +90,24 @@ interface CategoryApi {
         @PathVariable id: UUID,
         @Valid @RequestBody request: UpdateCategoryRequest,
     ): ResponseEntity<CategoryResponse>
+
+    @Operation(
+        summary = "Excluir categoria",
+        description = "Exclui uma categoria pelo ID.",
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "204",
+                description = "Categoria excluída com sucesso",
+            ),
+            ApiResponse(
+                responseCode = "404",
+                description = "Categoria não encontrada",
+            ),
+        ],
+    )
+    fun delete(
+        @PathVariable id: UUID,
+    ): ResponseEntity<Void>
 }

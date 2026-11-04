@@ -18,4 +18,6 @@ interface CategoryRepositoryOutputPort {
     ): List<Category>
 
     fun findById(id: UUID): Category?
+
+    fun deleteById(id: UUID)
 }

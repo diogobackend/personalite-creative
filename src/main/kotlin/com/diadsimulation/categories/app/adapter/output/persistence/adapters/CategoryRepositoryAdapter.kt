@@ -61,4 +61,8 @@ class CategoryRepositoryAdapter(
             .findById(id)
             .orElse(null)
             ?.let(categoryPersistenceMapper::toDomain)
+
+    override fun deleteById(id: UUID) {
+        categoryJpaRepository.deleteById(id)
+    }
 }
