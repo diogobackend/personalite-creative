@@ -9,7 +9,6 @@ import com.diadsimulation.products.app.adapter.input.web.mappers.ProductWebMappe
 import com.diadsimulation.products.app.adapter.input.web.swagger.ProductApi
 import com.diadsimulation.products.core.domain.enums.FeeChargeType
 import com.diadsimulation.products.core.domain.enums.PricingType
-import com.diadsimulation.products.core.domain.enums.ProductCategory
 import com.diadsimulation.products.core.domain.model.GetProductsFilter
 import com.diadsimulation.products.core.port.input.CreateProductInputPort
 import com.diadsimulation.products.core.port.input.DeleteProductInputPort
@@ -53,7 +52,7 @@ class ProductController(
         code: String?,
         name: String?,
         description: String?,
-        category: ProductCategory?,
+        category: String?,
         active: Boolean?,
         pricingType: PricingType?,
         feeName: String?,

@@ -1,13 +1,12 @@
 package com.diadsimulation.inventory.core.domain.model
 
 import com.diadsimulation.inventory.core.domain.enums.InventoryUnit
-import com.diadsimulation.products.core.domain.enums.ProductCategory
 import java.time.LocalDate
 
 data class GetInventoryFilter(
     val sku: String? = null,
     val name: String? = null,
-    val category: ProductCategory? = null,
+    val category: String? = null,
     val description: String? = null,
     val quantity: Int? = null,
     val minQuantity: Int? = null,

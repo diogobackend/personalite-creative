@@ -3,13 +3,13 @@ package com.diadsimulation.expenses.core.usecase
 import com.diadsimulation.expenses.core.domain.enums.ExpenseAllocationType.CATEGORY_PRODUCTS
 import com.diadsimulation.expenses.core.domain.enums.ExpenseAllocationType.GENERAL
 import com.diadsimulation.expenses.core.domain.enums.ExpenseAllocationType.SPECIFIC_PRODUCT
-import com.diadsimulation.expenses.core.domain.enums.ExpenseCategory.STOCK
 import com.diadsimulation.expenses.core.domain.model.Expense
 import com.diadsimulation.expenses.core.domain.model.ExpenseUpdate
 import com.diadsimulation.expenses.core.ports.input.UpdateExpenseInputPort
 import com.diadsimulation.expenses.core.ports.output.ExpenseRepositoryOutputPort
 import com.diadsimulation.expenses.core.ports.output.ExpenseStockOutputPort
 import com.diadsimulation.expenses.core.ports.output.ProductExpenseValidationOutputPort
+import com.diadsimulation.expenses.core.usecase.UpdateExpenseUseCaseImplementation.Constants.INVENTORY_ITEM_CATEGORY
 import java.math.BigDecimal.ZERO
 import java.time.OffsetDateTime
 import java.util.Collections.emptyList
@@ -21,6 +21,10 @@ class UpdateExpenseUseCaseImplementation(
     private val productExpenseValidationOutputPort: ProductExpenseValidationOutputPort,
     private val expenseStockOutputPort: ExpenseStockOutputPort,
 ) : UpdateExpenseInputPort {
+    object Constants {
+        const val INVENTORY_ITEM_CATEGORY = "item de estoque"
+    }
+
     override fun execute(
         id: UUID,
         update: ExpenseUpdate,
@@ -80,7 +84,7 @@ class UpdateExpenseUseCaseImplementation(
                 inventoryId =
                     when {
                         update.has("inventoryId") -> update.inventoryId
-                        update.category != null && update.category != STOCK -> null
+                        update.category != null && update.category != INVENTORY_ITEM_CATEGORY -> null
                         else -> currentExpense.inventoryId
                     },
                 description =
@@ -96,7 +100,7 @@ class UpdateExpenseUseCaseImplementation(
                 quantity =
                     when {
                         update.has("quantity") -> update.quantity
-                        update.category != null && update.category != STOCK -> null
+                        update.category != null && update.category != INVENTORY_ITEM_CATEGORY -> null
                         else -> currentExpense.quantity
                     },
                 products = products,
@@ -163,7 +167,7 @@ class UpdateExpenseUseCaseImplementation(
     }
 
     private fun validateStock(expense: Expense) {
-        if (expense.category == STOCK) {
+        if (expense.category == INVENTORY_ITEM_CATEGORY) {
             require(expense.inventoryId != null) {
                 "O item do estoque é obrigatório."
             }

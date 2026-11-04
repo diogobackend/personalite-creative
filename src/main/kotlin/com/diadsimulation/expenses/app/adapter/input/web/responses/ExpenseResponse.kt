@@ -1,7 +1,6 @@
 package com.diadsimulation.expenses.app.adapter.input.web.responses
 
 import com.diadsimulation.expenses.core.domain.enums.ExpenseAllocationType
-import com.diadsimulation.expenses.core.domain.enums.ExpenseCategory
 import com.diadsimulation.expenses.core.domain.enums.ExpenseStatus
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -14,7 +13,7 @@ data class ExpenseResponse(
     val name: String,
     val description: String?,
     val value: BigDecimal,
-    val category: ExpenseCategory,
+    val category: String,
     val allocationType: ExpenseAllocationType,
     val status: ExpenseStatus,
     val quantity: Int?,

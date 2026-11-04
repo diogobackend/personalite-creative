@@ -1,7 +1,6 @@
 package com.diadsimulation.inventory.app.adapter.output.persistence.entity
 
 import com.diadsimulation.inventory.core.domain.enums.InventoryUnit
-import com.diadsimulation.products.core.domain.enums.ProductCategory
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType.STRING
@@ -28,9 +27,8 @@ class InventoryEntity(
     val inventoryId: UUID,
     @Column(name = "name", nullable = false)
     var name: String,
-    @Enumerated(STRING)
-    @Column(name = "category", nullable = false)
-    var category: ProductCategory,
+    @Column(name = "category", nullable = false, length = 150)
+    var category: String,
     @Column(name = "description", columnDefinition = "TEXT")
     var description: String?,
     @Column(name = "product_id")
@@ -58,4 +56,6 @@ class InventoryEntity(
     val createdAt: OffsetDateTime,
     @Column(name = "updated_at", nullable = false)
     var updatedAt: OffsetDateTime,
+    @Column(name = "category_id")
+    val categoryId: UUID? = null,
 )

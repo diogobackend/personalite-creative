@@ -1,7 +1,6 @@
 package com.diadsimulation.expenses.app.adapter.output.persistence.entities
 
 import com.diadsimulation.expenses.core.domain.enums.ExpenseAllocationType
-import com.diadsimulation.expenses.core.domain.enums.ExpenseCategory
 import com.diadsimulation.expenses.core.domain.enums.ExpenseStatus
 import jakarta.persistence.CascadeType.ALL
 import jakarta.persistence.Column
@@ -30,9 +29,8 @@ class ExpenseEntity(
     var description: String? = null,
     @Column(nullable = false, precision = 15, scale = 2)
     var value: BigDecimal,
-    @Enumerated(STRING)
-    @Column(nullable = false, length = 30)
-    var category: ExpenseCategory,
+    @Column(nullable = false, length = 150)
+    var category: String,
     @Enumerated(STRING)
     @Column(name = "allocation_type", nullable = false, length = 30)
     var allocationType: ExpenseAllocationType,
@@ -53,4 +51,6 @@ class ExpenseEntity(
     val createdAt: OffsetDateTime = OffsetDateTime.now(),
     @Column(name = "updated_at", nullable = false)
     var updatedAt: OffsetDateTime = OffsetDateTime.now(),
+    @Column(name = "category_id")
+    val categoryId: UUID? = null,
 )

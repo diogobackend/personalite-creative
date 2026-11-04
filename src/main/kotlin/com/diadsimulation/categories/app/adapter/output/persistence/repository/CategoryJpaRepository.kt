@@ -13,4 +13,9 @@ interface CategoryJpaRepository :
         name: String,
         type: CategoryType,
     ): Boolean
+
+    fun existsByIdAndType(
+        id: UUID,
+        type: CategoryType,
+    ): Boolean
 }

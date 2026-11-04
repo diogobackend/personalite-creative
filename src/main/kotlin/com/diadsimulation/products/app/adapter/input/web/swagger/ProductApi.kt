@@ -7,7 +7,6 @@ import com.diadsimulation.products.app.adapter.input.web.dtos.responses.ProductR
 import com.diadsimulation.products.app.adapter.input.web.dtos.responses.ProductsPageResponse
 import com.diadsimulation.products.core.domain.enums.FeeChargeType
 import com.diadsimulation.products.core.domain.enums.PricingType
-import com.diadsimulation.products.core.domain.enums.ProductCategory
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
@@ -139,7 +138,7 @@ interface ProductApi {
         description: String?,
         @Parameter(description = "Categoria exata do produto.")
         @RequestParam(name = "category", required = false)
-        category: ProductCategory?,
+        category: String?,
         @Parameter(description = "Situação do produto. Quando omitido, inclui ativos e inativos.")
         @RequestParam(name = "active", required = false)
         active: Boolean?,

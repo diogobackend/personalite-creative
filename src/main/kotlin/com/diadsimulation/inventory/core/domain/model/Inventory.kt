@@ -1,14 +1,14 @@
 package com.diadsimulation.inventory.core.domain.model
 
 import com.diadsimulation.inventory.core.domain.enums.InventoryUnit
-import com.diadsimulation.products.core.domain.enums.ProductCategory
 import java.time.OffsetDateTime
 import java.util.UUID
 
 data class Inventory(
     val id: UUID = UUID.randomUUID(),
     val name: String,
-    val category: ProductCategory,
+    val category: String,
+    val categoryId: UUID? = null,
     val description: String? = null,
     val productId: UUID? = null,
     val quantity: Int = 0,

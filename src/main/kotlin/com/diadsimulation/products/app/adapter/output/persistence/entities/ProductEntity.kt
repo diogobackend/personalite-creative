@@ -1,7 +1,6 @@
 package com.diadsimulation.products.app.adapter.output.persistence.entities
 
 import com.diadsimulation.products.core.domain.enums.PricingType
-import com.diadsimulation.products.core.domain.enums.ProductCategory
 import jakarta.persistence.CascadeType.ALL
 import jakarta.persistence.CollectionTable
 import jakarta.persistence.Column
@@ -26,9 +25,8 @@ class ProductEntity(
     var code: String,
     @Column(nullable = false, length = 150)
     var name: String,
-    @Column(nullable = false, length = 30)
-    @Enumerated(STRING)
-    var category: ProductCategory,
+    @Column(nullable = false, length = 150)
+    var category: String,
     @Column(columnDefinition = "TEXT")
     var description: String? = null,
     @Column(name = "minimum_quantity")
@@ -80,4 +78,6 @@ class ProductEntity(
     val createdAt: OffsetDateTime = OffsetDateTime.now(),
     @Column(name = "updated_at", nullable = false)
     var updatedAt: OffsetDateTime = OffsetDateTime.now(),
+    @Column(name = "category_id")
+    val categoryId: UUID? = null,
 )

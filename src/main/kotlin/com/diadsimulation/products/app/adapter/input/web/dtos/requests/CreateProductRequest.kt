@@ -1,7 +1,6 @@
 package com.diadsimulation.products.app.adapter.input.web.dtos.requests
 
 import com.diadsimulation.products.core.domain.enums.PricingType
-import com.diadsimulation.products.core.domain.enums.ProductCategory
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Pattern
@@ -9,6 +8,7 @@ import jakarta.validation.constraints.Positive
 import jakarta.validation.constraints.PositiveOrZero
 import org.jetbrains.annotations.NotNull
 import java.util.Collections.emptyList
+import java.util.UUID
 
 data class CreateProductRequest(
     @field:NotBlank
@@ -17,7 +17,9 @@ data class CreateProductRequest(
     @field:NotBlank
     val name: String,
     @field:NotNull
-    val category: ProductCategory,
+    val category: String,
+    @field:NotNull
+    val categoryId: UUID,
     val description: String? = null,
     @field:Positive
     val minimumQuantity: Int? = null,

@@ -5,6 +5,7 @@ import com.diadsimulation.products.core.port.input.DeleteProductInputPort
 import com.diadsimulation.products.core.port.input.GetProductByIdInputPort
 import com.diadsimulation.products.core.port.input.GetProductsInputPort
 import com.diadsimulation.products.core.port.input.UpdateProductInputPort
+import com.diadsimulation.products.core.port.output.ProductCategoryOutputPort
 import com.diadsimulation.products.core.port.output.ProductRepositoryOutputPort
 import com.diadsimulation.products.core.usecase.CreateProductUseCaseImplementation
 import com.diadsimulation.products.core.usecase.DeleteProductUseCaseImplementation
@@ -17,8 +18,14 @@ import org.springframework.context.annotation.Configuration
 @Configuration
 class ProductUseCaseConfiguration {
     @Bean
-    fun createProductUseCase(productRepositoryOutputPort: ProductRepositoryOutputPort): CreateProductInputPort =
-        CreateProductUseCaseImplementation(productRepositoryOutputPort)
+    fun createProductUseCase(
+        productRepositoryOutputPort: ProductRepositoryOutputPort,
+        productCategoryOutputPort: ProductCategoryOutputPort,
+    ): CreateProductInputPort =
+        CreateProductUseCaseImplementation(
+            productRepositoryOutputPort,
+            productCategoryOutputPort,
+        )
 
     @Bean
     fun getProductsUseCase(productRepositoryOutputPort: ProductRepositoryOutputPort): GetProductsInputPort =

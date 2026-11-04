@@ -2,7 +2,6 @@ package com.diadsimulation.products.core.domain.model
 
 import com.diadsimulation.products.core.domain.enums.FeeChargeType
 import com.diadsimulation.products.core.domain.enums.PricingType
-import com.diadsimulation.products.core.domain.enums.ProductCategory
 import java.math.BigDecimal
 import java.time.OffsetDateTime
 
@@ -10,7 +9,7 @@ data class GetProductsFilter(
     val code: String? = null,
     val name: String? = null,
     val description: String? = null,
-    val category: ProductCategory? = null,
+    val category: String? = null,
     val active: Boolean? = null,
     val pricingType: PricingType? = null,
     val feeName: String? = null,

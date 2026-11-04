@@ -8,7 +8,6 @@ import com.diadsimulation.products.app.adapter.input.web.dtos.responses.ProductR
 import com.diadsimulation.products.app.adapter.input.web.dtos.responses.ProductsPageResponse
 import com.diadsimulation.products.core.domain.enums.FeeChargeType
 import com.diadsimulation.products.core.domain.enums.PricingType
-import com.diadsimulation.products.core.domain.enums.ProductCategory
 import com.diadsimulation.products.core.domain.model.CreateProductFeeCommand
 import com.diadsimulation.products.core.domain.model.CreateProductPriceCommand
 import com.diadsimulation.products.core.domain.model.Product
@@ -31,6 +30,7 @@ class ProductWebMapper {
             code = request.code,
             name = request.name,
             category = request.category,
+            categoryId = request.categoryId,
             description = request.description,
             minimumQuantity = request.minimumQuantity,
             pricingType = request.pricingType,
@@ -65,10 +65,7 @@ class ProductWebMapper {
     fun toCommand(request: UpdateProductRequest): UpdateProductCommand =
         UpdateProductCommand(
             name = patch(request.name) { text(it) },
-            category =
-                patch(request.category) {
-                    enumValue<ProductCategory>(it)
-                },
+            category = patch(request.category) { it.asText() },
             description = nullablePatch(request.description) { text(it) },
             minimumQuantity = nullablePatch(request.minimumQuantity) { integer(it) },
             pricingType =

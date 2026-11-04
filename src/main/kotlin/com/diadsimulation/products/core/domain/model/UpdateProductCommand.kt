@@ -1,14 +1,13 @@
 package com.diadsimulation.products.core.domain.model
 
 import com.diadsimulation.products.core.domain.enums.PricingType
-import com.diadsimulation.products.core.domain.enums.ProductCategory
 import com.diadsimulation.products.core.utils.PatchField
 import java.util.Collections.emptyList
 import java.util.UUID
 
 data class UpdateProductCommand(
     val name: PatchField<String> = PatchField.Absent,
-    val category: PatchField<ProductCategory> = PatchField.Absent,
+    val category: PatchField<String> = PatchField.Absent,
     val description: PatchField<String?> = PatchField.Absent,
     val minimumQuantity: PatchField<Int?> = PatchField.Absent,
     val pricingType: PatchField<PricingType> = PatchField.Absent,

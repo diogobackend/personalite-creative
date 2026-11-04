@@ -1,14 +1,13 @@
 package com.diadsimulation.inventory.app.adapter.input.web.dtos.response
 
 import com.diadsimulation.inventory.core.domain.enums.InventoryUnit
-import com.diadsimulation.products.core.domain.enums.ProductCategory
 import java.time.OffsetDateTime
 import java.util.UUID
 
 data class RegisterInventoryResponse(
     val id: UUID,
     val name: String,
-    val category: ProductCategory,
+    val category: String,
     val description: String?,
     val productId: UUID?,
     val quantity: Int,

@@ -23,6 +23,7 @@ class ExpenseWebMapper {
             description = request.description,
             value = request.value,
             category = request.category,
+            categoryId = request.categoryId,
             allocationType = request.allocationType,
             status = request.status,
             quantity = request.quantity,

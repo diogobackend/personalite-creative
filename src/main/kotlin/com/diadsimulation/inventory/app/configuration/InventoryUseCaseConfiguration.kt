@@ -5,6 +5,7 @@ import com.diadsimulation.inventory.core.ports.input.GetInventoryByIdInputPort
 import com.diadsimulation.inventory.core.ports.input.GetInventoryInputPort
 import com.diadsimulation.inventory.core.ports.input.RegisterInventoryInputPort
 import com.diadsimulation.inventory.core.ports.input.UpdateInventoryInputPort
+import com.diadsimulation.inventory.core.ports.output.InventoryCategoryOutputPort
 import com.diadsimulation.inventory.core.ports.output.InventoryMovementRepositoryOutputPort
 import com.diadsimulation.inventory.core.ports.output.InventoryRepositoryOutputPort
 import com.diadsimulation.inventory.core.usecase.DeleteInventoryUseCaseImplementation
@@ -21,10 +22,12 @@ class InventoryUseCaseConfiguration {
     fun registerInventoryUseCase(
         inventoryRepositoryOutputPort: InventoryRepositoryOutputPort,
         inventoryMovementRepositoryOutputPort: InventoryMovementRepositoryOutputPort,
+        inventoryCategoryOutputPort: InventoryCategoryOutputPort,
     ): RegisterInventoryInputPort =
         RegisterInventoryUseCaseImplementation(
             inventoryRepositoryOutputPort,
             inventoryMovementRepositoryOutputPort,
+            inventoryCategoryOutputPort,
         )
 
     @Bean

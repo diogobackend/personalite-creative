@@ -5,6 +5,7 @@ import com.diadsimulation.expenses.core.ports.input.DeleteExpenseInputPort
 import com.diadsimulation.expenses.core.ports.input.GetExpenseByIdInputPort
 import com.diadsimulation.expenses.core.ports.input.GetExpensesInputPort
 import com.diadsimulation.expenses.core.ports.input.UpdateExpenseInputPort
+import com.diadsimulation.expenses.core.ports.output.ExpenseCategoryOutputPort
 import com.diadsimulation.expenses.core.ports.output.ExpenseRepositoryOutputPort
 import com.diadsimulation.expenses.core.ports.output.ExpenseStockOutputPort
 import com.diadsimulation.expenses.core.ports.output.ProductExpenseValidationOutputPort
@@ -23,11 +24,13 @@ class ExpenseUseCaseConfiguration {
         expenseRepositoryOutputPort: ExpenseRepositoryOutputPort,
         productExpenseValidationOutputPort: ProductExpenseValidationOutputPort,
         expenseStockOutputPort: ExpenseStockOutputPort,
+        expenseCategoryOutputPort: ExpenseCategoryOutputPort,
     ): CreateExpenseInputPort =
         CreateExpenseUseCaseImplementation(
             expenseRepositoryOutputPort = expenseRepositoryOutputPort,
             productExpenseValidationOutputPort = productExpenseValidationOutputPort,
             expenseStockOutputPort = expenseStockOutputPort,
+            expenseCategoryOutputPort = expenseCategoryOutputPort,
         )
 
     @Bean

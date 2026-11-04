@@ -13,7 +13,6 @@ import com.diadsimulation.inventory.core.ports.input.GetInventoryByIdInputPort
 import com.diadsimulation.inventory.core.ports.input.GetInventoryInputPort
 import com.diadsimulation.inventory.core.ports.input.RegisterInventoryInputPort
 import com.diadsimulation.inventory.core.ports.input.UpdateInventoryInputPort
-import com.diadsimulation.products.core.domain.enums.ProductCategory
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RequestMapping
@@ -42,7 +41,7 @@ class InventoryController(
     override fun getInventory(
         sku: String?,
         name: String?,
-        category: ProductCategory?,
+        category: String?,
         description: String?,
         quantity: Int?,
         minQuantity: Int?,

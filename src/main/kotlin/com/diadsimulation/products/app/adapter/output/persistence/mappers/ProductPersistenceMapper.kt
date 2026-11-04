@@ -15,6 +15,7 @@ class ProductPersistenceMapper {
         val entity =
             ProductEntity(
                 id = product.id,
+                categoryId = product.categoryId,
                 code = product.code,
                 name = product.name,
                 category = product.category,
@@ -69,6 +70,7 @@ class ProductPersistenceMapper {
     fun toDomain(entity: ProductEntity): Product =
         Product(
             id = entity.id,
+            categoryId = entity.categoryId,
             code = entity.code,
             name = entity.name,
             category = entity.category,

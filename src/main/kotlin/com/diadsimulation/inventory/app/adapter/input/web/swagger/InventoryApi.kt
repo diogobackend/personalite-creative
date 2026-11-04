@@ -5,7 +5,6 @@ import com.diadsimulation.inventory.app.adapter.input.web.dtos.request.UpdateInv
 import com.diadsimulation.inventory.app.adapter.input.web.dtos.response.InventoryPageResponse
 import com.diadsimulation.inventory.app.adapter.input.web.dtos.response.RegisterInventoryResponse
 import com.diadsimulation.inventory.core.domain.enums.InventoryUnit
-import com.diadsimulation.products.core.domain.enums.ProductCategory
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
@@ -69,7 +68,7 @@ interface InventoryApi {
         @RequestParam(required = false)
         name: String?,
         @RequestParam(required = false)
-        category: ProductCategory?,
+        category: String?,
         @RequestParam(required = false)
         description: String?,
         @RequestParam(required = false)

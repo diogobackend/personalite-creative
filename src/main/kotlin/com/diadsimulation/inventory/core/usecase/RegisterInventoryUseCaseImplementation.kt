@@ -4,6 +4,7 @@ import com.diadsimulation.inventory.core.domain.enums.InventoryMovementType.IN
 import com.diadsimulation.inventory.core.domain.model.Inventory
 import com.diadsimulation.inventory.core.domain.model.InventoryMovement
 import com.diadsimulation.inventory.core.ports.input.RegisterInventoryInputPort
+import com.diadsimulation.inventory.core.ports.output.InventoryCategoryOutputPort
 import com.diadsimulation.inventory.core.ports.output.InventoryMovementRepositoryOutputPort
 import com.diadsimulation.inventory.core.ports.output.InventoryRepositoryOutputPort
 import org.springframework.transaction.annotation.Transactional
@@ -11,9 +12,19 @@ import org.springframework.transaction.annotation.Transactional
 open class RegisterInventoryUseCaseImplementation(
     private val inventoryRepositoryOutputPort: InventoryRepositoryOutputPort,
     private val inventoryMovementRepositoryOutputPort: InventoryMovementRepositoryOutputPort,
+    private val inventoryCategoryOutputPort: InventoryCategoryOutputPort,
 ) : RegisterInventoryInputPort {
     @Transactional
     override fun execute(inventory: Inventory): Inventory {
+        val categoryId =
+            requireNotNull(inventory.categoryId) {
+                "O ID da categoria é obrigatório."
+            }
+
+        require(inventoryCategoryOutputPort.existsByIdAndTypeInventory(categoryId)) {
+            "A categoria informada não existe ou não pertence ao tipo INVENTORY."
+        }
+
         require(inventory.quantity >= 0) {
             "A quantidade inicial não pode ser negativa."
         }

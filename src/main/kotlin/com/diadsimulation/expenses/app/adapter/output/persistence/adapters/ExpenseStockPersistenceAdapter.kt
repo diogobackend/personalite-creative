@@ -1,6 +1,6 @@
 package com.diadsimulation.expenses.app.adapter.output.persistence.adapters
 
-import com.diadsimulation.expenses.core.domain.enums.ExpenseCategory.STOCK
+import com.diadsimulation.expenses.app.adapter.output.persistence.adapters.ExpenseStockPersistenceAdapter.Constants.INVENTORY_ITEM_CATEGORY
 import com.diadsimulation.expenses.core.domain.model.Expense
 import com.diadsimulation.expenses.core.ports.output.ExpenseStockOutputPort
 import com.diadsimulation.inventory.core.domain.enums.InventoryMovementType.IN
@@ -18,6 +18,10 @@ class ExpenseStockPersistenceAdapter(
     private val inventoryRepositoryOutputPort: InventoryRepositoryOutputPort,
     private val inventoryMovementRepositoryOutputPort: InventoryMovementRepositoryOutputPort,
 ) : ExpenseStockOutputPort {
+    object Constants {
+        const val INVENTORY_ITEM_CATEGORY = "item de estoque"
+    }
+
     override fun registerEntry(expense: Expense) {
         val inventoryId = requireNotNull(expense.inventoryId)
         val quantity = requireNotNull(expense.quantity)
@@ -50,11 +54,12 @@ class ExpenseStockPersistenceAdapter(
     ) {
         val previousInventoryId =
             previousExpense.inventoryId.takeIf {
-                previousExpense.category == STOCK
+                previousExpense.category == INVENTORY_ITEM_CATEGORY
             }
+
         val updatedInventoryId =
             updatedExpense.inventoryId.takeIf {
-                updatedExpense.category == STOCK
+                updatedExpense.category == INVENTORY_ITEM_CATEGORY
             }
 
         val previousQuantity =

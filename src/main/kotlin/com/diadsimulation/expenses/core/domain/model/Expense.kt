@@ -2,7 +2,6 @@ package com.diadsimulation.expenses.core.domain.model
 
 import com.diadsimulation.expenses.core.domain.enums.ExpenseAllocationType
 import com.diadsimulation.expenses.core.domain.enums.ExpenseAllocationType.GENERAL
-import com.diadsimulation.expenses.core.domain.enums.ExpenseCategory
 import com.diadsimulation.expenses.core.domain.enums.ExpenseStatus
 import com.diadsimulation.expenses.core.domain.enums.ExpenseStatus.PENDING
 import java.math.BigDecimal
@@ -17,7 +16,8 @@ data class Expense(
     val name: String,
     val description: String? = null,
     val value: BigDecimal,
-    val category: ExpenseCategory,
+    val category: String,
+    val categoryId: UUID? = null,
     val allocationType: ExpenseAllocationType = GENERAL,
     val status: ExpenseStatus = PENDING,
     val quantity: Int? = null,

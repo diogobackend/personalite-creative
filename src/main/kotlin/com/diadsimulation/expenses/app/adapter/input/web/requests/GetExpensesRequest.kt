@@ -1,7 +1,6 @@
 package com.diadsimulation.expenses.app.adapter.input.web.requests
 
 import com.diadsimulation.expenses.core.domain.enums.ExpenseAllocationType
-import com.diadsimulation.expenses.core.domain.enums.ExpenseCategory
 import com.diadsimulation.expenses.core.domain.enums.ExpenseStatus
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.format.annotation.DateTimeFormat.ISO.DATE
@@ -17,7 +16,7 @@ data class GetExpensesRequest(
     val value: BigDecimal? = null,
     val minValue: BigDecimal? = null,
     val maxValue: BigDecimal? = null,
-    val category: ExpenseCategory? = null,
+    val category: String? = null,
     val allocationType: ExpenseAllocationType? = null,
     val status: ExpenseStatus? = null,
     val productId: UUID? = null,

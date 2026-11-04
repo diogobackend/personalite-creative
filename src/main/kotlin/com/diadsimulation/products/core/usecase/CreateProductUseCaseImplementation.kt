@@ -3,14 +3,24 @@ package com.diadsimulation.products.core.usecase
 import com.diadsimulation.products.core.domain.enums.PricingType
 import com.diadsimulation.products.core.domain.model.Product
 import com.diadsimulation.products.core.port.input.CreateProductInputPort
+import com.diadsimulation.products.core.port.output.ProductCategoryOutputPort
 import com.diadsimulation.products.core.port.output.ProductRepositoryOutputPort
 import java.math.BigDecimal
 
 class CreateProductUseCaseImplementation(
     private val productRepositoryOutputPort: ProductRepositoryOutputPort,
+    private val productCategoryOutputPort: ProductCategoryOutputPort,
 ) : CreateProductInputPort {
     override fun execute(product: Product): Product {
         validate(product)
+
+        requireNotNull(product.categoryId) {
+            "O ID da categoria é obrigatório."
+        }
+
+        require(productCategoryOutputPort.existsByIdAndTypeProduct(product.categoryId!!)) {
+            "A categoria informada não existe ou não pertence ao tipo PRODUCT."
+        }
 
         require(!productRepositoryOutputPort.existsByCode(product.code)) {
             "Já existe um produto cadastrado com o código ${product.code}."

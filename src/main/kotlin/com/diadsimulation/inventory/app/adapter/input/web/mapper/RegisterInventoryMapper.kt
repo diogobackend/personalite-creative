@@ -9,6 +9,7 @@ object RegisterInventoryMapper {
         Inventory(
             name = request.name,
             category = request.category,
+            categoryId = request.categoryId,
             description = request.description,
             productId = request.productId,
             quantity = request.quantity,

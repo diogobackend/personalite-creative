@@ -3,12 +3,13 @@ package com.diadsimulation.expenses.core.usecase
 import com.diadsimulation.expenses.core.domain.enums.ExpenseAllocationType.CATEGORY_PRODUCTS
 import com.diadsimulation.expenses.core.domain.enums.ExpenseAllocationType.GENERAL
 import com.diadsimulation.expenses.core.domain.enums.ExpenseAllocationType.SPECIFIC_PRODUCT
-import com.diadsimulation.expenses.core.domain.enums.ExpenseCategory.STOCK
 import com.diadsimulation.expenses.core.domain.model.Expense
 import com.diadsimulation.expenses.core.ports.input.CreateExpenseInputPort
+import com.diadsimulation.expenses.core.ports.output.ExpenseCategoryOutputPort
 import com.diadsimulation.expenses.core.ports.output.ExpenseRepositoryOutputPort
 import com.diadsimulation.expenses.core.ports.output.ExpenseStockOutputPort
 import com.diadsimulation.expenses.core.ports.output.ProductExpenseValidationOutputPort
+import com.diadsimulation.expenses.core.usecase.CreateExpenseUseCaseImplementation.Constants.INVENTORY_ITEM_CATEGORY
 import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal.ZERO
 
@@ -16,14 +17,28 @@ open class CreateExpenseUseCaseImplementation(
     private val expenseRepositoryOutputPort: ExpenseRepositoryOutputPort,
     private val productExpenseValidationOutputPort: ProductExpenseValidationOutputPort,
     private val expenseStockOutputPort: ExpenseStockOutputPort,
+    private val expenseCategoryOutputPort: ExpenseCategoryOutputPort,
 ) : CreateExpenseInputPort {
+    object Constants {
+        const val INVENTORY_ITEM_CATEGORY = "item de estoque"
+    }
+
     @Transactional
     override fun execute(expense: Expense): Expense {
+        val categoryId =
+            requireNotNull(expense.categoryId) {
+                "O ID da categoria é obrigatório."
+            }
+
+        require(expenseCategoryOutputPort.existsByIdAndTypeExpense(categoryId)) {
+            "A categoria informada não existe ou não pertence ao tipo EXPENSE."
+        }
+
         validate(expense)
 
         val savedExpense = expenseRepositoryOutputPort.save(expense)
 
-        if (savedExpense.category == STOCK) {
+        if (savedExpense.category == INVENTORY_ITEM_CATEGORY) {
             expenseStockOutputPort.registerEntry(savedExpense)
         }
 
@@ -44,7 +59,7 @@ open class CreateExpenseUseCaseImplementation(
     }
 
     private fun validateStock(expense: Expense) {
-        if (expense.category == STOCK) {
+        if (expense.category == INVENTORY_ITEM_CATEGORY) {
             require(expense.inventoryId != null) {
                 "O item do estoque é obrigatório."
             }

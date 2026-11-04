@@ -3,7 +3,6 @@ package com.diadsimulation.inventory.app.adapter.output.persistence.specificatio
 import com.diadsimulation.inventory.app.adapter.output.persistence.entity.InventoryEntity
 import com.diadsimulation.inventory.core.domain.enums.InventoryUnit
 import com.diadsimulation.inventory.core.domain.model.GetInventoryFilter
-import com.diadsimulation.products.core.domain.enums.ProductCategory
 import jakarta.persistence.criteria.Predicate
 import org.springframework.data.jpa.domain.Specification
 import java.time.LocalDate
@@ -45,7 +44,7 @@ object InventorySpecifications {
             contains("model", filter.model)
 
             filter.category?.let {
-                predicates += cb.equal(root.get<ProductCategory>("category"), it)
+                predicates += cb.equal(root.get<String>("category"), it)
             }
 
             filter.unit?.let {

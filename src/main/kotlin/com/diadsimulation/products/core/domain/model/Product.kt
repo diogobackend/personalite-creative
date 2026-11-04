@@ -1,16 +1,16 @@
 package com.diadsimulation.products.core.domain.model
 
 import com.diadsimulation.products.core.domain.enums.PricingType
-import com.diadsimulation.products.core.domain.enums.ProductCategory
 import java.time.OffsetDateTime
 import java.util.Collections.emptyList
 import java.util.UUID
 
 data class Product(
     val id: UUID = UUID.randomUUID(),
+    val categoryId: UUID? = null,
     val code: String,
     val name: String,
-    val category: ProductCategory,
+    val category: String,
     val description: String? = null,
     val minimumQuantity: Int? = null,
     val pricingType: PricingType,
