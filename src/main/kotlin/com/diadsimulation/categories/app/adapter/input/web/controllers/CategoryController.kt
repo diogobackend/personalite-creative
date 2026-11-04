@@ -1,18 +1,22 @@
 package com.diadsimulation.categories.app.adapter.input.web.controllers
 
 import com.diadsimulation.categories.app.adapter.input.web.dtos.requests.CreateCategoryRequest
+import com.diadsimulation.categories.app.adapter.input.web.dtos.requests.UpdateCategoryRequest
 import com.diadsimulation.categories.app.adapter.input.web.dtos.responses.CategoryResponse
 import com.diadsimulation.categories.app.adapter.input.web.mappers.CategoryWebMapper
 import com.diadsimulation.categories.app.adapter.input.web.swagger.CategoryApi
 import com.diadsimulation.categories.core.domain.enums.CategoryType
 import com.diadsimulation.categories.core.ports.input.CreateCategoryInputPort
 import com.diadsimulation.categories.core.ports.input.GetCategoriesInputPort
+import com.diadsimulation.categories.core.ports.input.UpdateCategoryInputPort
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import java.util.UUID
 
 @RestController
 @RequestMapping("/categories")
@@ -20,6 +24,7 @@ class CategoryController(
     private val createCategoryInputPort: CreateCategoryInputPort,
     private val categoryWebMapper: CategoryWebMapper,
     private val getCategoriesInputPort: GetCategoriesInputPort,
+    private val updateCategoryInputPort: UpdateCategoryInputPort,
 ) : CategoryApi {
     @PostMapping
     override fun create(request: CreateCategoryRequest): ResponseEntity<CategoryResponse> {
@@ -43,5 +48,16 @@ class CategoryController(
             getCategoriesInputPort
                 .execute(name, type)
                 .map(categoryWebMapper::toResponse),
+        )
+
+    @PatchMapping("/{id}")
+    override fun update(
+        id: UUID,
+        request: UpdateCategoryRequest,
+    ): ResponseEntity<CategoryResponse> =
+        ResponseEntity.ok(
+            categoryWebMapper.toResponse(
+                updateCategoryInputPort.execute(id, request.name),
+            ),
         )
 }

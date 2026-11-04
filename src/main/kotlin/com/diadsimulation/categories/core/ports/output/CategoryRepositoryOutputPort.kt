@@ -2,6 +2,7 @@ package com.diadsimulation.categories.core.ports.output
 
 import com.diadsimulation.categories.core.domain.enums.CategoryType
 import com.diadsimulation.categories.core.domain.model.Category
+import java.util.UUID
 
 interface CategoryRepositoryOutputPort {
     fun save(category: Category): Category
@@ -15,4 +16,6 @@ interface CategoryRepositoryOutputPort {
         name: String?,
         type: CategoryType?,
     ): List<Category>
+
+    fun findById(id: UUID): Category?
 }

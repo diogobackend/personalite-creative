@@ -9,6 +9,7 @@ import com.diadsimulation.categories.core.ports.output.CategoryRepositoryOutputP
 import jakarta.persistence.criteria.Predicate
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Repository
+import java.util.UUID
 
 @Repository
 class CategoryRepositoryAdapter(
@@ -54,4 +55,10 @@ class CategoryRepositoryAdapter(
                     criteriaBuilder.and(*predicates.toTypedArray())
                 },
             ).map(categoryPersistenceMapper::toDomain)
+
+    override fun findById(id: UUID): Category? =
+        categoryJpaRepository
+            .findById(id)
+            .orElse(null)
+            ?.let(categoryPersistenceMapper::toDomain)
 }
