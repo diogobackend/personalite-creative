@@ -10,4 +10,9 @@ interface CategoryRepositoryOutputPort {
         name: String,
         type: CategoryType,
     ): Boolean
+
+    fun findAll(
+        name: String?,
+        type: CategoryType?,
+    ): List<Category>
 }
