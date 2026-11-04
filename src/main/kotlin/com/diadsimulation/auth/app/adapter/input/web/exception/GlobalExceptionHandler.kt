@@ -9,6 +9,7 @@ import com.diadsimulation.auth.core.common.Messages.NAME_REQUIRED
 import com.diadsimulation.auth.core.common.Messages.REQUEST_CONFLICT
 import com.diadsimulation.auth.core.common.Messages.USER_NOT_FOUND
 import com.diadsimulation.auth.core.domain.exceptions.UserAlreadyExistsException
+import com.diadsimulation.categories.core.domain.exceptions.CategoryAlreadyExistsException
 import com.diadsimulation.products.core.domain.exceptions.ProductNotFoundException
 import com.fasterxml.jackson.core.JsonProcessingException
 import jakarta.servlet.http.HttpServletRequest
@@ -185,6 +186,17 @@ class GlobalExceptionHandler {
         buildResponse(
             status = BAD_REQUEST,
             message = INVALID_REQUEST_DATA,
+            request = request,
+        )
+
+    @ExceptionHandler(CategoryAlreadyExistsException::class)
+    fun handleCategoryAlreadyExists(
+        exception: CategoryAlreadyExistsException,
+        request: HttpServletRequest,
+    ): ResponseEntity<ApiErrorResponse> =
+        buildResponse(
+            status = CONFLICT,
+            message = exception.message ?: "Categoria já cadastrada.",
             request = request,
         )
 }

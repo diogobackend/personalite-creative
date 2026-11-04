@@ -65,6 +65,12 @@ class SecurityConfiguration(
                         SCHOOL_ADMIN.name,
                         PLATFORM_ADMIN.name,
                     )
+                    // Categorias
+                    .requestMatchers("/categories", "/categories/**")
+                    .hasAnyRole(
+                        SCHOOL_ADMIN.name,
+                        PLATFORM_ADMIN.name,
+                    )
                     // Produtos
                     .requestMatchers("/products", "/products/**")
                     .hasAnyRole(
