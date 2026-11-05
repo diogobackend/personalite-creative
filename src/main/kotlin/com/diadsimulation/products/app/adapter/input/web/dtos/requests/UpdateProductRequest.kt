@@ -5,6 +5,7 @@ import tools.jackson.databind.JsonNode
 data class UpdateProductRequest(
     val name: JsonNode? = null,
     val category: JsonNode? = null,
+    val categoryId: JsonNode? = null,
     val description: JsonNode? = null,
     val minimumQuantity: JsonNode? = null,
     val pricingType: JsonNode? = null,

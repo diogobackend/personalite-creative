@@ -44,6 +44,7 @@ class ProductPersistenceAdapter(
         entity.apply {
             name = product.name
             category = product.category
+            categoryId = product.categoryId
             description = product.description
             minimumQuantity = product.minimumQuantity
             pricingType = product.pricingType

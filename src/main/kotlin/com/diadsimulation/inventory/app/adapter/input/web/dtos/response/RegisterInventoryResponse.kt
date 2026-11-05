@@ -8,6 +8,7 @@ data class RegisterInventoryResponse(
     val id: UUID,
     val name: String,
     val category: String,
+    val categoryId: UUID?,
     val description: String?,
     val productId: UUID?,
     val quantity: Int,

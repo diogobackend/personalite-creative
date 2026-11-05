@@ -38,6 +38,7 @@ class ExpensePersistenceAdapter(
             description = expense.description
             value = expense.value
             category = expense.category
+            categoryId = expense.categoryId
             allocationType = expense.allocationType
             status = expense.status
             quantity = expense.quantity

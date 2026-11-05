@@ -79,5 +79,5 @@ class ProductEntity(
     @Column(name = "updated_at", nullable = false)
     var updatedAt: OffsetDateTime = OffsetDateTime.now(),
     @Column(name = "category_id")
-    val categoryId: UUID? = null,
+    var categoryId: UUID? = null,
 )

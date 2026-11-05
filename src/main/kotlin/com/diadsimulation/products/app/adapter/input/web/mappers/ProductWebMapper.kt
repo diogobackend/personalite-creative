@@ -66,6 +66,7 @@ class ProductWebMapper {
         UpdateProductCommand(
             name = patch(request.name) { text(it) },
             category = patch(request.category) { it.asText() },
+            categoryId = patch(request.categoryId) { uuid(it) },
             description = nullablePatch(request.description) { text(it) },
             minimumQuantity = nullablePatch(request.minimumQuantity) { integer(it) },
             pricingType =
@@ -247,6 +248,7 @@ class ProductWebMapper {
             code = product.code,
             name = product.name,
             category = product.category,
+            categoryId = product.categoryId,
             description = product.description,
             minimumQuantity = product.minimumQuantity,
             pricingType = product.pricingType,

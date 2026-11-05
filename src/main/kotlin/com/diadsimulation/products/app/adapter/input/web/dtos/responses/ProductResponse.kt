@@ -9,6 +9,7 @@ data class ProductResponse(
     val code: String,
     val name: String,
     val category: String,
+    val categoryId: UUID?,
     val description: String?,
     val minimumQuantity: Int?,
     val pricingType: PricingType,

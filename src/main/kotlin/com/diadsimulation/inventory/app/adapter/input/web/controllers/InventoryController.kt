@@ -114,6 +114,7 @@ class InventoryController(
             UpdateInventory(
                 name = request.name,
                 category = request.category,
+                categoryId = request.categoryId,
                 description = request.description,
                 quantity = request.quantity,
                 minimumQuantity = request.minimumQuantity,

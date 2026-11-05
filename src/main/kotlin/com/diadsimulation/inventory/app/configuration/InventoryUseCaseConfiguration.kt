@@ -43,8 +43,14 @@ class InventoryUseCaseConfiguration {
         )
 
     @Bean
-    fun updateInventoryUseCase(inventoryRepositoryOutputPort: InventoryRepositoryOutputPort): UpdateInventoryInputPort =
-        UpdateInventoryUseCaseImplementation(inventoryRepositoryOutputPort)
+    fun updateInventoryUseCase(
+        inventoryRepositoryOutputPort: InventoryRepositoryOutputPort,
+        inventoryCategoryOutputPort: InventoryCategoryOutputPort,
+    ): UpdateInventoryInputPort =
+        UpdateInventoryUseCaseImplementation(
+            inventoryRepositoryOutputPort,
+            inventoryCategoryOutputPort,
+        )
 
     @Bean
     fun deleteInventoryUseCase(inventoryRepositoryOutputPort: InventoryRepositoryOutputPort): DeleteInventoryInputPort =

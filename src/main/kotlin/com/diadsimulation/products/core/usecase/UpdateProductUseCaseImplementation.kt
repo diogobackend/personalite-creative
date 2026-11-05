@@ -7,6 +7,7 @@ import com.diadsimulation.products.core.domain.model.ProductFee
 import com.diadsimulation.products.core.domain.model.ProductPrice
 import com.diadsimulation.products.core.domain.model.UpdateProductCommand
 import com.diadsimulation.products.core.port.input.UpdateProductInputPort
+import com.diadsimulation.products.core.port.output.ProductCategoryOutputPort
 import com.diadsimulation.products.core.port.output.ProductRepositoryOutputPort
 import com.diadsimulation.products.core.utils.PatchField
 import java.math.BigDecimal
@@ -15,6 +16,7 @@ import java.util.UUID
 
 class UpdateProductUseCaseImplementation(
     private val productRepositoryOutputPort: ProductRepositoryOutputPort,
+    private val productCategoryOutputPort: ProductCategoryOutputPort,
 ) : UpdateProductInputPort {
     override fun execute(
         productId: UUID,
@@ -30,6 +32,7 @@ class UpdateProductUseCaseImplementation(
             product.copy(
                 name = request.name.resolve(product.name),
                 category = request.category.resolve(product.category),
+                categoryId = request.categoryId.resolve(product.categoryId),
                 description = request.description.resolve(product.description),
                 minimumQuantity = request.minimumQuantity.resolve(product.minimumQuantity),
                 pricingType = request.pricingType.resolve(product.pricingType),
@@ -50,6 +53,16 @@ class UpdateProductUseCaseImplementation(
             )
 
         validate(updatedProduct)
+
+        if (request.categoryId is PatchField.Present) {
+            requireNotNull(updatedProduct.categoryId) {
+                "O ID da categoria é obrigatório."
+            }
+
+            require(productCategoryOutputPort.existsByIdAndTypeProduct(updatedProduct.categoryId)) {
+                "A categoria informada não existe ou não pertence ao tipo PRODUCT."
+            }
+        }
 
         return productRepositoryOutputPort.update(updatedProduct)
     }

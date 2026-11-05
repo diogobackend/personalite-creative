@@ -48,11 +48,13 @@ class ExpenseUseCaseConfiguration {
         expenseRepositoryOutputPort: ExpenseRepositoryOutputPort,
         productExpenseValidationOutputPort: ProductExpenseValidationOutputPort,
         expenseStockOutputPort: ExpenseStockOutputPort,
+        expenseCategoryOutputPort: ExpenseCategoryOutputPort,
     ): UpdateExpenseInputPort =
         UpdateExpenseUseCaseImplementation(
             expenseRepositoryOutputPort = expenseRepositoryOutputPort,
             productExpenseValidationOutputPort = productExpenseValidationOutputPort,
             expenseStockOutputPort = expenseStockOutputPort,
+            expenseCategoryOutputPort = expenseCategoryOutputPort,
         )
 
     @Bean

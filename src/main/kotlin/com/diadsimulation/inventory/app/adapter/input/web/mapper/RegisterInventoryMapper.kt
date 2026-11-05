@@ -28,6 +28,7 @@ object RegisterInventoryMapper {
             id = inventory.id,
             name = inventory.name,
             category = inventory.category,
+            categoryId = inventory.categoryId,
             description = inventory.description,
             productId = inventory.productId,
             quantity = inventory.quantity,

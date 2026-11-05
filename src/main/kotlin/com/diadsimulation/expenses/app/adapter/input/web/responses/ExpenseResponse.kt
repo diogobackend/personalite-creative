@@ -14,6 +14,7 @@ data class ExpenseResponse(
     val description: String?,
     val value: BigDecimal,
     val category: String,
+    val categoryId: UUID?,
     val allocationType: ExpenseAllocationType,
     val status: ExpenseStatus,
     val quantity: Int?,

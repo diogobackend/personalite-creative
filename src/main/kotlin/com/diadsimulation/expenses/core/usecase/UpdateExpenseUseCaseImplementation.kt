@@ -6,6 +6,7 @@ import com.diadsimulation.expenses.core.domain.enums.ExpenseAllocationType.SPECI
 import com.diadsimulation.expenses.core.domain.model.Expense
 import com.diadsimulation.expenses.core.domain.model.ExpenseUpdate
 import com.diadsimulation.expenses.core.ports.input.UpdateExpenseInputPort
+import com.diadsimulation.expenses.core.ports.output.ExpenseCategoryOutputPort
 import com.diadsimulation.expenses.core.ports.output.ExpenseRepositoryOutputPort
 import com.diadsimulation.expenses.core.ports.output.ExpenseStockOutputPort
 import com.diadsimulation.expenses.core.ports.output.ProductExpenseValidationOutputPort
@@ -20,6 +21,7 @@ class UpdateExpenseUseCaseImplementation(
     private val expenseRepositoryOutputPort: ExpenseRepositoryOutputPort,
     private val productExpenseValidationOutputPort: ProductExpenseValidationOutputPort,
     private val expenseStockOutputPort: ExpenseStockOutputPort,
+    private val expenseCategoryOutputPort: ExpenseCategoryOutputPort,
 ) : UpdateExpenseInputPort {
     object Constants {
         const val INVENTORY_ITEM_CATEGORY = "item de estoque"
@@ -95,6 +97,7 @@ class UpdateExpenseUseCaseImplementation(
                     },
                 value = value,
                 category = update.category ?: currentExpense.category,
+                categoryId = update.categoryId ?: currentExpense.categoryId,
                 allocationType = allocationType,
                 status = update.status ?: currentExpense.status,
                 quantity =
@@ -107,6 +110,17 @@ class UpdateExpenseUseCaseImplementation(
                 expenseDate = update.expenseDate ?: currentExpense.expenseDate,
                 updatedAt = OffsetDateTime.now(),
             )
+
+        if (update.has("categoryId")) {
+            val categoryId =
+                requireNotNull(updatedExpense.categoryId) {
+                    "O ID da categoria é obrigatório."
+                }
+
+            require(expenseCategoryOutputPort.existsByIdAndTypeExpense(categoryId)) {
+                "A categoria informada não existe ou não pertence ao tipo EXPENSE."
+            }
+        }
 
         validate(updatedExpense)
 
@@ -121,6 +135,10 @@ class UpdateExpenseUseCaseImplementation(
     }
 
     private fun validateRequiredFields(update: ExpenseUpdate) {
+        require(!update.has("categoryId") || update.categoryId != null) {
+            "O ID da categoria não pode ser nulo."
+        }
+
         require(!update.has("name") || update.name != null) {
             "O nome da despesa não pode ser nulo."
         }

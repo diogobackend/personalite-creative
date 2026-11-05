@@ -83,6 +83,7 @@ class ExpenseController(
                 "description",
                 "value",
                 "category",
+                "categoryId",
                 "allocationType",
                 "status",
                 "quantity",

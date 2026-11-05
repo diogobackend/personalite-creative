@@ -13,6 +13,7 @@ data class ExpenseUpdate(
     val description: String? = null,
     val value: BigDecimal? = null,
     val category: String? = null,
+    val categoryId: UUID? = null,
     val allocationType: ExpenseAllocationType? = null,
     val status: ExpenseStatus? = null,
     val quantity: Int? = null,

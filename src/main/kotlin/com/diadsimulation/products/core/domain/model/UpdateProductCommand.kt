@@ -8,6 +8,7 @@ import java.util.UUID
 data class UpdateProductCommand(
     val name: PatchField<String> = PatchField.Absent,
     val category: PatchField<String> = PatchField.Absent,
+    val categoryId: PatchField<UUID> = PatchField.Absent,
     val description: PatchField<String?> = PatchField.Absent,
     val minimumQuantity: PatchField<Int?> = PatchField.Absent,
     val pricingType: PatchField<PricingType> = PatchField.Absent,

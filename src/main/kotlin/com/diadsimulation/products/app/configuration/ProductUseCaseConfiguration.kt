@@ -36,8 +36,14 @@ class ProductUseCaseConfiguration {
         GetProductByIdUseCaseImplementation(productRepositoryOutputPort)
 
     @Bean
-    fun updateProductUseCase(productRepositoryOutputPort: ProductRepositoryOutputPort): UpdateProductInputPort =
-        UpdateProductUseCaseImplementation(productRepositoryOutputPort)
+    fun updateProductUseCase(
+        productRepositoryOutputPort: ProductRepositoryOutputPort,
+        productCategoryOutputPort: ProductCategoryOutputPort,
+    ): UpdateProductInputPort =
+        UpdateProductUseCaseImplementation(
+            productRepositoryOutputPort = productRepositoryOutputPort,
+            productCategoryOutputPort = productCategoryOutputPort,
+        )
 
     @Bean
     fun deleteProductUseCase(productRepositoryOutputPort: ProductRepositoryOutputPort): DeleteProductInputPort =

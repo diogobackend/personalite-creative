@@ -17,6 +17,7 @@ data class UpdateExpenseRequest(
     @field:DecimalMin("0.01")
     val value: BigDecimal? = null,
     val category: String? = null,
+    val categoryId: UUID? = null,
     val allocationType: ExpenseAllocationType? = null,
     val status: ExpenseStatus? = null,
     val quantity: Int? = null,
