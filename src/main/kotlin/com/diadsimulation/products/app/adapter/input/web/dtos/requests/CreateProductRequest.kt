@@ -12,7 +12,7 @@ import java.util.UUID
 
 data class CreateProductRequest(
     @field:NotBlank
-    @field:Pattern(regexp = "[0-9]{3}")
+    @field:Pattern(regexp = "[0-9]{4}")
     val code: String,
     @field:NotBlank
     val name: String,

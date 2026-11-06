@@ -1,0 +1,2 @@
+ALTER TABLE products
+ALTER COLUMN code TYPE VARCHAR(4);

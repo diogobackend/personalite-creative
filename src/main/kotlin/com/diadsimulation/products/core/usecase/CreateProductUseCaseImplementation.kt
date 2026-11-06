@@ -30,8 +30,8 @@ class CreateProductUseCaseImplementation(
     }
 
     private fun validate(product: Product) {
-        require(product.code.matches(Regex("\\d{3}"))) {
-            "O código comercial deve conter exatamente 3 dígitos."
+        require(product.code.matches(Regex("\\d{4}"))) {
+            "O código comercial deve conter exatamente 4 dígitos."
         }
 
         require(product.name.isNotBlank()) {

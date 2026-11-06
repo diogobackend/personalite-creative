@@ -21,7 +21,7 @@ class ProductEntity(
     @Id
     @Column(nullable = false, updatable = false)
     val id: UUID = UUID.randomUUID(),
-    @Column(nullable = false, unique = true, length = 3)
+    @Column(nullable = false, unique = true, length = 4)
     var code: String,
     @Column(nullable = false, length = 150)
     var name: String,
