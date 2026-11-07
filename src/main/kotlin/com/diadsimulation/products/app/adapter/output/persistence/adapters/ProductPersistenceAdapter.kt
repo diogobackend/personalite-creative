@@ -156,24 +156,6 @@ class ProductPersistenceAdapter(
 
     @Transactional(readOnly = true)
     override fun findAll(filter: GetProductsFilter): ProductsPage {
-        filter.code?.let { code ->
-            val products =
-                productJpaRepository
-                    .findByCode(code)
-                    ?.let(productPersistenceMapper::toDomain)
-                    ?.let(::listOf)
-                    .orEmpty()
-
-            return ProductsPage(
-                content = products,
-                page = 0,
-                size = 1,
-                totalElementsThisPage = products.size,
-                totalElements = products.size.toLong(),
-                totalPages = if (products.isEmpty()) 0 else 1,
-            )
-        }
-
         val allowedSortFields =
             setOf(
                 "name",

@@ -12,11 +12,12 @@ object ProductSpecifications {
         Specification { root, query, criteriaBuilder ->
             val predicates = mutableListOf<Predicate>()
 
-            if (filter.code != null) {
-                return@Specification criteriaBuilder.equal(
-                    root.get<String>("code"),
-                    filter.code,
-                )
+            filter.code?.takeIf { it.isNotBlank() }?.let {
+                predicates +=
+                    criteriaBuilder.like(
+                        root.get<String>("code"),
+                        "%${it.trim()}%",
+                    )
             }
 
             filter.name?.takeIf { it.isNotBlank() }?.let {
