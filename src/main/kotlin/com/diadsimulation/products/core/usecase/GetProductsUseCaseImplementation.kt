@@ -10,18 +10,10 @@ class GetProductsUseCaseImplementation(
 ) : GetProductsInputPort {
     override fun execute(filter: GetProductsFilter): ProductsPage {
         val effectiveFilter =
-            if (filter.code != null) {
-                GetProductsFilter(
-                    code = filter.code,
-                    page = 0,
-                    size = 1,
-                )
-            } else {
-                filter.copy(
-                    page = filter.page.coerceAtLeast(0),
-                    size = filter.size.coerceIn(1, 100),
-                )
-            }
+            filter.copy(
+                page = filter.page.coerceAtLeast(0),
+                size = filter.size.coerceIn(1, 100),
+            )
 
         return productRepositoryOutputPort.findAll(effectiveFilter)
     }
