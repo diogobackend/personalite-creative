@@ -1,7 +1,7 @@
 package com.diadsimulation.sales.core.domain.utils
 
 import java.math.BigDecimal
-import java.math.RoundingMode
+import java.math.RoundingMode.HALF_UP
 
 object SaleFinancialCalculator {
     private val HUNDRED = BigDecimal("100")
@@ -23,7 +23,7 @@ object SaleFinancialCalculator {
     ): BigDecimal =
         totalAmount
             .subtract(paidAmount(totalAmount, paidPercentage))
-            .setScale(MONETARY_SCALE, RoundingMode.HALF_UP)
+            .setScale(MONETARY_SCALE, HALF_UP)
 
     fun remainingPercentage(paidPercentage: BigDecimal): BigDecimal = HUNDRED.subtract(paidPercentage)
 
@@ -33,5 +33,5 @@ object SaleFinancialCalculator {
     ): BigDecimal =
         totalAmount
             .multiply(percentage)
-            .divide(HUNDRED, MONETARY_SCALE, RoundingMode.HALF_UP)
+            .divide(HUNDRED, MONETARY_SCALE, HALF_UP)
 }

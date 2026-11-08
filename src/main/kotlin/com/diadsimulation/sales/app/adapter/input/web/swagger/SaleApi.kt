@@ -196,6 +196,9 @@ interface SaleApi {
         - Os itens vinculados à venda também são excluídos.
         - A operação é transacional.
         - A exclusão não remove o cliente nem os produtos cadastrados.
+        - O valor recebido é recalculado com base no valor total da venda e no percentual pago.
+        - O valor restante é recalculado automaticamente.
+        - O percentual pago pode aumentar ou diminuir entre 0 e 100.
     """,
     )
     @ApiResponses(

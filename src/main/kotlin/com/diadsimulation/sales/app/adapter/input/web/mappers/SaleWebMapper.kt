@@ -66,6 +66,8 @@ class SaleWebMapper {
                     )
                 },
             deliveredAt = sale.deliveredAt,
+            receivedAmount = sale.receivedAmount,
+            remainingAmount = sale.remainingAmount,
             createdAt = sale.createdAt,
             updatedAt = sale.updatedAt,
         )

@@ -2,6 +2,7 @@ package com.diadsimulation.sales.core.domain.model
 
 import com.diadsimulation.sales.core.domain.enums.PaymentMethod
 import java.math.BigDecimal
+import java.math.RoundingMode.HALF_UP
 import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.util.UUID
@@ -19,4 +20,17 @@ data class Sale(
     val deliveredAt: OffsetDateTime? = null,
     val createdAt: OffsetDateTime = OffsetDateTime.now(),
     val updatedAt: OffsetDateTime = OffsetDateTime.now(),
-)
+) {
+    val receivedAmount: BigDecimal
+        get() =
+            totalAmount
+                .multiply(paidPercentage)
+                .divide(HUNDRED, 2, HALF_UP)
+
+    val remainingAmount: BigDecimal
+        get() = totalAmount.subtract(receivedAmount)
+
+    private companion object {
+        val HUNDRED = BigDecimal("100")
+    }
+}

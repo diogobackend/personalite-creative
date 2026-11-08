@@ -17,6 +17,8 @@ data class CreateSaleResponse(
     val observation: String?,
     val items: List<CreateSaleItemResponse>,
     val deliveredAt: OffsetDateTime? = null,
+    val receivedAmount: BigDecimal,
+    val remainingAmount: BigDecimal,
     val createdAt: OffsetDateTime,
     val updatedAt: OffsetDateTime,
 )

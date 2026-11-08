@@ -11,6 +11,7 @@ import com.diadsimulation.sales.core.ports.input.UpdateSaleInputPort
 import com.diadsimulation.sales.core.ports.output.UpdateSaleOutputPort
 import java.math.BigDecimal
 import java.math.BigDecimal.ZERO
+import java.math.RoundingMode.HALF_UP
 import java.time.OffsetDateTime
 import java.util.NoSuchElementException
 import java.util.UUID
