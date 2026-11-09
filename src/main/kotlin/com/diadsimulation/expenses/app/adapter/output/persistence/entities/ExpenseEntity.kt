@@ -11,6 +11,7 @@ import jakarta.persistence.Id
 import jakarta.persistence.OneToMany
 import jakarta.persistence.Table
 import java.math.BigDecimal
+import java.math.BigDecimal.ZERO
 import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.util.UUID
@@ -29,6 +30,8 @@ class ExpenseEntity(
     var description: String? = null,
     @Column(nullable = false, precision = 15, scale = 2)
     var value: BigDecimal,
+    @Column(name = "paid_amount", nullable = false, precision = 15, scale = 2)
+    var paidAmount: BigDecimal = ZERO,
     @Column(nullable = false, length = 150)
     var category: String,
     @Enumerated(STRING)

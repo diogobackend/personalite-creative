@@ -3,6 +3,9 @@ package com.diadsimulation.expenses.core.usecase
 import com.diadsimulation.expenses.core.domain.enums.ExpenseAllocationType.CATEGORY_PRODUCTS
 import com.diadsimulation.expenses.core.domain.enums.ExpenseAllocationType.GENERAL
 import com.diadsimulation.expenses.core.domain.enums.ExpenseAllocationType.SPECIFIC_PRODUCT
+import com.diadsimulation.expenses.core.domain.enums.ExpenseStatus.PAID
+import com.diadsimulation.expenses.core.domain.enums.ExpenseStatus.PARTIALLY_PAID
+import com.diadsimulation.expenses.core.domain.enums.ExpenseStatus.PENDING
 import com.diadsimulation.expenses.core.domain.model.Expense
 import com.diadsimulation.expenses.core.ports.input.CreateExpenseInputPort
 import com.diadsimulation.expenses.core.ports.output.ExpenseCategoryOutputPort
@@ -36,7 +39,17 @@ open class CreateExpenseUseCaseImplementation(
 
         validate(expense)
 
-        val savedExpense = expenseRepositoryOutputPort.save(expense)
+        val status =
+            when {
+                expense.paidAmount.compareTo(ZERO) == 0 -> PENDING
+                expense.paidAmount.compareTo(expense.value) == 0 -> PAID
+                else -> PARTIALLY_PAID
+            }
+
+        val savedExpense =
+            expenseRepositoryOutputPort.save(
+                expense.copy(status = status),
+            )
 
         if (savedExpense.category == INVENTORY_ITEM_CATEGORY) {
             expenseStockOutputPort.registerEntry(savedExpense)
@@ -52,6 +65,10 @@ open class CreateExpenseUseCaseImplementation(
 
         require(expense.value > ZERO) {
             "O valor da despesa deve ser maior que zero."
+        }
+
+        require(expense.paidAmount >= ZERO && expense.paidAmount <= expense.value) {
+            "O valor pago deve estar entre zero e o valor total da despesa."
         }
 
         validateStock(expense)

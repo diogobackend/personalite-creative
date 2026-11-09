@@ -12,6 +12,7 @@ import jakarta.validation.constraints.Size
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.format.annotation.DateTimeFormat.ISO.DATE_TIME
 import java.math.BigDecimal
+import java.math.BigDecimal.ZERO
 import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.util.Collections.emptyList
@@ -26,6 +27,8 @@ data class CreateExpenseRequest(
     @field:NotNull
     @field:DecimalMin("0.01")
     val value: BigDecimal,
+    @field:DecimalMin("0.00")
+    val paidAmount: BigDecimal = ZERO,
     val category: String,
     @field:NotNull
     val categoryId: UUID,

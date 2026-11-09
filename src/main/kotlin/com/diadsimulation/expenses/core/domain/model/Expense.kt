@@ -5,6 +5,7 @@ import com.diadsimulation.expenses.core.domain.enums.ExpenseAllocationType.GENER
 import com.diadsimulation.expenses.core.domain.enums.ExpenseStatus
 import com.diadsimulation.expenses.core.domain.enums.ExpenseStatus.PENDING
 import java.math.BigDecimal
+import java.math.BigDecimal.ZERO
 import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.util.Collections.emptyList
@@ -16,6 +17,7 @@ data class Expense(
     val name: String,
     val description: String? = null,
     val value: BigDecimal,
+    val paidAmount: BigDecimal = ZERO,
     val category: String,
     val categoryId: UUID? = null,
     val allocationType: ExpenseAllocationType = GENERAL,

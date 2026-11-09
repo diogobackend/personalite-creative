@@ -3,6 +3,10 @@ package com.diadsimulation.expenses.core.usecase
 import com.diadsimulation.expenses.core.domain.enums.ExpenseAllocationType.CATEGORY_PRODUCTS
 import com.diadsimulation.expenses.core.domain.enums.ExpenseAllocationType.GENERAL
 import com.diadsimulation.expenses.core.domain.enums.ExpenseAllocationType.SPECIFIC_PRODUCT
+import com.diadsimulation.expenses.core.domain.enums.ExpenseStatus.CANCELLED
+import com.diadsimulation.expenses.core.domain.enums.ExpenseStatus.PAID
+import com.diadsimulation.expenses.core.domain.enums.ExpenseStatus.PARTIALLY_PAID
+import com.diadsimulation.expenses.core.domain.enums.ExpenseStatus.PENDING
 import com.diadsimulation.expenses.core.domain.model.Expense
 import com.diadsimulation.expenses.core.domain.model.ExpenseUpdate
 import com.diadsimulation.expenses.core.ports.input.UpdateExpenseInputPort
@@ -38,6 +42,10 @@ class UpdateExpenseUseCaseImplementation(
                 )
 
         validateRequiredFields(update)
+
+        require(currentExpense.status != CANCELLED) {
+            "Não é permitido alterar uma despesa cancelada."
+        }
 
         val allocationType =
             update.allocationType ?: currentExpense.allocationType
@@ -80,6 +88,30 @@ class UpdateExpenseUseCaseImplementation(
                 }
             }
 
+        val paidAmount =
+            if (update.has("paidAmount")) {
+                requireNotNull(update.paidAmount) {
+                    "O valor pago não pode ser nulo."
+                }
+            } else {
+                currentExpense.paidAmount
+            }
+
+        require(paidAmount >= ZERO && paidAmount <= value) {
+            "O valor pago deve estar entre zero e o valor total da despesa."
+        }
+
+        val status =
+            if (update.status == CANCELLED) {
+                CANCELLED
+            } else {
+                when {
+                    paidAmount.compareTo(ZERO) == 0 -> PENDING
+                    paidAmount.compareTo(value) == 0 -> PAID
+                    else -> PARTIALLY_PAID
+                }
+            }
+
         val updatedExpense =
             currentExpense.copy(
                 name = update.name ?: currentExpense.name,
@@ -96,10 +128,11 @@ class UpdateExpenseUseCaseImplementation(
                         currentExpense.description
                     },
                 value = value,
+                paidAmount = paidAmount,
                 category = update.category ?: currentExpense.category,
                 categoryId = update.categoryId ?: currentExpense.categoryId,
                 allocationType = allocationType,
-                status = update.status ?: currentExpense.status,
+                status = status,
                 quantity =
                     when {
                         update.has("quantity") -> update.quantity
@@ -135,6 +168,10 @@ class UpdateExpenseUseCaseImplementation(
     }
 
     private fun validateRequiredFields(update: ExpenseUpdate) {
+        require(!update.has("paidAmount") || update.paidAmount != null) {
+            "O valor pago não pode ser nulo."
+        }
+
         require(!update.has("categoryId") || update.categoryId != null) {
             "O ID da categoria não pode ser nulo."
         }

@@ -12,6 +12,8 @@ import com.diadsimulation.expenses.core.domain.model.ExpenseUpdate
 import com.diadsimulation.expenses.core.domain.model.ExpensesPage
 import com.diadsimulation.expenses.core.domain.model.GetExpensesFilter
 import org.springframework.stereotype.Component
+import java.math.BigDecimal
+import java.math.RoundingMode.HALF_UP
 import java.time.OffsetDateTime.now
 
 @Component
@@ -22,6 +24,7 @@ class ExpenseWebMapper {
             inventoryId = request.inventoryId,
             description = request.description,
             value = request.value,
+            paidAmount = request.paidAmount,
             category = request.category,
             categoryId = request.categoryId,
             allocationType = request.allocationType,
@@ -73,6 +76,12 @@ class ExpenseWebMapper {
             name = expense.name,
             description = expense.description,
             value = expense.value,
+            paidAmount = expense.paidAmount,
+            remainingAmount = expense.value.subtract(expense.paidAmount),
+            paidPercentage =
+                expense.paidAmount
+                    .multiply(BigDecimal.valueOf(100))
+                    .divide(expense.value, 2, HALF_UP),
             category = expense.category,
             categoryId = expense.categoryId,
             allocationType = expense.allocationType,
@@ -109,6 +118,7 @@ class ExpenseWebMapper {
             inventoryId = request.inventoryId,
             description = request.description,
             value = request.value,
+            paidAmount = request.paidAmount,
             category = request.category,
             categoryId = request.categoryId,
             allocationType = request.allocationType,

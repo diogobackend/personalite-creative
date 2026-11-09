@@ -37,6 +37,7 @@ class ExpensePersistenceAdapter(
             name = expense.name
             description = expense.description
             value = expense.value
+            paidAmount = expense.paidAmount
             category = expense.category
             categoryId = expense.categoryId
             allocationType = expense.allocationType
