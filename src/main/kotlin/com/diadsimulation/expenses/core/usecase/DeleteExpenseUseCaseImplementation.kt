@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional
 import java.util.NoSuchElementException
 import java.util.UUID
 
-class DeleteExpenseUseCaseImplementation(
+open class DeleteExpenseUseCaseImplementation(
     private val expenseRepositoryOutputPort: ExpenseRepositoryOutputPort,
     private val expenseStockOutputPort: ExpenseStockOutputPort,
 ) : DeleteExpenseInputPort {
