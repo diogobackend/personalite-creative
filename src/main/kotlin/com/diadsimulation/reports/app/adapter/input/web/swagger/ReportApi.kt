@@ -1,6 +1,7 @@
 package com.diadsimulation.reports.app.adapter.input.web.swagger
 
 import com.diadsimulation.reports.app.adapter.input.web.dtos.response.ReportOverviewResponse
+import com.diadsimulation.reports.app.adapter.input.web.dtos.response.SalesReportResponse
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -25,4 +26,17 @@ interface ReportApi {
         @DateTimeFormat(iso = DATE)
         endDate: LocalDate?,
     ): ReportOverviewResponse
+
+    @Operation(
+        summary = "Consultar relatório de vendas",
+        description = "Retorna os indicadores consolidados de vendas no período informado.",
+    )
+    fun getSalesReport(
+        @RequestParam(required = false)
+        @DateTimeFormat(iso = DATE)
+        startDate: LocalDate?,
+        @RequestParam(required = false)
+        @DateTimeFormat(iso = DATE)
+        endDate: LocalDate?,
+    ): SalesReportResponse
 }
