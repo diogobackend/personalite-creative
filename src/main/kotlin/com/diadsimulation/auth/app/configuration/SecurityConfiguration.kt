@@ -95,6 +95,12 @@ class SecurityConfiguration(
                         SCHOOL_ADMIN.name,
                         PLATFORM_ADMIN.name,
                     )
+                    // Relatórios
+                    .requestMatchers("/reports", "/reports/**")
+                    .hasAnyRole(
+                        SCHOOL_ADMIN.name,
+                        PLATFORM_ADMIN.name,
+                    )
                     // Demais endpoints
                     .anyRequest()
                     .hasRole(PLATFORM_ADMIN.name)
