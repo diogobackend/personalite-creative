@@ -1,9 +1,11 @@
 package com.diadsimulation.reports.app.adapter.input.web.controllers
 
+import com.diadsimulation.reports.app.adapter.input.web.dtos.response.ExpensesReportResponse
 import com.diadsimulation.reports.app.adapter.input.web.dtos.response.ReportOverviewResponse
 import com.diadsimulation.reports.app.adapter.input.web.dtos.response.SalesReportResponse
 import com.diadsimulation.reports.app.adapter.input.web.swagger.ReportApi
 import com.diadsimulation.reports.core.domain.models.ReportOverview
+import com.diadsimulation.reports.core.ports.input.GetExpensesReportInputPort
 import com.diadsimulation.reports.core.ports.input.GetReportOverviewInputPort
 import com.diadsimulation.reports.core.ports.input.GetSalesReportInputPort
 import org.springframework.web.bind.annotation.GetMapping
@@ -17,6 +19,7 @@ import java.time.ZoneId
 class ReportController(
     private val getReportOverviewInputPort: GetReportOverviewInputPort,
     private val getSalesReportInputPort: GetSalesReportInputPort,
+    private val getExpensesReportInputPort: GetExpensesReportInputPort,
 ) : ReportApi {
     @GetMapping("/overview")
     override fun getOverview(
@@ -66,6 +69,29 @@ class ReportController(
             receivedAmount = report.receivedAmount,
             outstandingAmount = report.outstandingAmount,
             receivedPercentage = report.receivedPercentage,
+        )
+    }
+
+    @GetMapping("/expenses")
+    override fun getExpensesReport(
+        startDate: LocalDate?,
+        endDate: LocalDate?,
+    ): ExpensesReportResponse {
+        val today = LocalDate.now(ZoneId.of("America/Sao_Paulo"))
+
+        val report =
+            getExpensesReportInputPort.execute(
+                startDate = startDate ?: today.withDayOfMonth(1),
+                endDate = endDate ?: today,
+            )
+
+        return ExpensesReportResponse(
+            totalExpenses = report.totalExpenses,
+            expectedAmount = report.expectedAmount,
+            paidAmount = report.paidAmount,
+            outstandingAmount = report.outstandingAmount,
+            paidPercentage = report.paidPercentage,
+            pendingExpenses = report.pendingExpenses,
         )
     }
 }

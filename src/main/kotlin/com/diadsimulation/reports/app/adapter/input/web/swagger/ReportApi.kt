@@ -1,5 +1,6 @@
 package com.diadsimulation.reports.app.adapter.input.web.swagger
 
+import com.diadsimulation.reports.app.adapter.input.web.dtos.response.ExpensesReportResponse
 import com.diadsimulation.reports.app.adapter.input.web.dtos.response.ReportOverviewResponse
 import com.diadsimulation.reports.app.adapter.input.web.dtos.response.SalesReportResponse
 import io.swagger.v3.oas.annotations.Operation
@@ -39,4 +40,19 @@ interface ReportApi {
         @DateTimeFormat(iso = DATE)
         endDate: LocalDate?,
     ): SalesReportResponse
+
+    @Operation(
+        summary = "Consultar relatório de despesas",
+        description = "Retorna os indicadores de despesas no período informado.",
+    )
+    fun getExpensesReport(
+        @Parameter(description = "Data inicial (yyyy-MM-dd)")
+        @RequestParam(required = false)
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+        startDate: LocalDate?,
+        @Parameter(description = "Data final (yyyy-MM-dd)")
+        @RequestParam(required = false)
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+        endDate: LocalDate?,
+    ): ExpensesReportResponse
 }
