@@ -1,7 +1,10 @@
 package com.diadsimulation.reports.app.adapter.input.web.controllers
 
+import com.diadsimulation.expenses.core.ports.input.ReportTransactionsInputPort
 import com.diadsimulation.reports.app.adapter.input.web.dtos.response.ExpensesReportResponse
 import com.diadsimulation.reports.app.adapter.input.web.dtos.response.ReportOverviewResponse
+import com.diadsimulation.reports.app.adapter.input.web.dtos.response.ReportTransactionResponse
+import com.diadsimulation.reports.app.adapter.input.web.dtos.response.ReportTransactionsResponse
 import com.diadsimulation.reports.app.adapter.input.web.dtos.response.SalesReportResponse
 import com.diadsimulation.reports.app.adapter.input.web.swagger.ReportApi
 import com.diadsimulation.reports.core.domain.models.ReportOverview
@@ -20,6 +23,7 @@ class ReportController(
     private val getReportOverviewInputPort: GetReportOverviewInputPort,
     private val getSalesReportInputPort: GetSalesReportInputPort,
     private val getExpensesReportInputPort: GetExpensesReportInputPort,
+    private val getReportTransactionsInputPort: ReportTransactionsInputPort,
 ) : ReportApi {
     @GetMapping("/overview")
     override fun getOverview(
@@ -92,6 +96,36 @@ class ReportController(
             outstandingAmount = report.outstandingAmount,
             paidPercentage = report.paidPercentage,
             pendingExpenses = report.pendingExpenses,
+        )
+    }
+
+    @GetMapping("/transactions")
+    override fun getTransactions(
+        startDate: LocalDate?,
+        endDate: LocalDate?,
+    ): ReportTransactionsResponse {
+        val today = LocalDate.now(ZoneId.of("America/Sao_Paulo"))
+
+        val report =
+            getReportTransactionsInputPort.execute(
+                startDate = startDate ?: today.withDayOfMonth(1),
+                endDate = endDate ?: today,
+            )
+
+        return ReportTransactionsResponse(
+            totalEntries = report.totalEntries,
+            totalExits = report.totalExits,
+            balance = report.balance,
+            transactions =
+                report.transactions.map { transaction ->
+                    ReportTransactionResponse(
+                        id = transaction.id,
+                        type = transaction.type.name,
+                        description = transaction.description,
+                        referenceDate = transaction.referenceDate,
+                        amount = transaction.amount,
+                    )
+                },
         )
     }
 }

@@ -1,0 +1,3 @@
+package com.diadsimulation.reports.core.usecase
+
+class ReportTransactionsUseCaseImplementation

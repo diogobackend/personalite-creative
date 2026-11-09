@@ -1,7 +1,11 @@
 package com.diadsimulation.reports.app.config
 
+import com.diadsimulation.expenses.core.ports.input.ReportTransactionsInputPort
+import com.diadsimulation.expenses.core.ports.output.GetReportTransactionsOutputPort
+import com.diadsimulation.expenses.core.usecase.GetReportTransactionsUseCaseImplementation
 import com.diadsimulation.reports.app.adapter.output.adapters.ExpensesReportPersistenceAdapter
 import com.diadsimulation.reports.app.adapter.output.adapters.ReportOverviewPersistenceAdapter
+import com.diadsimulation.reports.app.adapter.output.adapters.ReportTransactionsPersistenceAdapter
 import com.diadsimulation.reports.app.adapter.output.adapters.SalesReportPersistenceAdapter
 import com.diadsimulation.reports.core.ports.input.GetExpensesReportInputPort
 import com.diadsimulation.reports.core.ports.input.GetReportOverviewInputPort
@@ -42,4 +46,12 @@ class ReportUseCaseConfiguration {
     @Bean
     fun getExpensesReportInputPort(getExpensesReportOutputPort: GetExpensesReportOutputPort): GetExpensesReportInputPort =
         GetExpensesReportUseCaseImplementation(getExpensesReportOutputPort)
+
+    @Bean
+    fun getReportTransactionsOutputPort(entityManager: EntityManager): GetReportTransactionsOutputPort =
+        ReportTransactionsPersistenceAdapter(entityManager)
+
+    @Bean
+    fun getReportTransactionsInputPort(getReportTransactionsOutputPort: GetReportTransactionsOutputPort): ReportTransactionsInputPort =
+        GetReportTransactionsUseCaseImplementation(getReportTransactionsOutputPort)
 }
