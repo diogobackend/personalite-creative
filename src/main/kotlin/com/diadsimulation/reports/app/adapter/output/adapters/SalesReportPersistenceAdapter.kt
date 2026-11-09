@@ -18,8 +18,8 @@ class SalesReportPersistenceAdapter(
     ): SalesReport {
         val zoneId = ZoneId.of("America/Sao_Paulo")
 
-        val start = startDate.atStartOfDay(zoneId).toInstant()
-        val end = endDate.plusDays(1).atStartOfDay(zoneId).toInstant()
+        val start = startDate.atStartOfDay(zoneId).toOffsetDateTime()
+        val end = endDate.plusDays(1).atStartOfDay(zoneId).toOffsetDateTime()
 
         val sales =
             entityManager
