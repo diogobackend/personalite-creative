@@ -15,12 +15,14 @@ import com.diadsimulation.expenses.core.ports.output.ExpenseRepositoryOutputPort
 import com.diadsimulation.expenses.core.ports.output.ExpenseStockOutputPort
 import com.diadsimulation.expenses.core.ports.output.ProductExpenseValidationOutputPort
 import com.diadsimulation.expenses.core.usecase.UpdateExpenseUseCaseImplementation.Constants.INVENTORY_ITEM_CATEGORY
+import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal.ZERO
 import java.time.OffsetDateTime
 import java.util.Collections.emptyList
 import java.util.NoSuchElementException
 import java.util.UUID
 
+@Transactional
 class UpdateExpenseUseCaseImplementation(
     private val expenseRepositoryOutputPort: ExpenseRepositoryOutputPort,
     private val productExpenseValidationOutputPort: ProductExpenseValidationOutputPort,
@@ -162,6 +164,12 @@ class UpdateExpenseUseCaseImplementation(
         expenseStockOutputPort.updateEntry(
             previousExpense = currentExpense,
             updatedExpense = savedExpense,
+            reason =
+                if (savedExpense.status == CANCELLED) {
+                    "EXPENSE_CANCELLED"
+                } else {
+                    "EXPENSE_ADJUSTMENT"
+                },
         )
 
         return savedExpense

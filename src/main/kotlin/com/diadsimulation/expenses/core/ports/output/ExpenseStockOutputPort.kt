@@ -8,5 +8,6 @@ interface ExpenseStockOutputPort {
     fun updateEntry(
         previousExpense: Expense,
         updatedExpense: Expense,
+        reason: String = "EXPENSE_ADJUSTMENT",
     )
 }

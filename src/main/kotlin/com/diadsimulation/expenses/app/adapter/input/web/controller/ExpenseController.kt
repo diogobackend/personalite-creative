@@ -88,6 +88,7 @@ class ExpenseController(
                 "allocationType",
                 "status",
                 "quantity",
+                "inventoryId",
                 "products",
                 "expenseDate",
             )

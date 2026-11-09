@@ -58,8 +58,12 @@ class ExpenseUseCaseConfiguration {
         )
 
     @Bean
-    fun deleteExpenseInputPort(expenseRepositoryOutputPort: ExpenseRepositoryOutputPort): DeleteExpenseInputPort =
+    fun deleteExpenseInputPort(
+        expenseRepositoryOutputPort: ExpenseRepositoryOutputPort,
+        expenseStockOutputPort: ExpenseStockOutputPort,
+    ): DeleteExpenseInputPort =
         DeleteExpenseUseCaseImplementation(
             expenseRepositoryOutputPort = expenseRepositoryOutputPort,
+            expenseStockOutputPort = expenseStockOutputPort,
         )
 }

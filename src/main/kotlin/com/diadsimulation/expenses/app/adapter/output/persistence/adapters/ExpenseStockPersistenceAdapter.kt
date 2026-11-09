@@ -1,6 +1,7 @@
 package com.diadsimulation.expenses.app.adapter.output.persistence.adapters
 
 import com.diadsimulation.expenses.app.adapter.output.persistence.adapters.ExpenseStockPersistenceAdapter.Constants.INVENTORY_ITEM_CATEGORY
+import com.diadsimulation.expenses.core.domain.enums.ExpenseStatus.CANCELLED
 import com.diadsimulation.expenses.core.domain.model.Expense
 import com.diadsimulation.expenses.core.ports.output.ExpenseStockOutputPort
 import com.diadsimulation.inventory.core.domain.enums.InventoryMovementType.IN
@@ -51,15 +52,18 @@ class ExpenseStockPersistenceAdapter(
     override fun updateEntry(
         previousExpense: Expense,
         updatedExpense: Expense,
+        reason: String,
     ) {
         val previousInventoryId =
             previousExpense.inventoryId.takeIf {
-                previousExpense.category == INVENTORY_ITEM_CATEGORY
+                previousExpense.category == INVENTORY_ITEM_CATEGORY &&
+                    previousExpense.status != CANCELLED
             }
 
         val updatedInventoryId =
             updatedExpense.inventoryId.takeIf {
-                updatedExpense.category == INVENTORY_ITEM_CATEGORY
+                updatedExpense.category == INVENTORY_ITEM_CATEGORY &&
+                    updatedExpense.status != CANCELLED
             }
 
         val previousQuantity =
@@ -98,7 +102,7 @@ class ExpenseStockPersistenceAdapter(
                     inventoryId = inventoryId,
                     type = if (delta > 0) IN else OUT,
                     quantity = kotlin.math.abs(delta),
-                    reason = "EXPENSE_ADJUSTMENT",
+                    reason = reason,
                     expenseId = updatedExpense.id,
                 ),
             )
