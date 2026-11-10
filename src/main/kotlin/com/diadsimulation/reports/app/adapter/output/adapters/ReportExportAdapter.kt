@@ -876,7 +876,7 @@ class ReportExportAdapter(
 
     companion object {
         private val GOLD_COLOR = Color(190, 145, 65)
-        private val ZEBRA_ORANGE = Color(220, 133, 31)
+        private val ZEBRA_ORANGE = Color(235, 170, 85)
         private val ZEBRA_SAND = Color(249, 224, 190)
         private val DARK_COLOR = Color(53, 47, 42)
         private val BR_LOCALE = Locale.forLanguageTag("pt-BR")
