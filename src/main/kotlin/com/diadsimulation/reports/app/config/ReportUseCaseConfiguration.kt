@@ -1,7 +1,9 @@
 package com.diadsimulation.reports.app.config
 
+import com.diadsimulation.expenses.core.ports.input.ReportCashFlowInputPort
 import com.diadsimulation.expenses.core.ports.input.ReportTransactionsInputPort
 import com.diadsimulation.expenses.core.ports.output.GetReportTransactionsOutputPort
+import com.diadsimulation.expenses.core.usecase.GetReportCashFlowUseCaseImplementation
 import com.diadsimulation.expenses.core.usecase.GetReportTransactionsUseCaseImplementation
 import com.diadsimulation.reports.app.adapter.output.adapters.ExpensesReportPersistenceAdapter
 import com.diadsimulation.reports.app.adapter.output.adapters.ReportOverviewPersistenceAdapter
@@ -54,4 +56,10 @@ class ReportUseCaseConfiguration {
     @Bean
     fun getReportTransactionsInputPort(getReportTransactionsOutputPort: GetReportTransactionsOutputPort): ReportTransactionsInputPort =
         GetReportTransactionsUseCaseImplementation(getReportTransactionsOutputPort)
+
+    @Bean
+    fun getReportCashFlowInputPort(reportTransactionsInputPort: ReportTransactionsInputPort): ReportCashFlowInputPort =
+        GetReportCashFlowUseCaseImplementation(
+            reportTransactionsInputPort = reportTransactionsInputPort,
+        )
 }

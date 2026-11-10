@@ -1,6 +1,7 @@
 package com.diadsimulation.reports.app.adapter.input.web.swagger
 
 import com.diadsimulation.reports.app.adapter.input.web.dtos.response.ExpensesReportResponse
+import com.diadsimulation.reports.app.adapter.input.web.dtos.response.ReportCashFlowResponse
 import com.diadsimulation.reports.app.adapter.input.web.dtos.response.ReportOverviewResponse
 import com.diadsimulation.reports.app.adapter.input.web.dtos.response.ReportTransactionsResponse
 import com.diadsimulation.reports.app.adapter.input.web.dtos.response.SalesReportResponse
@@ -71,4 +72,19 @@ interface ReportApi {
         @DateTimeFormat(iso = DATE)
         endDate: LocalDate?,
     ): ReportTransactionsResponse
+
+    @Operation(
+        summary = "Consultar fluxo de caixa",
+        description = "Retorna entradas, saídas e saldo agrupados por data de referência no período informado.",
+    )
+    fun getCashFlow(
+        @Parameter(description = "Data inicial (yyyy-MM-dd)")
+        @RequestParam(required = false)
+        @DateTimeFormat(iso = DATE)
+        startDate: LocalDate?,
+        @Parameter(description = "Data final (yyyy-MM-dd)")
+        @RequestParam(required = false)
+        @DateTimeFormat(iso = DATE)
+        endDate: LocalDate?,
+    ): ReportCashFlowResponse
 }

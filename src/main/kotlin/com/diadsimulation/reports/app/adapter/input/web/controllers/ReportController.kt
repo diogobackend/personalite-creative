@@ -1,7 +1,9 @@
 package com.diadsimulation.reports.app.adapter.input.web.controllers
 
+import com.diadsimulation.expenses.core.ports.input.ReportCashFlowInputPort
 import com.diadsimulation.expenses.core.ports.input.ReportTransactionsInputPort
 import com.diadsimulation.reports.app.adapter.input.web.dtos.response.ExpensesReportResponse
+import com.diadsimulation.reports.app.adapter.input.web.dtos.response.ReportCashFlowResponse
 import com.diadsimulation.reports.app.adapter.input.web.dtos.response.ReportOverviewResponse
 import com.diadsimulation.reports.app.adapter.input.web.dtos.response.ReportTransactionResponse
 import com.diadsimulation.reports.app.adapter.input.web.dtos.response.ReportTransactionsResponse
@@ -24,6 +26,7 @@ class ReportController(
     private val getSalesReportInputPort: GetSalesReportInputPort,
     private val getExpensesReportInputPort: GetExpensesReportInputPort,
     private val getReportTransactionsInputPort: ReportTransactionsInputPort,
+    private val getReportCashFlowInputPort: ReportCashFlowInputPort,
 ) : ReportApi {
     @GetMapping("/overview")
     override fun getOverview(
@@ -127,5 +130,21 @@ class ReportController(
                     )
                 },
         )
+    }
+
+    @GetMapping("/cash-flow")
+    override fun getCashFlow(
+        startDate: LocalDate?,
+        endDate: LocalDate?,
+    ): ReportCashFlowResponse {
+        val today = LocalDate.now(ZoneId.of("America/Sao_Paulo"))
+
+        val report =
+            getReportCashFlowInputPort.execute(
+                startDate = startDate ?: today.withDayOfMonth(1),
+                endDate = endDate ?: today,
+            )
+
+        return ReportCashFlowResponse.from(report)
     }
 }
