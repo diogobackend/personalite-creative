@@ -13,12 +13,14 @@ import com.diadsimulation.reports.core.ports.input.GetExpensesReportInputPort
 import com.diadsimulation.reports.core.ports.input.GetReportOverviewInputPort
 import com.diadsimulation.reports.core.ports.input.GetSalesReportInputPort
 import com.diadsimulation.reports.core.ports.input.ReportComparisonInputPort
+import com.diadsimulation.reports.core.ports.input.ReportRevenueEvolutionInputPort
 import com.diadsimulation.reports.core.ports.output.GetExpensesReportOutputPort
 import com.diadsimulation.reports.core.ports.output.GetReportOverviewOutputPort
 import com.diadsimulation.reports.core.ports.output.GetSalesReportOutputPort
 import com.diadsimulation.reports.core.usecase.GetExpensesReportUseCaseImplementation
 import com.diadsimulation.reports.core.usecase.GetReportComparisonUseCaseImplementation
 import com.diadsimulation.reports.core.usecase.GetReportOverviewUseCaseImplementation
+import com.diadsimulation.reports.core.usecase.GetReportRevenueEvolutionUseCaseImplementation
 import com.diadsimulation.reports.core.usecase.GetSalesReportUseCaseImplementation
 import jakarta.persistence.EntityManager
 import org.springframework.context.annotation.Bean
@@ -68,6 +70,12 @@ class ReportUseCaseConfiguration {
     @Bean
     fun getReportComparisonInputPort(getReportOverviewInputPort: GetReportOverviewInputPort): ReportComparisonInputPort =
         GetReportComparisonUseCaseImplementation(
+            getReportOverviewInputPort = getReportOverviewInputPort,
+        )
+
+    @Bean
+    fun getReportRevenueEvolutionInputPort(getReportOverviewInputPort: GetReportOverviewInputPort): ReportRevenueEvolutionInputPort =
+        GetReportRevenueEvolutionUseCaseImplementation(
             getReportOverviewInputPort = getReportOverviewInputPort,
         )
 }

@@ -6,6 +6,7 @@ import com.diadsimulation.reports.app.adapter.input.web.dtos.response.ExpensesRe
 import com.diadsimulation.reports.app.adapter.input.web.dtos.response.ReportCashFlowResponse
 import com.diadsimulation.reports.app.adapter.input.web.dtos.response.ReportComparisonResponse
 import com.diadsimulation.reports.app.adapter.input.web.dtos.response.ReportOverviewResponse
+import com.diadsimulation.reports.app.adapter.input.web.dtos.response.ReportRevenueEvolutionResponse
 import com.diadsimulation.reports.app.adapter.input.web.dtos.response.ReportTransactionResponse
 import com.diadsimulation.reports.app.adapter.input.web.dtos.response.ReportTransactionsResponse
 import com.diadsimulation.reports.app.adapter.input.web.dtos.response.SalesReportResponse
@@ -15,6 +16,7 @@ import com.diadsimulation.reports.core.ports.input.GetExpensesReportInputPort
 import com.diadsimulation.reports.core.ports.input.GetReportOverviewInputPort
 import com.diadsimulation.reports.core.ports.input.GetSalesReportInputPort
 import com.diadsimulation.reports.core.ports.input.ReportComparisonInputPort
+import com.diadsimulation.reports.core.ports.input.ReportRevenueEvolutionInputPort
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -30,6 +32,7 @@ class ReportController(
     private val getReportTransactionsInputPort: ReportTransactionsInputPort,
     private val getReportCashFlowInputPort: ReportCashFlowInputPort,
     private val getReportComparisonInputPort: ReportComparisonInputPort,
+    private val reportRevenueEvolutionInputPort: ReportRevenueEvolutionInputPort,
 ) : ReportApi {
     @GetMapping("/overview")
     override fun getOverview(
@@ -164,6 +167,18 @@ class ReportController(
                 endDate = endDate,
                 previousStartDate = previousStartDate,
                 previousEndDate = previousEndDate,
+            ),
+        )
+
+    @GetMapping("/revenue-evolution")
+    override fun getRevenueEvolution(
+        startDate: LocalDate,
+        endDate: LocalDate,
+    ): ReportRevenueEvolutionResponse =
+        ReportRevenueEvolutionResponse.from(
+            reportRevenueEvolutionInputPort.execute(
+                startDate = startDate,
+                endDate = endDate,
             ),
         )
 }

@@ -4,6 +4,7 @@ import com.diadsimulation.reports.app.adapter.input.web.dtos.response.ExpensesRe
 import com.diadsimulation.reports.app.adapter.input.web.dtos.response.ReportCashFlowResponse
 import com.diadsimulation.reports.app.adapter.input.web.dtos.response.ReportComparisonResponse
 import com.diadsimulation.reports.app.adapter.input.web.dtos.response.ReportOverviewResponse
+import com.diadsimulation.reports.app.adapter.input.web.dtos.response.ReportRevenueEvolutionResponse
 import com.diadsimulation.reports.app.adapter.input.web.dtos.response.ReportTransactionsResponse
 import com.diadsimulation.reports.app.adapter.input.web.dtos.response.SalesReportResponse
 import io.swagger.v3.oas.annotations.Operation
@@ -111,4 +112,19 @@ interface ReportApi {
         @DateTimeFormat(iso = DATE)
         previousEndDate: LocalDate,
     ): ReportComparisonResponse
+
+    @Operation(
+        summary = "Consultar evolução do faturamento",
+        description = "Retorna o faturamento total e sua evolução mensal no período informado.",
+    )
+    fun getRevenueEvolution(
+        @Parameter(description = "Data inicial do período (yyyy-MM-dd)")
+        @RequestParam
+        @DateTimeFormat(iso = DATE)
+        startDate: LocalDate,
+        @Parameter(description = "Data final do período (yyyy-MM-dd)")
+        @RequestParam
+        @DateTimeFormat(iso = DATE)
+        endDate: LocalDate,
+    ): ReportRevenueEvolutionResponse
 }
