@@ -7,11 +7,14 @@ import com.diadsimulation.reports.app.adapter.input.web.dtos.response.ReportOver
 import com.diadsimulation.reports.app.adapter.input.web.dtos.response.ReportRevenueEvolutionResponse
 import com.diadsimulation.reports.app.adapter.input.web.dtos.response.ReportTransactionsResponse
 import com.diadsimulation.reports.app.adapter.input.web.dtos.response.SalesReportResponse
+import com.diadsimulation.reports.core.domain.enums.ReportExportFormat
+import com.diadsimulation.reports.core.domain.enums.ReportExportType
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.format.annotation.DateTimeFormat.ISO.DATE
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RequestParam
 import java.time.LocalDate
 
@@ -127,4 +130,27 @@ interface ReportApi {
         @DateTimeFormat(iso = DATE)
         endDate: LocalDate,
     ): ReportRevenueEvolutionResponse
+
+    @Operation(
+        summary = "Exportar relatórios financeiros",
+        description = "Exporta todos os relatórios ou um relatório específico em PDF ou Excel, conforme o período informado.",
+    )
+    fun exportReport(
+        @Parameter(description = "Data inicial do período (yyyy-MM-dd)")
+        @RequestParam
+        @DateTimeFormat(iso = DATE)
+        startDate: LocalDate,
+        @Parameter(description = "Data final do período (yyyy-MM-dd)")
+        @RequestParam
+        @DateTimeFormat(iso = DATE)
+        endDate: LocalDate,
+        @Parameter(description = "Formato do arquivo: PDF ou XLSX")
+        @RequestParam
+        format: ReportExportFormat,
+        @Parameter(
+            description = "Tipo de relatório: ALL, OVERVIEW, SALES, EXPENSES, TRANSACTIONS, CASH_FLOW, COMPARISON ou REVENUE_EVOLUTION",
+        )
+        @RequestParam
+        type: ReportExportType,
+    ): ResponseEntity<ByteArray>
 }

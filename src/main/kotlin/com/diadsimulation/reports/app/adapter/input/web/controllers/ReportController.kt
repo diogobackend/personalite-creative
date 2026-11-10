@@ -11,12 +11,21 @@ import com.diadsimulation.reports.app.adapter.input.web.dtos.response.ReportTran
 import com.diadsimulation.reports.app.adapter.input.web.dtos.response.ReportTransactionsResponse
 import com.diadsimulation.reports.app.adapter.input.web.dtos.response.SalesReportResponse
 import com.diadsimulation.reports.app.adapter.input.web.swagger.ReportApi
+import com.diadsimulation.reports.core.domain.enums.ReportExportFormat
+import com.diadsimulation.reports.core.domain.enums.ReportExportFormat.PDF
+import com.diadsimulation.reports.core.domain.enums.ReportExportFormat.XLSX
+import com.diadsimulation.reports.core.domain.enums.ReportExportType
 import com.diadsimulation.reports.core.domain.models.ReportOverview
 import com.diadsimulation.reports.core.ports.input.GetExpensesReportInputPort
 import com.diadsimulation.reports.core.ports.input.GetReportOverviewInputPort
 import com.diadsimulation.reports.core.ports.input.GetSalesReportInputPort
 import com.diadsimulation.reports.core.ports.input.ReportComparisonInputPort
+import com.diadsimulation.reports.core.ports.input.ReportExportInputPort
 import com.diadsimulation.reports.core.ports.input.ReportRevenueEvolutionInputPort
+import org.springframework.http.HttpHeaders.CONTENT_DISPOSITION
+import org.springframework.http.MediaType
+import org.springframework.http.MediaType.APPLICATION_PDF
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -33,6 +42,7 @@ class ReportController(
     private val getReportCashFlowInputPort: ReportCashFlowInputPort,
     private val getReportComparisonInputPort: ReportComparisonInputPort,
     private val reportRevenueEvolutionInputPort: ReportRevenueEvolutionInputPort,
+    private val reportExportInputPort: ReportExportInputPort,
 ) : ReportApi {
     @GetMapping("/overview")
     override fun getOverview(
@@ -181,4 +191,43 @@ class ReportController(
                 endDate = endDate,
             ),
         )
+
+    @GetMapping("/export")
+    override fun exportReport(
+        startDate: LocalDate,
+        endDate: LocalDate,
+        format: ReportExportFormat,
+        type: ReportExportType,
+    ): ResponseEntity<ByteArray> {
+        val file =
+            reportExportInputPort.execute(
+                startDate = startDate,
+                endDate = endDate,
+                format = format,
+                type = type,
+            )
+
+        val extension = format.name.lowercase()
+        val contentType =
+            when (format) {
+                PDF -> {
+                    APPLICATION_PDF
+                }
+
+                XLSX -> {
+                    MediaType.parseMediaType(
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    )
+                }
+            }
+
+        return ResponseEntity
+            .ok()
+            .contentType(contentType)
+            .header(
+                CONTENT_DISPOSITION,
+                "attachment; filename=\"relatorio-${type.name.lowercase()}.$extension\"",
+            ).contentLength(file.size.toLong())
+            .body(file)
+    }
 }

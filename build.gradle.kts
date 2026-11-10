@@ -51,6 +51,8 @@ dependencies {
     implementation("org.openapitools:jackson-databind-nullable:0.2.8")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.2")
     implementation("io.jsonwebtoken:jjwt-api:0.12.6")
+    implementation("com.github.librepdf:openpdf:2.0.3")
+    implementation("org.apache.poi:poi-ooxml:5.4.1")
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.6")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.6")
     runtimeOnly("org.postgresql:postgresql")

@@ -6,6 +6,7 @@ import com.diadsimulation.expenses.core.ports.output.GetReportTransactionsOutput
 import com.diadsimulation.expenses.core.usecase.GetReportCashFlowUseCaseImplementation
 import com.diadsimulation.expenses.core.usecase.GetReportTransactionsUseCaseImplementation
 import com.diadsimulation.reports.app.adapter.output.adapters.ExpensesReportPersistenceAdapter
+import com.diadsimulation.reports.app.adapter.output.adapters.ReportExportAdapter
 import com.diadsimulation.reports.app.adapter.output.adapters.ReportOverviewPersistenceAdapter
 import com.diadsimulation.reports.app.adapter.output.adapters.ReportTransactionsPersistenceAdapter
 import com.diadsimulation.reports.app.adapter.output.adapters.SalesReportPersistenceAdapter
@@ -13,10 +14,13 @@ import com.diadsimulation.reports.core.ports.input.GetExpensesReportInputPort
 import com.diadsimulation.reports.core.ports.input.GetReportOverviewInputPort
 import com.diadsimulation.reports.core.ports.input.GetSalesReportInputPort
 import com.diadsimulation.reports.core.ports.input.ReportComparisonInputPort
+import com.diadsimulation.reports.core.ports.input.ReportExportInputPort
 import com.diadsimulation.reports.core.ports.input.ReportRevenueEvolutionInputPort
 import com.diadsimulation.reports.core.ports.output.GetExpensesReportOutputPort
 import com.diadsimulation.reports.core.ports.output.GetReportOverviewOutputPort
 import com.diadsimulation.reports.core.ports.output.GetSalesReportOutputPort
+import com.diadsimulation.reports.core.ports.output.ReportExportOutputPort
+import com.diadsimulation.reports.core.usecase.ExportReportUseCaseImplementation
 import com.diadsimulation.reports.core.usecase.GetExpensesReportUseCaseImplementation
 import com.diadsimulation.reports.core.usecase.GetReportComparisonUseCaseImplementation
 import com.diadsimulation.reports.core.usecase.GetReportOverviewUseCaseImplementation
@@ -77,5 +81,31 @@ class ReportUseCaseConfiguration {
     fun getReportRevenueEvolutionInputPort(getReportOverviewInputPort: GetReportOverviewInputPort): ReportRevenueEvolutionInputPort =
         GetReportRevenueEvolutionUseCaseImplementation(
             getReportOverviewInputPort = getReportOverviewInputPort,
+        )
+
+    @Bean
+    fun reportExportInputPort(reportExportOutputPort: ReportExportOutputPort): ReportExportInputPort =
+        ExportReportUseCaseImplementation(
+            reportExportOutputPort = reportExportOutputPort,
+        )
+
+    @Bean
+    fun reportExportOutputPort(
+        getReportOverviewInputPort: GetReportOverviewInputPort,
+        getSalesReportInputPort: GetSalesReportInputPort,
+        getExpensesReportInputPort: GetExpensesReportInputPort,
+        reportTransactionsInputPort: ReportTransactionsInputPort,
+        reportCashFlowInputPort: ReportCashFlowInputPort,
+        reportComparisonInputPort: ReportComparisonInputPort,
+        reportRevenueEvolutionInputPort: ReportRevenueEvolutionInputPort,
+    ): ReportExportOutputPort =
+        ReportExportAdapter(
+            getReportOverviewInputPort = getReportOverviewInputPort,
+            getSalesReportInputPort = getSalesReportInputPort,
+            getExpensesReportInputPort = getExpensesReportInputPort,
+            reportTransactionsInputPort = reportTransactionsInputPort,
+            reportCashFlowInputPort = reportCashFlowInputPort,
+            reportComparisonInputPort = reportComparisonInputPort,
+            reportRevenueEvolutionInputPort = reportRevenueEvolutionInputPort,
         )
 }
