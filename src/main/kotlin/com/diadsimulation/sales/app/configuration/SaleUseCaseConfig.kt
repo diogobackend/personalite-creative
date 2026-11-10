@@ -10,6 +10,7 @@ import com.diadsimulation.sales.core.ports.input.UpdateSaleInputPort
 import com.diadsimulation.sales.core.ports.output.CreateSaleOutputPort
 import com.diadsimulation.sales.core.ports.output.DeleteSaleOutputPort
 import com.diadsimulation.sales.core.ports.output.FindSaleByIdOutputPort
+import com.diadsimulation.sales.core.ports.output.SalePaymentRepositoryOutputPort
 import com.diadsimulation.sales.core.ports.output.SearchSalesOutputPort
 import com.diadsimulation.sales.core.ports.output.UpdateSaleOutputPort
 import com.diadsimulation.sales.core.usecase.CreateSaleUseCaseImplementation
@@ -28,12 +29,14 @@ class SaleUseCaseConfig {
         userRepositoryOutputPort: UserRepositoryOutputPort,
         productRepositoryOutputPort: ProductRepositoryOutputPort,
         inventoryRepositoryOutputPort: InventoryRepositoryOutputPort,
+        salePaymentRepositoryOutputPort: SalePaymentRepositoryOutputPort,
     ): CreateSaleInputPort =
         CreateSaleUseCaseImplementation(
             createSaleOutputPort = createSaleOutputPort,
             userRepositoryOutputPort = userRepositoryOutputPort,
             productRepositoryOutputPort = productRepositoryOutputPort,
             inventoryRepositoryOutputPort = inventoryRepositoryOutputPort,
+            salePaymentRepositoryOutputPort = salePaymentRepositoryOutputPort,
         )
 
     @Bean
@@ -51,6 +54,7 @@ class SaleUseCaseConfig {
         userRepositoryOutputPort: UserRepositoryOutputPort,
         productRepositoryOutputPort: ProductRepositoryOutputPort,
         inventoryRepositoryOutputPort: InventoryRepositoryOutputPort,
+        salePaymentRepositoryOutputPort: SalePaymentRepositoryOutputPort,
     ): UpdateSaleInputPort =
         UpdateSaleUseCaseImplementation(
             findSaleByIdInputPort = findSaleByIdInputPort,
@@ -58,6 +62,7 @@ class SaleUseCaseConfig {
             userRepositoryOutputPort = userRepositoryOutputPort,
             productRepositoryOutputPort = productRepositoryOutputPort,
             inventoryRepositoryOutputPort = inventoryRepositoryOutputPort,
+            salePaymentRepositoryOutputPort = salePaymentRepositoryOutputPort,
         )
 
     @Bean

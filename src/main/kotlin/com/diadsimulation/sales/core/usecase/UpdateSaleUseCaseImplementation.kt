@@ -3,26 +3,32 @@ package com.diadsimulation.sales.core.usecase
 import com.diadsimulation.auth.core.port.output.UserRepositoryOutputPort
 import com.diadsimulation.inventory.core.ports.output.InventoryRepositoryOutputPort
 import com.diadsimulation.products.core.port.output.ProductRepositoryOutputPort
+import com.diadsimulation.sales.core.domain.enums.SalePaymentType.RECEIPT
+import com.diadsimulation.sales.core.domain.enums.SalePaymentType.REFUND
 import com.diadsimulation.sales.core.domain.model.Sale
+import com.diadsimulation.sales.core.domain.model.SalePayment
 import com.diadsimulation.sales.core.domain.model.SaleUpdate
 import com.diadsimulation.sales.core.domain.utils.UpdateField
 import com.diadsimulation.sales.core.ports.input.FindSaleByIdInputPort
 import com.diadsimulation.sales.core.ports.input.UpdateSaleInputPort
+import com.diadsimulation.sales.core.ports.output.SalePaymentRepositoryOutputPort
 import com.diadsimulation.sales.core.ports.output.UpdateSaleOutputPort
+import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
 import java.math.BigDecimal.ZERO
-import java.math.RoundingMode.HALF_UP
 import java.time.OffsetDateTime
 import java.util.NoSuchElementException
 import java.util.UUID
 
-class UpdateSaleUseCaseImplementation(
+open class UpdateSaleUseCaseImplementation(
     private val findSaleByIdInputPort: FindSaleByIdInputPort,
     private val updateSaleOutputPort: UpdateSaleOutputPort,
     private val userRepositoryOutputPort: UserRepositoryOutputPort,
     private val productRepositoryOutputPort: ProductRepositoryOutputPort,
     private val inventoryRepositoryOutputPort: InventoryRepositoryOutputPort,
+    private val salePaymentRepositoryOutputPort: SalePaymentRepositoryOutputPort,
 ) : UpdateSaleInputPort {
+    @Transactional
     override fun execute(
         id: UUID,
         update: SaleUpdate,
@@ -43,11 +49,9 @@ class UpdateSaleUseCaseImplementation(
             require(item.quantity > 0) {
                 "A quantidade do produto deve ser maior que zero."
             }
-
             require(item.unitPrice > ZERO) {
                 "O preço unitário do produto deve ser maior que zero."
             }
-
             require(item.totalPrice > ZERO) {
                 "O produto precisa ser vendido com um valor positivo."
             }
@@ -78,6 +82,10 @@ class UpdateSaleUseCaseImplementation(
                 total + item.totalPrice
             }
 
+        require(totalAmount > ZERO) {
+            "O valor total da venda deve ser maior que zero."
+        }
+
         val downPaymentPercentage =
             update.downPaymentPercentage ?: currentSale.downPaymentPercentage
 
@@ -92,6 +100,8 @@ class UpdateSaleUseCaseImplementation(
             "A porcentagem paga deve estar entre 0 e 100."
         }
 
+        val updatedAt = OffsetDateTime.now()
+
         val updatedSale =
             currentSale.copy(
                 customerId = customerId,
@@ -100,7 +110,7 @@ class UpdateSaleUseCaseImplementation(
                 downPaymentPercentage = downPaymentPercentage,
                 paidPercentage = paidPercentage,
                 paymentMethod = update.paymentMethod ?: currentSale.paymentMethod,
-                updatedAt = OffsetDateTime.now(),
+                updatedAt = updatedAt,
                 deliveryDeadline =
                     when (val field = update.deliveryDeadline) {
                         is UpdateField.Set -> field.value
@@ -113,13 +123,38 @@ class UpdateSaleUseCaseImplementation(
                     },
                 deliveredAt =
                     when (update.delivered) {
-                        true -> currentSale.deliveredAt ?: OffsetDateTime.now()
+                        true -> currentSale.deliveredAt ?: updatedAt
                         false -> null
                         null -> currentSale.deliveredAt
                     },
             )
 
-        return updateSaleOutputPort.update(updatedSale)
+        val previousReceivedAmount = currentSale.receivedAmount
+        val updatedReceivedAmount = updatedSale.receivedAmount
+
+        val difference = updatedReceivedAmount.subtract(previousReceivedAmount)
+
+        val savedSale = updateSaleOutputPort.update(updatedSale)
+
+        if (difference.compareTo(ZERO) != 0) {
+            val type =
+                if (difference > ZERO) {
+                    RECEIPT
+                } else {
+                    REFUND
+                }
+
+            salePaymentRepositoryOutputPort.save(
+                SalePayment(
+                    saleId = savedSale.id,
+                    amount = difference.abs(),
+                    type = type,
+                    paidAt = updatedAt,
+                ),
+            )
+        }
+
+        return savedSale
     }
 
     private companion object {
