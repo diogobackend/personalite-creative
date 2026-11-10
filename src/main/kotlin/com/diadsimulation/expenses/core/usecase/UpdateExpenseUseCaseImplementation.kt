@@ -3,14 +3,18 @@ package com.diadsimulation.expenses.core.usecase
 import com.diadsimulation.expenses.core.domain.enums.ExpenseAllocationType.CATEGORY_PRODUCTS
 import com.diadsimulation.expenses.core.domain.enums.ExpenseAllocationType.GENERAL
 import com.diadsimulation.expenses.core.domain.enums.ExpenseAllocationType.SPECIFIC_PRODUCT
+import com.diadsimulation.expenses.core.domain.enums.ExpensePaymentType.PAYMENT
+import com.diadsimulation.expenses.core.domain.enums.ExpensePaymentType.REFUND
 import com.diadsimulation.expenses.core.domain.enums.ExpenseStatus.CANCELLED
 import com.diadsimulation.expenses.core.domain.enums.ExpenseStatus.PAID
 import com.diadsimulation.expenses.core.domain.enums.ExpenseStatus.PARTIALLY_PAID
 import com.diadsimulation.expenses.core.domain.enums.ExpenseStatus.PENDING
 import com.diadsimulation.expenses.core.domain.model.Expense
+import com.diadsimulation.expenses.core.domain.model.ExpensePayment
 import com.diadsimulation.expenses.core.domain.model.ExpenseUpdate
 import com.diadsimulation.expenses.core.ports.input.UpdateExpenseInputPort
 import com.diadsimulation.expenses.core.ports.output.ExpenseCategoryOutputPort
+import com.diadsimulation.expenses.core.ports.output.ExpensePaymentRepositoryOutputPort
 import com.diadsimulation.expenses.core.ports.output.ExpenseRepositoryOutputPort
 import com.diadsimulation.expenses.core.ports.output.ExpenseStockOutputPort
 import com.diadsimulation.expenses.core.ports.output.ProductExpenseValidationOutputPort
@@ -28,6 +32,7 @@ class UpdateExpenseUseCaseImplementation(
     private val productExpenseValidationOutputPort: ProductExpenseValidationOutputPort,
     private val expenseStockOutputPort: ExpenseStockOutputPort,
     private val expenseCategoryOutputPort: ExpenseCategoryOutputPort,
+    private val expensePaymentRepositoryOutputPort: ExpensePaymentRepositoryOutputPort,
 ) : UpdateExpenseInputPort {
     object Constants {
         const val INVENTORY_ITEM_CATEGORY = "item de estoque"
@@ -114,13 +119,18 @@ class UpdateExpenseUseCaseImplementation(
                 }
             }
 
+        val updatedAt = OffsetDateTime.now()
+
         val updatedExpense =
             currentExpense.copy(
                 name = update.name ?: currentExpense.name,
                 inventoryId =
                     when {
                         update.has("inventoryId") -> update.inventoryId
-                        update.category != null && update.category != INVENTORY_ITEM_CATEGORY -> null
+
+                        update.category != null &&
+                            update.category != INVENTORY_ITEM_CATEGORY -> null
+
                         else -> currentExpense.inventoryId
                     },
                 description =
@@ -138,12 +148,15 @@ class UpdateExpenseUseCaseImplementation(
                 quantity =
                     when {
                         update.has("quantity") -> update.quantity
-                        update.category != null && update.category != INVENTORY_ITEM_CATEGORY -> null
+
+                        update.category != null &&
+                            update.category != INVENTORY_ITEM_CATEGORY -> null
+
                         else -> currentExpense.quantity
                     },
                 products = products,
                 expenseDate = update.expenseDate ?: currentExpense.expenseDate,
-                updatedAt = OffsetDateTime.now(),
+                updatedAt = updatedAt,
             )
 
         if (update.has("categoryId")) {
@@ -159,6 +172,8 @@ class UpdateExpenseUseCaseImplementation(
 
         validate(updatedExpense)
 
+        val difference = paidAmount.subtract(currentExpense.paidAmount)
+
         val savedExpense = expenseRepositoryOutputPort.save(updatedExpense)
 
         expenseStockOutputPort.updateEntry(
@@ -172,6 +187,24 @@ class UpdateExpenseUseCaseImplementation(
                 },
         )
 
+        if (difference.compareTo(ZERO) != 0) {
+            val paymentType =
+                if (difference > ZERO) {
+                    PAYMENT
+                } else {
+                    REFUND
+                }
+
+            expensePaymentRepositoryOutputPort.save(
+                ExpensePayment(
+                    expenseId = savedExpense.id,
+                    amount = difference.abs(),
+                    type = paymentType,
+                    paidAt = updatedAt,
+                ),
+            )
+        }
+
         return savedExpense
     }
 
@@ -179,35 +212,27 @@ class UpdateExpenseUseCaseImplementation(
         require(!update.has("paidAmount") || update.paidAmount != null) {
             "O valor pago não pode ser nulo."
         }
-
         require(!update.has("categoryId") || update.categoryId != null) {
             "O ID da categoria não pode ser nulo."
         }
-
         require(!update.has("name") || update.name != null) {
             "O nome da despesa não pode ser nulo."
         }
-
         require(!update.has("value") || update.value != null) {
             "O valor da despesa não pode ser nulo."
         }
-
         require(!update.has("category") || update.category != null) {
             "A categoria da despesa não pode ser nula."
         }
-
         require(!update.has("allocationType") || update.allocationType != null) {
             "O tipo de alocação não pode ser nulo."
         }
-
         require(!update.has("status") || update.status != null) {
             "O status da despesa não pode ser nulo."
         }
-
         require(!update.has("expenseDate") || update.expenseDate != null) {
             "A data da despesa não pode ser nula."
         }
-
         require(!update.has("products") || update.products != null) {
             "A lista de produtos não pode ser nula."
         }
@@ -234,6 +259,7 @@ class UpdateExpenseUseCaseImplementation(
             require(expense.inventoryId != null) {
                 "O item do estoque é obrigatório."
             }
+
             require(expense.quantity != null && expense.quantity > 0) {
                 "Despesas de estoque devem possuir quantidade maior que zero."
             }
@@ -241,6 +267,7 @@ class UpdateExpenseUseCaseImplementation(
             require(expense.inventoryId == null) {
                 "O item do estoque é permitido apenas para despesas de estoque."
             }
+
             require(expense.quantity == null) {
                 "A quantidade é permitida apenas para despesas de estoque."
             }

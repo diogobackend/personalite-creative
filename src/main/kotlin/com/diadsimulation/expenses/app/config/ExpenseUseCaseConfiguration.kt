@@ -6,6 +6,7 @@ import com.diadsimulation.expenses.core.ports.input.GetExpenseByIdInputPort
 import com.diadsimulation.expenses.core.ports.input.GetExpensesInputPort
 import com.diadsimulation.expenses.core.ports.input.UpdateExpenseInputPort
 import com.diadsimulation.expenses.core.ports.output.ExpenseCategoryOutputPort
+import com.diadsimulation.expenses.core.ports.output.ExpensePaymentRepositoryOutputPort
 import com.diadsimulation.expenses.core.ports.output.ExpenseRepositoryOutputPort
 import com.diadsimulation.expenses.core.ports.output.ExpenseStockOutputPort
 import com.diadsimulation.expenses.core.ports.output.ProductExpenseValidationOutputPort
@@ -25,12 +26,14 @@ class ExpenseUseCaseConfiguration {
         productExpenseValidationOutputPort: ProductExpenseValidationOutputPort,
         expenseStockOutputPort: ExpenseStockOutputPort,
         expenseCategoryOutputPort: ExpenseCategoryOutputPort,
+        expensePaymentRepositoryOutputPort: ExpensePaymentRepositoryOutputPort,
     ): CreateExpenseInputPort =
         CreateExpenseUseCaseImplementation(
             expenseRepositoryOutputPort = expenseRepositoryOutputPort,
             productExpenseValidationOutputPort = productExpenseValidationOutputPort,
             expenseStockOutputPort = expenseStockOutputPort,
             expenseCategoryOutputPort = expenseCategoryOutputPort,
+            expensePaymentRepositoryOutputPort = expensePaymentRepositoryOutputPort,
         )
 
     @Bean
@@ -49,12 +52,14 @@ class ExpenseUseCaseConfiguration {
         productExpenseValidationOutputPort: ProductExpenseValidationOutputPort,
         expenseStockOutputPort: ExpenseStockOutputPort,
         expenseCategoryOutputPort: ExpenseCategoryOutputPort,
+        expensePaymentRepositoryOutputPort: ExpensePaymentRepositoryOutputPort,
     ): UpdateExpenseInputPort =
         UpdateExpenseUseCaseImplementation(
             expenseRepositoryOutputPort = expenseRepositoryOutputPort,
             productExpenseValidationOutputPort = productExpenseValidationOutputPort,
             expenseStockOutputPort = expenseStockOutputPort,
             expenseCategoryOutputPort = expenseCategoryOutputPort,
+            expensePaymentRepositoryOutputPort = expensePaymentRepositoryOutputPort,
         )
 
     @Bean

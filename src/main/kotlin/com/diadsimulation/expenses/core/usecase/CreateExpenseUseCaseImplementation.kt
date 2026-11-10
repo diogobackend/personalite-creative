@@ -3,24 +3,28 @@ package com.diadsimulation.expenses.core.usecase
 import com.diadsimulation.expenses.core.domain.enums.ExpenseAllocationType.CATEGORY_PRODUCTS
 import com.diadsimulation.expenses.core.domain.enums.ExpenseAllocationType.GENERAL
 import com.diadsimulation.expenses.core.domain.enums.ExpenseAllocationType.SPECIFIC_PRODUCT
+import com.diadsimulation.expenses.core.domain.enums.ExpensePaymentType.PAYMENT
 import com.diadsimulation.expenses.core.domain.enums.ExpenseStatus.PAID
 import com.diadsimulation.expenses.core.domain.enums.ExpenseStatus.PARTIALLY_PAID
 import com.diadsimulation.expenses.core.domain.enums.ExpenseStatus.PENDING
 import com.diadsimulation.expenses.core.domain.model.Expense
+import com.diadsimulation.expenses.core.domain.model.ExpensePayment
 import com.diadsimulation.expenses.core.ports.input.CreateExpenseInputPort
 import com.diadsimulation.expenses.core.ports.output.ExpenseCategoryOutputPort
+import com.diadsimulation.expenses.core.ports.output.ExpensePaymentRepositoryOutputPort
 import com.diadsimulation.expenses.core.ports.output.ExpenseRepositoryOutputPort
 import com.diadsimulation.expenses.core.ports.output.ExpenseStockOutputPort
 import com.diadsimulation.expenses.core.ports.output.ProductExpenseValidationOutputPort
-import com.diadsimulation.expenses.core.usecase.CreateExpenseUseCaseImplementation.Constants.INVENTORY_ITEM_CATEGORY
 import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal.ZERO
+import java.time.OffsetDateTime
 
 open class CreateExpenseUseCaseImplementation(
     private val expenseRepositoryOutputPort: ExpenseRepositoryOutputPort,
     private val productExpenseValidationOutputPort: ProductExpenseValidationOutputPort,
     private val expenseStockOutputPort: ExpenseStockOutputPort,
     private val expenseCategoryOutputPort: ExpenseCategoryOutputPort,
+    private val expensePaymentRepositoryOutputPort: ExpensePaymentRepositoryOutputPort,
 ) : CreateExpenseInputPort {
     object Constants {
         const val INVENTORY_ITEM_CATEGORY = "item de estoque"
@@ -51,8 +55,19 @@ open class CreateExpenseUseCaseImplementation(
                 expense.copy(status = status),
             )
 
-        if (savedExpense.category == INVENTORY_ITEM_CATEGORY) {
+        if (savedExpense.category == Constants.INVENTORY_ITEM_CATEGORY) {
             expenseStockOutputPort.registerEntry(savedExpense)
+        }
+
+        if (savedExpense.paidAmount > ZERO) {
+            expensePaymentRepositoryOutputPort.save(
+                ExpensePayment(
+                    expenseId = savedExpense.id,
+                    amount = savedExpense.paidAmount,
+                    type = PAYMENT,
+                    paidAt = OffsetDateTime.now(),
+                ),
+            )
         }
 
         return savedExpense
@@ -76,10 +91,11 @@ open class CreateExpenseUseCaseImplementation(
     }
 
     private fun validateStock(expense: Expense) {
-        if (expense.category == INVENTORY_ITEM_CATEGORY) {
+        if (expense.category == Constants.INVENTORY_ITEM_CATEGORY) {
             require(expense.inventoryId != null) {
                 "O item do estoque é obrigatório."
             }
+
             require(expense.quantity != null && expense.quantity > 0) {
                 "Despesas de estoque devem possuir quantidade maior que zero."
             }
@@ -87,6 +103,7 @@ open class CreateExpenseUseCaseImplementation(
             require(expense.inventoryId == null) {
                 "O item do estoque é permitido apenas para despesas de estoque."
             }
+
             require(expense.quantity == null) {
                 "A quantidade é permitida apenas para despesas de estoque."
             }
