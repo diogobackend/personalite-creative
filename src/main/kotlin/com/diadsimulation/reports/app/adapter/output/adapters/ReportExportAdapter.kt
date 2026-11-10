@@ -41,7 +41,6 @@ import com.lowagie.text.pdf.PdfPTable
 import com.lowagie.text.pdf.PdfWriter
 import org.apache.poi.ss.usermodel.FillPatternType.SOLID_FOREGROUND
 import org.apache.poi.ss.usermodel.HorizontalAlignment.LEFT
-import org.apache.poi.ss.usermodel.IndexedColors.GREY_25_PERCENT
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import java.beans.Introspector
 import java.io.ByteArrayOutputStream
@@ -287,12 +286,12 @@ class ReportExportAdapter(
         val fieldName = name.substringAfterLast(".")
 
         return when {
-            value == null -> {
-                TEXT
-            }
-
             fieldName.endsWith("Percentage", ignoreCase = true) -> {
                 PERCENTAGE
+            }
+
+            value == null -> {
+                TEXT
             }
 
             value is BigDecimal -> {
@@ -318,15 +317,63 @@ class ReportExportAdapter(
     }
 
     private fun formatLabel(value: String): String {
-        val words =
-            value
-                .replace(".", " - ")
+        val labels =
+            mapOf(
+                "expectedExpenses" to "Despesas previstas",
+                "expectedProfit" to "Lucro líquido previsto",
+                "expectedRevenue" to "Faturamento bruto",
+                "outstandingExpenses" to "Despesas pendentes",
+                "outstandingRevenue" to "Valores a receber",
+                "paidExpenses" to "Despesas pagas",
+                "realizedProfit" to "Lucro líquido realizado",
+                "receivedRevenue" to "Dinheiro recebido",
+                "totalRevenue" to "Faturamento total",
+                "totalSales" to "Quantidade de vendas",
+                "averageTicket" to "Ticket médio",
+                "receivedAmount" to "Valor recebido",
+                "outstandingAmount" to "Valor pendente",
+                "receivedPercentage" to "Percentual recebido",
+                "totalExpenses" to "Quantidade de despesas",
+                "expectedAmount" to "Valor previsto",
+                "paidAmount" to "Valor pago",
+                "paidPercentage" to "Percentual pago",
+                "pendingExpenses" to "Despesas pendentes (quantidade)",
+                "totalEntries" to "Total de entradas",
+                "totalExits" to "Total de saídas",
+                "balance" to "Saldo",
+                "transactions" to "Transações",
+                "days" to "Movimentação diária",
+                "months" to "Evolução mensal",
+                "currentPeriod" to "Período atual",
+                "previousPeriod" to "Período anterior",
+                "variations" to "Variações",
+                "startDate" to "Data inicial",
+                "endDate" to "Data final",
+                "revenue" to "Faturamento",
+                "expenses" to "Despesas",
+                "profit" to "Lucro",
+                "revenuePercentage" to "Variação do faturamento",
+                "expensesPercentage" to "Variação das despesas",
+                "profitPercentage" to "Variação do lucro",
+                "id" to "Identificador",
+                "type" to "Tipo",
+                "description" to "Descrição",
+                "referenceDate" to "Data de referência",
+                "amount" to "Valor",
+                "date" to "Data",
+                "entries" to "Entradas",
+                "exits" to "Saídas",
+                "month" to "Mês",
+                "value" to "Valor",
+                "ENTRY" to "Entrada",
+                "EXIT" to "Saída",
+            )
+        return value.split(".").joinToString(" - ") { part ->
+            labels[part] ?: part
                 .replace(Regex("([a-z])([A-Z])"), "$1 $2")
                 .replace("_", " ")
                 .lowercase(BR_LOCALE)
-
-        return words.replaceFirstChar {
-            it.titlecase(BR_LOCALE)
+                .replaceFirstChar { it.titlecase(BR_LOCALE) }
         }
     }
 
@@ -418,9 +465,34 @@ class ReportExportAdapter(
                     document.newPage()
                 }
 
-                document.add(
-                    Paragraph("Relatórios financeiros", titleFont),
+                val header =
+                    PdfPTable(2).apply {
+                        widthPercentage = 100f
+                        setWidths(floatArrayOf(1f, 5f))
+                        setSpacingAfter(18f)
+                    }
+                val logoCell =
+                    PdfPCell().apply {
+                        border = 0
+                        setPadding(4f)
+                    }
+                loadLogo()?.let { bytes ->
+                    val logo =
+                        com.lowagie.text.Image
+                            .getInstance(bytes)
+                    logo.scaleToFit(85f, 55f)
+                    logoCell.addElement(logo)
+                }
+                header.addCell(logoCell)
+                header.addCell(
+                    PdfPCell().apply {
+                        border = 0
+                        verticalAlignment = ALIGN_MIDDLE
+                        addElement(Paragraph("PERSONALITÉ CREATIVE", titleFont))
+                        addElement(Paragraph("Relatórios financeiros", normalFont))
+                    },
                 )
+                document.add(header)
 
                 document.add(
                     Paragraph(
@@ -432,7 +504,9 @@ class ReportExportAdapter(
                 document.add(Paragraph(" "))
 
                 document.add(
-                    Paragraph(section.title, sectionFont),
+                    Paragraph(section.title, sectionFont).apply {
+                        font.color = GOLD_COLOR
+                    },
                 )
 
                 document.add(Paragraph(" "))
@@ -499,6 +573,7 @@ class ReportExportAdapter(
 
                     document.add(Paragraph(" "))
                 }
+                document.add(Paragraph("Personalité Creative | Página ${index + 1} de ${sections.size}", normalFont))
             }
         } finally {
             document.close()
@@ -512,17 +587,20 @@ class ReportExportAdapter(
         header: Boolean,
     ): PdfPCell {
         val font =
-            FontFactory.getFont(
-                if (header) HELVETICA_BOLD else HELVETICA,
-                8f,
-            )
+            FontFactory
+                .getFont(
+                    if (header) HELVETICA_BOLD else HELVETICA,
+                    8f,
+                ).apply {
+                    color = if (header) java.awt.Color.WHITE else DARK_COLOR
+                }
 
         return PdfPCell(Phrase(value, font)).apply {
             setPadding(6f)
             verticalAlignment = ALIGN_MIDDLE
 
             if (header) {
-                backgroundColor = java.awt.Color(230, 230, 230)
+                backgroundColor = GOLD_COLOR
             }
         }
     }
@@ -537,13 +615,14 @@ class ReportExportAdapter(
         XSSFWorkbook().use { workbook ->
             val headerStyle =
                 workbook.createCellStyle().apply {
-                    fillForegroundColor = GREY_25_PERCENT.index
+                    fillForegroundColor = org.apache.poi.ss.usermodel.IndexedColors.BROWN.index
                     fillPattern = SOLID_FOREGROUND
                     alignment = LEFT
 
                     setFont(
                         workbook.createFont().apply {
                             bold = true
+                            color = org.apache.poi.ss.usermodel.IndexedColors.WHITE.index
                         },
                     )
                 }
@@ -554,6 +633,7 @@ class ReportExportAdapter(
                         workbook.createFont().apply {
                             bold = true
                             fontHeightInPoints = 14
+                            color = org.apache.poi.ss.usermodel.IndexedColors.BROWN.index
                         },
                     )
                 }
@@ -630,7 +710,7 @@ class ReportExportAdapter(
                         cell.cellStyle = dateStyle
                     }
 
-                    FieldType.MONTH -> {
+                    MONTH -> {
                         cell.setCellValue((value as YearMonth).atDay(1))
                         cell.cellStyle = monthStyle
                     }
@@ -648,13 +728,26 @@ class ReportExportAdapter(
                     )
 
                 var rowIndex = 0
+                loadLogo()?.let { bytes ->
+                    val pictureIndex = workbook.addPicture(bytes, org.apache.poi.ss.usermodel.Workbook.PICTURE_TYPE_PNG)
+                    val drawing = sheet.createDrawingPatriarch()
+                    val anchor =
+                        workbook.creationHelper.createClientAnchor().apply {
+                            setCol1(0)
+                            row1 = 0
+                            setCol2(2)
+                            setRow2(4)
+                        }
+                    drawing.createPicture(anchor, pictureIndex)
+                    rowIndex = 5
+                }
 
                 sheet
                     .createRow(rowIndex++)
                     .createCell(0)
                     .apply {
-                        setCellValue(section.title)
-                        cellStyle = titleStyle
+                        setCellValue("PERSONALITÉ CREATIVE | ${section.title}")
+                        setCellStyle(titleStyle)
                     }
 
                 sheet
@@ -671,7 +764,7 @@ class ReportExportAdapter(
 
                     row.createCell(0).apply {
                         setCellValue(field.label)
-                        cellStyle = headerStyle
+                        setCellStyle(headerStyle)
                     }
 
                     writeCell(
@@ -688,7 +781,7 @@ class ReportExportAdapter(
                         .createCell(0)
                         .apply {
                             setCellValue(table.title)
-                            cellStyle = titleStyle
+                            setCellStyle(titleStyle)
                         }
 
                     if (table.headers.isEmpty()) {
@@ -702,7 +795,7 @@ class ReportExportAdapter(
                         table.headers.forEachIndexed { columnIndex, header ->
                             headerRow.createCell(columnIndex).apply {
                                 setCellValue(header)
-                                cellStyle = headerStyle
+                                setCellStyle(headerStyle)
                             }
                         }
 
@@ -735,8 +828,12 @@ class ReportExportAdapter(
                     )
 
                 repeat(columnCount) { column ->
-                    sheet.setColumnWidth(column, 6000)
+                    sheet.setColumnWidth(column, 6500)
                 }
+                sheet
+                    .createRow(rowIndex + 1)
+                    .createCell(0)
+                    .setCellValue("Personalité Creative | Relatório financeiro")
             }
 
             workbook.write(output)
@@ -763,7 +860,11 @@ class ReportExportAdapter(
         val rows: List<List<ReportField>>,
     )
 
+    private fun loadLogo(): ByteArray? = javaClass.getResourceAsStream("/reports/personalite-logo.png")?.use { it.readBytes() }
+
     companion object {
+        private val GOLD_COLOR = java.awt.Color(190, 145, 65)
+        private val DARK_COLOR = java.awt.Color(53, 47, 42)
         private val BR_LOCALE = Locale.forLanguageTag("pt-BR")
         private val DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy")
         private val MONTH_FORMAT = DateTimeFormatter.ofPattern("MM/yyyy")
