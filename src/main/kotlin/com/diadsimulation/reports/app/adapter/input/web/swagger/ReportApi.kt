@@ -2,6 +2,7 @@ package com.diadsimulation.reports.app.adapter.input.web.swagger
 
 import com.diadsimulation.reports.app.adapter.input.web.dtos.response.ExpensesReportResponse
 import com.diadsimulation.reports.app.adapter.input.web.dtos.response.ReportCashFlowResponse
+import com.diadsimulation.reports.app.adapter.input.web.dtos.response.ReportComparisonResponse
 import com.diadsimulation.reports.app.adapter.input.web.dtos.response.ReportOverviewResponse
 import com.diadsimulation.reports.app.adapter.input.web.dtos.response.ReportTransactionsResponse
 import com.diadsimulation.reports.app.adapter.input.web.dtos.response.SalesReportResponse
@@ -87,4 +88,27 @@ interface ReportApi {
         @DateTimeFormat(iso = DATE)
         endDate: LocalDate?,
     ): ReportCashFlowResponse
+
+    @Operation(
+        summary = "Comparar períodos financeiros",
+        description = "Compara faturamento, despesas e lucro entre dois períodos, retornando suas variações percentuais.",
+    )
+    fun getComparison(
+        @Parameter(description = "Data inicial do período atual (yyyy-MM-dd)")
+        @RequestParam
+        @DateTimeFormat(iso = DATE)
+        startDate: LocalDate,
+        @Parameter(description = "Data final do período atual (yyyy-MM-dd)")
+        @RequestParam
+        @DateTimeFormat(iso = DATE)
+        endDate: LocalDate,
+        @Parameter(description = "Data inicial do período anterior (yyyy-MM-dd)")
+        @RequestParam
+        @DateTimeFormat(iso = DATE)
+        previousStartDate: LocalDate,
+        @Parameter(description = "Data final do período anterior (yyyy-MM-dd)")
+        @RequestParam
+        @DateTimeFormat(iso = DATE)
+        previousEndDate: LocalDate,
+    ): ReportComparisonResponse
 }

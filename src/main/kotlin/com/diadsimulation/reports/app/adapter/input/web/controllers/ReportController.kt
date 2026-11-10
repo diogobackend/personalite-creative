@@ -4,6 +4,7 @@ import com.diadsimulation.expenses.core.ports.input.ReportCashFlowInputPort
 import com.diadsimulation.expenses.core.ports.input.ReportTransactionsInputPort
 import com.diadsimulation.reports.app.adapter.input.web.dtos.response.ExpensesReportResponse
 import com.diadsimulation.reports.app.adapter.input.web.dtos.response.ReportCashFlowResponse
+import com.diadsimulation.reports.app.adapter.input.web.dtos.response.ReportComparisonResponse
 import com.diadsimulation.reports.app.adapter.input.web.dtos.response.ReportOverviewResponse
 import com.diadsimulation.reports.app.adapter.input.web.dtos.response.ReportTransactionResponse
 import com.diadsimulation.reports.app.adapter.input.web.dtos.response.ReportTransactionsResponse
@@ -13,6 +14,7 @@ import com.diadsimulation.reports.core.domain.models.ReportOverview
 import com.diadsimulation.reports.core.ports.input.GetExpensesReportInputPort
 import com.diadsimulation.reports.core.ports.input.GetReportOverviewInputPort
 import com.diadsimulation.reports.core.ports.input.GetSalesReportInputPort
+import com.diadsimulation.reports.core.ports.input.ReportComparisonInputPort
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -27,6 +29,7 @@ class ReportController(
     private val getExpensesReportInputPort: GetExpensesReportInputPort,
     private val getReportTransactionsInputPort: ReportTransactionsInputPort,
     private val getReportCashFlowInputPort: ReportCashFlowInputPort,
+    private val getReportComparisonInputPort: ReportComparisonInputPort,
 ) : ReportApi {
     @GetMapping("/overview")
     override fun getOverview(
@@ -147,4 +150,20 @@ class ReportController(
 
         return ReportCashFlowResponse.from(report)
     }
+
+    @GetMapping("/comparison")
+    override fun getComparison(
+        startDate: LocalDate,
+        endDate: LocalDate,
+        previousStartDate: LocalDate,
+        previousEndDate: LocalDate,
+    ): ReportComparisonResponse =
+        ReportComparisonResponse.from(
+            getReportComparisonInputPort.execute(
+                startDate = startDate,
+                endDate = endDate,
+                previousStartDate = previousStartDate,
+                previousEndDate = previousEndDate,
+            ),
+        )
 }
