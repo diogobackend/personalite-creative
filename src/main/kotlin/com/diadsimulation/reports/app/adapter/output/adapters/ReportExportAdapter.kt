@@ -41,7 +41,10 @@ import com.lowagie.text.pdf.PdfPTable
 import com.lowagie.text.pdf.PdfWriter
 import org.apache.poi.ss.usermodel.FillPatternType.SOLID_FOREGROUND
 import org.apache.poi.ss.usermodel.HorizontalAlignment.LEFT
+import org.apache.poi.ss.usermodel.IndexedColors
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
+import java.awt.Color
+import java.awt.Color.WHITE
 import java.beans.Introspector
 import java.io.ByteArrayOutputStream
 import java.math.BigDecimal
@@ -444,7 +447,7 @@ class ReportExportAdapter(
         try {
             val titleFont =
                 FontFactory.getFont(
-                    HELVETICA_BOLD,
+                    HELVETICA,
                     16f,
                 )
 
@@ -488,7 +491,11 @@ class ReportExportAdapter(
                     PdfPCell().apply {
                         border = 0
                         verticalAlignment = ALIGN_MIDDLE
-                        addElement(Paragraph("PERSONALITÉ CREATIVE", titleFont))
+                        addElement(
+                            Paragraph("PERSONALITÉ CREATIVE", titleFont).apply {
+                                font.color = GOLD_COLOR
+                            },
+                        )
                         addElement(Paragraph("Relatórios financeiros", normalFont))
                     },
                 )
@@ -519,13 +526,14 @@ class ReportExportAdapter(
                             setSpacingAfter(15f)
                         }
 
-                    section.summary.forEach { field ->
+                    section.summary.forEachIndexed { rowIndex, field ->
+                        val rowColor = if (rowIndex % 2 == 0) ZEBRA_ORANGE else ZEBRA_SAND
                         summaryTable.addCell(
-                            pdfCell(field.label, true),
+                            pdfCell(field.label, false, rowColor),
                         )
 
                         summaryTable.addCell(
-                            pdfCell(formatValue(field), false),
+                            pdfCell(formatValue(field), false, rowColor),
                         )
                     }
 
@@ -560,10 +568,11 @@ class ReportExportAdapter(
                             )
                         }
 
-                        table.rows.forEach { row ->
+                        table.rows.forEachIndexed { rowIndex, row ->
+                            val rowColor = if (rowIndex % 2 == 0) ZEBRA_ORANGE else ZEBRA_SAND
                             row.forEach { field ->
                                 pdfTable.addCell(
-                                    pdfCell(formatValue(field), false),
+                                    pdfCell(formatValue(field), false, rowColor),
                                 )
                             }
                         }
@@ -585,6 +594,7 @@ class ReportExportAdapter(
     private fun pdfCell(
         value: String,
         header: Boolean,
+        rowColor: Color? = null,
     ): PdfPCell {
         val font =
             FontFactory
@@ -592,7 +602,7 @@ class ReportExportAdapter(
                     if (header) HELVETICA_BOLD else HELVETICA,
                     8f,
                 ).apply {
-                    color = if (header) java.awt.Color.WHITE else DARK_COLOR
+                    color = if (header) WHITE else DARK_COLOR
                 }
 
         return PdfPCell(Phrase(value, font)).apply {
@@ -601,6 +611,8 @@ class ReportExportAdapter(
 
             if (header) {
                 backgroundColor = GOLD_COLOR
+            } else if (rowColor != null) {
+                backgroundColor = rowColor
             }
         }
     }
@@ -622,7 +634,7 @@ class ReportExportAdapter(
                     setFont(
                         workbook.createFont().apply {
                             bold = true
-                            color = org.apache.poi.ss.usermodel.IndexedColors.WHITE.index
+                            color = IndexedColors.WHITE.index
                         },
                     )
                 }
@@ -633,7 +645,7 @@ class ReportExportAdapter(
                         workbook.createFont().apply {
                             bold = true
                             fontHeightInPoints = 14
-                            color = org.apache.poi.ss.usermodel.IndexedColors.BROWN.index
+                            color = IndexedColors.BROWN.index
                         },
                     )
                 }
@@ -863,8 +875,10 @@ class ReportExportAdapter(
     private fun loadLogo(): ByteArray? = javaClass.getResourceAsStream("/reports/personalite-logo.png")?.use { it.readBytes() }
 
     companion object {
-        private val GOLD_COLOR = java.awt.Color(190, 145, 65)
-        private val DARK_COLOR = java.awt.Color(53, 47, 42)
+        private val GOLD_COLOR = Color(190, 145, 65)
+        private val ZEBRA_ORANGE = Color(220, 133, 31)
+        private val ZEBRA_SAND = Color(249, 224, 190)
+        private val DARK_COLOR = Color(53, 47, 42)
         private val BR_LOCALE = Locale.forLanguageTag("pt-BR")
         private val DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy")
         private val MONTH_FORMAT = DateTimeFormatter.ofPattern("MM/yyyy")
