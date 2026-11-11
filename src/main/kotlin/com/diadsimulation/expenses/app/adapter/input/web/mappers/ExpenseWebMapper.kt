@@ -1,19 +1,17 @@
 package com.diadsimulation.expenses.app.adapter.input.web.mappers
 
-import com.diadsimulation.expenses.app.adapter.input.web.requests.CreateExpenseRequest
-import com.diadsimulation.expenses.app.adapter.input.web.requests.GetExpensesRequest
-import com.diadsimulation.expenses.app.adapter.input.web.requests.UpdateExpenseRequest
-import com.diadsimulation.expenses.app.adapter.input.web.responses.ExpenseProductResponse
-import com.diadsimulation.expenses.app.adapter.input.web.responses.ExpenseResponse
-import com.diadsimulation.expenses.app.adapter.input.web.responses.ExpensesPageResponse
+import com.diadsimulation.expenses.app.adapter.input.web.dtos.requests.CreateExpenseRequest
+import com.diadsimulation.expenses.app.adapter.input.web.dtos.requests.GetExpensesRequest
+import com.diadsimulation.expenses.app.adapter.input.web.dtos.requests.UpdateExpenseRequest
+import com.diadsimulation.expenses.app.adapter.input.web.dtos.responses.ExpenseProductResponse
+import com.diadsimulation.expenses.app.adapter.input.web.dtos.responses.ExpenseResponse
+import com.diadsimulation.expenses.app.adapter.input.web.dtos.responses.ExpensesPageResponse
 import com.diadsimulation.expenses.core.domain.model.Expense
 import com.diadsimulation.expenses.core.domain.model.ExpenseProduct
 import com.diadsimulation.expenses.core.domain.model.ExpenseUpdate
 import com.diadsimulation.expenses.core.domain.model.ExpensesPage
 import com.diadsimulation.expenses.core.domain.model.GetExpensesFilter
 import org.springframework.stereotype.Component
-import java.math.BigDecimal
-import java.math.RoundingMode.HALF_UP
 import java.time.OffsetDateTime.now
 
 @Component
@@ -28,7 +26,6 @@ class ExpenseWebMapper {
             category = request.category,
             categoryId = request.categoryId,
             allocationType = request.allocationType,
-            status = request.status,
             quantity = request.quantity,
             products =
                 request.products.map { product ->
@@ -77,11 +74,8 @@ class ExpenseWebMapper {
             description = expense.description,
             value = expense.value,
             paidAmount = expense.paidAmount,
-            remainingAmount = expense.value.subtract(expense.paidAmount),
-            paidPercentage =
-                expense.paidAmount
-                    .multiply(BigDecimal.valueOf(100))
-                    .divide(expense.value, 2, HALF_UP),
+            remainingAmount = expense.remainingAmount,
+            paidPercentage = expense.paidPercentage,
             category = expense.category,
             categoryId = expense.categoryId,
             allocationType = expense.allocationType,

@@ -1,11 +1,11 @@
 package com.diadsimulation.expenses.app.adapter.input.web.controller
 
+import com.diadsimulation.expenses.app.adapter.input.web.dtos.requests.CreateExpenseRequest
+import com.diadsimulation.expenses.app.adapter.input.web.dtos.requests.GetExpensesRequest
+import com.diadsimulation.expenses.app.adapter.input.web.dtos.requests.UpdateExpenseRequest
+import com.diadsimulation.expenses.app.adapter.input.web.dtos.responses.ExpenseResponse
+import com.diadsimulation.expenses.app.adapter.input.web.dtos.responses.ExpensesPageResponse
 import com.diadsimulation.expenses.app.adapter.input.web.mappers.ExpenseWebMapper
-import com.diadsimulation.expenses.app.adapter.input.web.requests.CreateExpenseRequest
-import com.diadsimulation.expenses.app.adapter.input.web.requests.GetExpensesRequest
-import com.diadsimulation.expenses.app.adapter.input.web.requests.UpdateExpenseRequest
-import com.diadsimulation.expenses.app.adapter.input.web.responses.ExpenseResponse
-import com.diadsimulation.expenses.app.adapter.input.web.responses.ExpensesPageResponse
 import com.diadsimulation.expenses.app.adapter.input.web.swagger.ExpenseApi
 import com.diadsimulation.expenses.core.ports.input.CreateExpenseInputPort
 import com.diadsimulation.expenses.core.ports.input.DeleteExpenseInputPort

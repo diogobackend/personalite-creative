@@ -1,4 +1,4 @@
-package com.diadsimulation.expenses.app.adapter.input.web.requests
+package com.diadsimulation.expenses.app.adapter.input.web.dtos.requests
 
 import jakarta.validation.constraints.DecimalMin
 import java.math.BigDecimal

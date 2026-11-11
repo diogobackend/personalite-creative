@@ -1,4 +1,4 @@
-package com.diadsimulation.expenses.app.adapter.input.web.responses
+package com.diadsimulation.expenses.app.adapter.input.web.dtos.responses
 
 import java.math.BigDecimal
 import java.util.UUID

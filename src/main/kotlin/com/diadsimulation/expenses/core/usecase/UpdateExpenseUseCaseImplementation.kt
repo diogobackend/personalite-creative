@@ -3,8 +3,11 @@ package com.diadsimulation.expenses.core.usecase
 import com.diadsimulation.expenses.core.domain.enums.ExpenseAllocationType.CATEGORY_PRODUCTS
 import com.diadsimulation.expenses.core.domain.enums.ExpenseAllocationType.GENERAL
 import com.diadsimulation.expenses.core.domain.enums.ExpenseAllocationType.SPECIFIC_PRODUCT
+import com.diadsimulation.expenses.core.domain.enums.ExpensePaymentType
 import com.diadsimulation.expenses.core.domain.enums.ExpensePaymentType.PAYMENT
 import com.diadsimulation.expenses.core.domain.enums.ExpensePaymentType.REFUND
+import com.diadsimulation.expenses.core.domain.enums.ExpensePaymentType.VALUE_ADJUSTMENT_DECREASE
+import com.diadsimulation.expenses.core.domain.enums.ExpensePaymentType.VALUE_ADJUSTMENT_INCREASE
 import com.diadsimulation.expenses.core.domain.enums.ExpenseStatus.CANCELLED
 import com.diadsimulation.expenses.core.domain.enums.ExpenseStatus.PAID
 import com.diadsimulation.expenses.core.domain.enums.ExpenseStatus.PARTIALLY_PAID
@@ -52,6 +55,18 @@ class UpdateExpenseUseCaseImplementation(
 
         require(currentExpense.status != CANCELLED) {
             "Não é permitido alterar uma despesa cancelada."
+        }
+
+        if (update.has("status")) {
+            require(update.status == CANCELLED) {
+                "O status só pode ser informado para cancelar a despesa."
+            }
+
+            require(update.fieldsPresent == setOf("status")) {
+                "O cancelamento deve ser solicitado sem outras alterações."
+            }
+
+            return cancelExpense(currentExpense)
         }
 
         val allocationType =
@@ -108,15 +123,15 @@ class UpdateExpenseUseCaseImplementation(
             "O valor pago deve estar entre zero e o valor total da despesa."
         }
 
+        require(paidAmount.scale() <= 2) {
+            "O valor pago deve possuir no máximo duas casas decimais."
+        }
+
         val status =
-            if (update.status == CANCELLED) {
-                CANCELLED
-            } else {
-                when {
-                    paidAmount.compareTo(ZERO) == 0 -> PENDING
-                    paidAmount.compareTo(value) == 0 -> PAID
-                    else -> PARTIALLY_PAID
-                }
+            when {
+                paidAmount.compareTo(ZERO) == 0 -> PENDING
+                paidAmount.compareTo(value) == 0 -> PAID
+                else -> PARTIALLY_PAID
             }
 
         val updatedAt = OffsetDateTime.now()
@@ -172,40 +187,83 @@ class UpdateExpenseUseCaseImplementation(
 
         validate(updatedExpense)
 
-        val difference = paidAmount.subtract(currentExpense.paidAmount)
+        val valueDifference =
+            value.subtract(currentExpense.value)
 
-        val savedExpense = expenseRepositoryOutputPort.save(updatedExpense)
+        val paymentDifference =
+            paidAmount.subtract(currentExpense.paidAmount)
+
+        val savedExpense =
+            expenseRepositoryOutputPort.save(updatedExpense)
 
         expenseStockOutputPort.updateEntry(
             previousExpense = currentExpense,
             updatedExpense = savedExpense,
-            reason =
-                if (savedExpense.status == CANCELLED) {
-                    "EXPENSE_CANCELLED"
-                } else {
-                    "EXPENSE_ADJUSTMENT"
-                },
+            reason = "EXPENSE_ADJUSTMENT",
         )
 
-        if (difference.compareTo(ZERO) != 0) {
-            val paymentType =
-                if (difference > ZERO) {
-                    PAYMENT
-                } else {
-                    REFUND
-                }
-
+        if (valueDifference.compareTo(ZERO) != 0) {
             expensePaymentRepositoryOutputPort.save(
                 ExpensePayment(
                     expenseId = savedExpense.id,
-                    amount = difference.abs(),
-                    type = paymentType,
+                    amount = valueDifference.abs(),
+                    type =
+                        if (valueDifference > ZERO) {
+                            VALUE_ADJUSTMENT_INCREASE
+                        } else {
+                            VALUE_ADJUSTMENT_DECREASE
+                        },
+                    paidAt = updatedAt,
+                ),
+            )
+        }
+
+        if (paymentDifference.compareTo(ZERO) != 0) {
+            expensePaymentRepositoryOutputPort.save(
+                ExpensePayment(
+                    expenseId = savedExpense.id,
+                    amount = paymentDifference.abs(),
+                    type =
+                        if (paymentDifference > ZERO) {
+                            PAYMENT
+                        } else {
+                            REFUND
+                        },
                     paidAt = updatedAt,
                 ),
             )
         }
 
         return savedExpense
+    }
+
+    private fun cancelExpense(currentExpense: Expense): Expense {
+        val cancelledAt = OffsetDateTime.now()
+
+        val cancelledExpense =
+            expenseRepositoryOutputPort.save(
+                currentExpense.copy(
+                    status = CANCELLED,
+                    updatedAt = cancelledAt,
+                ),
+            )
+
+        expenseStockOutputPort.updateEntry(
+            previousExpense = currentExpense,
+            updatedExpense = cancelledExpense,
+            reason = "EXPENSE_CANCELLED",
+        )
+
+        expensePaymentRepositoryOutputPort.save(
+            ExpensePayment(
+                expenseId = cancelledExpense.id,
+                amount = cancelledExpense.value,
+                type = ExpensePaymentType.CANCELLED,
+                paidAt = cancelledAt,
+            ),
+        )
+
+        return cancelledExpense
     }
 
     private fun validateRequiredFields(update: ExpenseUpdate) {
@@ -303,20 +361,12 @@ class UpdateExpenseUseCaseImplementation(
             "Não é permitido vincular produtos duplicados."
         }
 
-        require(
-            productIds.all(
-                productExpenseValidationOutputPort::existsById,
-            ),
-        ) {
+        require(productIds.all(productExpenseValidationOutputPort::existsById)) {
             "Um ou mais produtos vinculados não existem."
         }
 
         if (expense.allocationType == CATEGORY_PRODUCTS) {
-            require(
-                productExpenseValidationOutputPort.belongToSameCategory(
-                    productIds,
-                ),
-            ) {
+            require(productExpenseValidationOutputPort.belongToSameCategory(productIds)) {
                 "Todos os produtos vinculados devem pertencer à mesma categoria."
             }
         }

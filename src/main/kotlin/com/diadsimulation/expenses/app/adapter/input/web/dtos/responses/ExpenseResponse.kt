@@ -1,4 +1,4 @@
-package com.diadsimulation.expenses.app.adapter.input.web.responses
+package com.diadsimulation.expenses.app.adapter.input.web.dtos.responses
 
 import com.diadsimulation.expenses.core.domain.enums.ExpenseAllocationType
 import com.diadsimulation.expenses.core.domain.enums.ExpenseStatus

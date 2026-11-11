@@ -1,9 +1,7 @@
-package com.diadsimulation.expenses.app.adapter.input.web.requests
+package com.diadsimulation.expenses.app.adapter.input.web.dtos.requests
 
 import com.diadsimulation.expenses.core.domain.enums.ExpenseAllocationType
 import com.diadsimulation.expenses.core.domain.enums.ExpenseAllocationType.GENERAL
-import com.diadsimulation.expenses.core.domain.enums.ExpenseStatus
-import com.diadsimulation.expenses.core.domain.enums.ExpenseStatus.PENDING
 import jakarta.validation.Valid
 import jakarta.validation.constraints.DecimalMin
 import jakarta.validation.constraints.NotBlank
@@ -33,7 +31,6 @@ data class CreateExpenseRequest(
     @field:NotNull
     val categoryId: UUID,
     val allocationType: ExpenseAllocationType = GENERAL,
-    val status: ExpenseStatus = PENDING,
     val quantity: Int? = null,
     @field:Valid
     val products: List<ExpenseProductRequest> = emptyList(),

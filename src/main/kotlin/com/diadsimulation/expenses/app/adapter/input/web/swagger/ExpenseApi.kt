@@ -1,9 +1,9 @@
 package com.diadsimulation.expenses.app.adapter.input.web.swagger
 
-import com.diadsimulation.expenses.app.adapter.input.web.requests.CreateExpenseRequest
-import com.diadsimulation.expenses.app.adapter.input.web.requests.GetExpensesRequest
-import com.diadsimulation.expenses.app.adapter.input.web.responses.ExpenseResponse
-import com.diadsimulation.expenses.app.adapter.input.web.responses.ExpensesPageResponse
+import com.diadsimulation.expenses.app.adapter.input.web.dtos.requests.CreateExpenseRequest
+import com.diadsimulation.expenses.app.adapter.input.web.dtos.requests.GetExpensesRequest
+import com.diadsimulation.expenses.app.adapter.input.web.dtos.responses.ExpenseResponse
+import com.diadsimulation.expenses.app.adapter.input.web.dtos.responses.ExpensesPageResponse
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
