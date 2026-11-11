@@ -15,18 +15,20 @@ import com.diadsimulation.expenses.core.usecase.DeleteExpenseUseCaseImplementati
 import com.diadsimulation.expenses.core.usecase.GetExpenseByIdUseCaseImplementation
 import com.diadsimulation.expenses.core.usecase.GetExpensesUseCaseImplementation
 import com.diadsimulation.expenses.core.usecase.UpdateExpenseUseCaseImplementation
+import com.diadsimulation.movements.core.ports.output.MovementRepositoryOutputPort
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
 @Configuration
 class ExpenseUseCaseConfiguration {
     @Bean
-    fun createExpenseInputPort(
+    fun createExpenseUseCaseImplementation(
         expenseRepositoryOutputPort: ExpenseRepositoryOutputPort,
         productExpenseValidationOutputPort: ProductExpenseValidationOutputPort,
         expenseStockOutputPort: ExpenseStockOutputPort,
         expenseCategoryOutputPort: ExpenseCategoryOutputPort,
         expensePaymentRepositoryOutputPort: ExpensePaymentRepositoryOutputPort,
+        movementRepositoryOutputPort: MovementRepositoryOutputPort,
     ): CreateExpenseInputPort =
         CreateExpenseUseCaseImplementation(
             expenseRepositoryOutputPort = expenseRepositoryOutputPort,
@@ -34,6 +36,7 @@ class ExpenseUseCaseConfiguration {
             expenseStockOutputPort = expenseStockOutputPort,
             expenseCategoryOutputPort = expenseCategoryOutputPort,
             expensePaymentRepositoryOutputPort = expensePaymentRepositoryOutputPort,
+            movementRepositoryOutputPort = movementRepositoryOutputPort,
         )
 
     @Bean
@@ -53,6 +56,7 @@ class ExpenseUseCaseConfiguration {
         expenseStockOutputPort: ExpenseStockOutputPort,
         expenseCategoryOutputPort: ExpenseCategoryOutputPort,
         expensePaymentRepositoryOutputPort: ExpensePaymentRepositoryOutputPort,
+        movementRepositoryOutputPort: MovementRepositoryOutputPort,
     ): UpdateExpenseInputPort =
         UpdateExpenseUseCaseImplementation(
             expenseRepositoryOutputPort = expenseRepositoryOutputPort,
@@ -60,6 +64,7 @@ class ExpenseUseCaseConfiguration {
             expenseStockOutputPort = expenseStockOutputPort,
             expenseCategoryOutputPort = expenseCategoryOutputPort,
             expensePaymentRepositoryOutputPort = expensePaymentRepositoryOutputPort,
+            movementRepositoryOutputPort = movementRepositoryOutputPort,
         )
 
     @Bean

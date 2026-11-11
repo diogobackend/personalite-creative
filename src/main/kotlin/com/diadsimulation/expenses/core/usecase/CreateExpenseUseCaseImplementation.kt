@@ -3,7 +3,7 @@ package com.diadsimulation.expenses.core.usecase
 import com.diadsimulation.expenses.core.domain.enums.ExpenseAllocationType.CATEGORY_PRODUCTS
 import com.diadsimulation.expenses.core.domain.enums.ExpenseAllocationType.GENERAL
 import com.diadsimulation.expenses.core.domain.enums.ExpenseAllocationType.SPECIFIC_PRODUCT
-import com.diadsimulation.expenses.core.domain.enums.ExpensePaymentType.PAYMENT
+import com.diadsimulation.expenses.core.domain.enums.ExpensePaymentType
 import com.diadsimulation.expenses.core.domain.enums.ExpenseStatus.PAID
 import com.diadsimulation.expenses.core.domain.enums.ExpenseStatus.PARTIALLY_PAID
 import com.diadsimulation.expenses.core.domain.enums.ExpenseStatus.PENDING
@@ -15,9 +15,16 @@ import com.diadsimulation.expenses.core.ports.output.ExpensePaymentRepositoryOut
 import com.diadsimulation.expenses.core.ports.output.ExpenseRepositoryOutputPort
 import com.diadsimulation.expenses.core.ports.output.ExpenseStockOutputPort
 import com.diadsimulation.expenses.core.ports.output.ProductExpenseValidationOutputPort
+import com.diadsimulation.movements.core.domain.enums.MovementDirection.OUT
+import com.diadsimulation.movements.core.domain.enums.MovementOperation
+import com.diadsimulation.movements.core.domain.enums.MovementOperation.CREATED
+import com.diadsimulation.movements.core.domain.enums.MovementOrigin.EXPENSE
+import com.diadsimulation.movements.core.domain.models.Movement
+import com.diadsimulation.movements.core.ports.output.MovementRepositoryOutputPort
 import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal.ZERO
 import java.time.OffsetDateTime
+import java.util.UUID
 
 open class CreateExpenseUseCaseImplementation(
     private val expenseRepositoryOutputPort: ExpenseRepositoryOutputPort,
@@ -25,6 +32,7 @@ open class CreateExpenseUseCaseImplementation(
     private val expenseStockOutputPort: ExpenseStockOutputPort,
     private val expenseCategoryOutputPort: ExpenseCategoryOutputPort,
     private val expensePaymentRepositoryOutputPort: ExpensePaymentRepositoryOutputPort,
+    private val movementRepositoryOutputPort: MovementRepositoryOutputPort,
 ) : CreateExpenseInputPort {
     object Constants {
         const val INVENTORY_ITEM_CATEGORY = "item de estoque"
@@ -59,13 +67,47 @@ open class CreateExpenseUseCaseImplementation(
             expenseStockOutputPort.registerEntry(savedExpense)
         }
 
+        val now = OffsetDateTime.now()
+
+        movementRepositoryOutputPort.save(
+            Movement(
+                id = UUID.randomUUID(),
+                originId = savedExpense.id,
+                origin = EXPENSE,
+                operation = CREATED,
+                direction = null,
+                status = savedExpense.status.name,
+                previousValue = null,
+                currentValue = savedExpense.value,
+                amount = savedExpense.value,
+                description = "Despesa registrada.",
+                createdAt = now,
+            ),
+        )
+
         if (savedExpense.paidAmount > ZERO) {
             expensePaymentRepositoryOutputPort.save(
                 ExpensePayment(
                     expenseId = savedExpense.id,
                     amount = savedExpense.paidAmount,
-                    type = PAYMENT,
-                    paidAt = OffsetDateTime.now(),
+                    type = ExpensePaymentType.PAYMENT,
+                    paidAt = now,
+                ),
+            )
+
+            movementRepositoryOutputPort.save(
+                Movement(
+                    id = UUID.randomUUID(),
+                    originId = savedExpense.id,
+                    origin = EXPENSE,
+                    operation = MovementOperation.PAYMENT,
+                    direction = OUT,
+                    status = savedExpense.status.name,
+                    previousValue = ZERO,
+                    currentValue = savedExpense.paidAmount,
+                    amount = savedExpense.paidAmount,
+                    description = "Pagamento inicial da despesa.",
+                    createdAt = now,
                 ),
             )
         }

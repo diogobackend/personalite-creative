@@ -2,6 +2,12 @@ package com.diadsimulation.sales.core.usecase
 
 import com.diadsimulation.auth.core.port.output.UserRepositoryOutputPort
 import com.diadsimulation.inventory.core.ports.output.InventoryRepositoryOutputPort
+import com.diadsimulation.movements.core.domain.enums.MovementDirection.IN
+import com.diadsimulation.movements.core.domain.enums.MovementOperation.CREATED
+import com.diadsimulation.movements.core.domain.enums.MovementOperation.PAYMENT
+import com.diadsimulation.movements.core.domain.enums.MovementOrigin.SALE
+import com.diadsimulation.movements.core.domain.models.Movement
+import com.diadsimulation.movements.core.ports.output.MovementRepositoryOutputPort
 import com.diadsimulation.products.core.port.output.ProductRepositoryOutputPort
 import com.diadsimulation.sales.core.domain.enums.SalePaymentType.RECEIPT
 import com.diadsimulation.sales.core.domain.model.Sale
@@ -14,6 +20,7 @@ import java.math.BigDecimal
 import java.math.BigDecimal.ZERO
 import java.time.OffsetDateTime
 import java.util.NoSuchElementException
+import java.util.UUID
 
 open class CreateSaleUseCaseImplementation(
     private val createSaleOutputPort: CreateSaleOutputPort,
@@ -21,6 +28,7 @@ open class CreateSaleUseCaseImplementation(
     private val productRepositoryOutputPort: ProductRepositoryOutputPort,
     private val inventoryRepositoryOutputPort: InventoryRepositoryOutputPort,
     private val salePaymentRepositoryOutputPort: SalePaymentRepositoryOutputPort,
+    private val movementRepositoryOutputPort: MovementRepositoryOutputPort,
 ) : CreateSaleInputPort {
     @Transactional
     override fun execute(sale: Sale): Sale {
@@ -43,10 +51,15 @@ open class CreateSaleUseCaseImplementation(
             }
         }
 
-        sale.items.map { it.productId }.distinct().forEach { productId ->
-            productRepositoryOutputPort.findById(productId)
-                ?: throw NoSuchElementException("Produto não encontrado: $productId")
-        }
+        sale.items
+            .map { it.productId }
+            .distinct()
+            .forEach { productId ->
+                productRepositoryOutputPort.findById(productId)
+                    ?: throw NoSuchElementException(
+                        "Produto não encontrado: $productId",
+                    )
+            }
 
         sale.items
             .mapNotNull { item ->
@@ -83,6 +96,23 @@ open class CreateSaleUseCaseImplementation(
         }
 
         val savedSale = createSaleOutputPort.save(sale)
+        val now = OffsetDateTime.now()
+
+        movementRepositoryOutputPort.save(
+            Movement(
+                id = UUID.randomUUID(),
+                originId = savedSale.id,
+                origin = SALE,
+                operation = CREATED,
+                direction = null,
+                status = null,
+                previousValue = null,
+                currentValue = savedSale.totalAmount,
+                amount = savedSale.totalAmount,
+                description = "Venda registrada.",
+                createdAt = now,
+            ),
+        )
 
         if (savedSale.receivedAmount > ZERO) {
             salePaymentRepositoryOutputPort.save(
@@ -90,7 +120,23 @@ open class CreateSaleUseCaseImplementation(
                     saleId = savedSale.id,
                     amount = savedSale.receivedAmount,
                     type = RECEIPT,
-                    paidAt = OffsetDateTime.now(),
+                    paidAt = now,
+                ),
+            )
+
+            movementRepositoryOutputPort.save(
+                Movement(
+                    id = UUID.randomUUID(),
+                    originId = savedSale.id,
+                    origin = SALE,
+                    operation = PAYMENT,
+                    direction = IN,
+                    status = null,
+                    previousValue = ZERO,
+                    currentValue = savedSale.receivedAmount,
+                    amount = savedSale.receivedAmount,
+                    description = "Recebimento inicial da venda.",
+                    createdAt = now,
                 ),
             )
         }

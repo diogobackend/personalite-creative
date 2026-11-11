@@ -1,8 +1,18 @@
+
 package com.diadsimulation.sales.core.usecase
 
 import com.diadsimulation.auth.core.port.output.UserRepositoryOutputPort
 import com.diadsimulation.inventory.core.ports.output.InventoryRepositoryOutputPort
+import com.diadsimulation.movements.core.domain.enums.MovementDirection.IN
+import com.diadsimulation.movements.core.domain.enums.MovementDirection.OUT
+import com.diadsimulation.movements.core.domain.enums.MovementOperation
+import com.diadsimulation.movements.core.domain.enums.MovementOperation.PAYMENT
+import com.diadsimulation.movements.core.domain.enums.MovementOperation.REFUND
+import com.diadsimulation.movements.core.domain.enums.MovementOrigin
+import com.diadsimulation.movements.core.domain.models.Movement
+import com.diadsimulation.movements.core.ports.output.MovementRepositoryOutputPort
 import com.diadsimulation.products.core.port.output.ProductRepositoryOutputPort
+import com.diadsimulation.sales.core.domain.enums.SalePaymentType
 import com.diadsimulation.sales.core.domain.enums.SalePaymentType.RECEIPT
 import com.diadsimulation.sales.core.domain.enums.SalePaymentType.REFUND
 import com.diadsimulation.sales.core.domain.enums.SalePaymentType.VALUE_ADJUSTMENT_DECREASE
@@ -18,7 +28,6 @@ import com.diadsimulation.sales.core.ports.output.UpdateSaleOutputPort
 import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
 import java.math.BigDecimal.ZERO
-import java.math.RoundingMode.HALF_UP
 import java.time.OffsetDateTime
 import java.util.NoSuchElementException
 import java.util.UUID
@@ -30,6 +39,7 @@ open class UpdateSaleUseCaseImplementation(
     private val productRepositoryOutputPort: ProductRepositoryOutputPort,
     private val inventoryRepositoryOutputPort: InventoryRepositoryOutputPort,
     private val salePaymentRepositoryOutputPort: SalePaymentRepositoryOutputPort,
+    private val movementRepositoryOutputPort: MovementRepositoryOutputPort,
 ) : UpdateSaleInputPort {
     @Transactional
     override fun execute(
@@ -52,9 +62,11 @@ open class UpdateSaleUseCaseImplementation(
             require(item.quantity > 0) {
                 "A quantidade do produto deve ser maior que zero."
             }
+
             require(item.unitPrice > ZERO) {
                 "O preço unitário do produto deve ser maior que zero."
             }
+
             require(item.totalPrice > ZERO) {
                 "O produto precisa ser vendido com um valor positivo."
             }
@@ -101,7 +113,7 @@ open class UpdateSaleUseCaseImplementation(
         require(
             financialOperation == null ||
                 financialOperation == RECEIPT ||
-                financialOperation == REFUND,
+                financialOperation == SalePaymentType.REFUND,
         ) {
             "A operação financeira deve ser RECEIPT ou REFUND."
         }
@@ -136,7 +148,7 @@ open class UpdateSaleUseCaseImplementation(
             require(
                 when (financialOperation) {
                     RECEIPT -> financialDifference > ZERO
-                    REFUND -> financialDifference < ZERO
+                    SalePaymentType.REFUND -> financialDifference < ZERO
                     else -> false
                 },
             ) {
@@ -179,12 +191,14 @@ open class UpdateSaleUseCaseImplementation(
         val savedSale = updateSaleOutputPort.update(updatedSale)
 
         if (totalDifference.compareTo(ZERO) != 0) {
+            val isIncrease = totalDifference > ZERO
+
             salePaymentRepositoryOutputPort.save(
                 SalePayment(
                     saleId = savedSale.id,
                     amount = totalDifference.abs(),
                     type =
-                        if (totalDifference > ZERO) {
+                        if (isIncrease) {
                             VALUE_ADJUSTMENT_INCREASE
                         } else {
                             VALUE_ADJUSTMENT_DECREASE
@@ -192,15 +206,75 @@ open class UpdateSaleUseCaseImplementation(
                     paidAt = updatedAt,
                 ),
             )
+
+            movementRepositoryOutputPort.save(
+                Movement(
+                    id = UUID.randomUUID(),
+                    originId = savedSale.id,
+                    origin = MovementOrigin.SALE,
+                    operation =
+                        if (isIncrease) {
+                            MovementOperation.VALUE_ADJUSTMENT_INCREASE
+                        } else {
+                            MovementOperation.VALUE_ADJUSTMENT_DECREASE
+                        },
+                    direction = null,
+                    status = null,
+                    previousValue = currentSale.totalAmount,
+                    currentValue = savedSale.totalAmount,
+                    amount = totalDifference.abs(),
+                    description =
+                        if (isIncrease) {
+                            "Aumento do valor total da venda."
+                        } else {
+                            "Redução do valor total da venda."
+                        },
+                    createdAt = updatedAt,
+                ),
+            )
         }
 
         if (financialDifference.compareTo(ZERO) != 0) {
+            val operation = requireNotNull(financialOperation)
+            val isReceipt = operation == RECEIPT
+
             salePaymentRepositoryOutputPort.save(
                 SalePayment(
                     saleId = savedSale.id,
                     amount = financialDifference.abs(),
-                    type = requireNotNull(financialOperation),
+                    type = operation,
                     paidAt = updatedAt,
+                ),
+            )
+
+            movementRepositoryOutputPort.save(
+                Movement(
+                    id = UUID.randomUUID(),
+                    originId = savedSale.id,
+                    origin = MovementOrigin.SALE,
+                    operation =
+                        if (isReceipt) {
+                            PAYMENT
+                        } else {
+                            MovementOperation.REFUND
+                        },
+                    direction =
+                        if (isReceipt) {
+                            IN
+                        } else {
+                            OUT
+                        },
+                    status = null,
+                    previousValue = currentSale.receivedAmount,
+                    currentValue = savedSale.receivedAmount,
+                    amount = financialDifference.abs(),
+                    description =
+                        if (isReceipt) {
+                            "Recebimento registrado na venda."
+                        } else {
+                            "Estorno registrado na venda."
+                        },
+                    createdAt = updatedAt,
                 ),
             )
         }

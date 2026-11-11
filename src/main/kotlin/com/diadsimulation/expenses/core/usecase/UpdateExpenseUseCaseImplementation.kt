@@ -22,6 +22,12 @@ import com.diadsimulation.expenses.core.ports.output.ExpenseRepositoryOutputPort
 import com.diadsimulation.expenses.core.ports.output.ExpenseStockOutputPort
 import com.diadsimulation.expenses.core.ports.output.ProductExpenseValidationOutputPort
 import com.diadsimulation.expenses.core.usecase.UpdateExpenseUseCaseImplementation.Constants.INVENTORY_ITEM_CATEGORY
+import com.diadsimulation.movements.core.domain.enums.MovementDirection.IN
+import com.diadsimulation.movements.core.domain.enums.MovementDirection.OUT
+import com.diadsimulation.movements.core.domain.enums.MovementOperation
+import com.diadsimulation.movements.core.domain.enums.MovementOrigin
+import com.diadsimulation.movements.core.domain.models.Movement
+import com.diadsimulation.movements.core.ports.output.MovementRepositoryOutputPort
 import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal.ZERO
 import java.time.OffsetDateTime
@@ -36,6 +42,7 @@ class UpdateExpenseUseCaseImplementation(
     private val expenseStockOutputPort: ExpenseStockOutputPort,
     private val expenseCategoryOutputPort: ExpenseCategoryOutputPort,
     private val expensePaymentRepositoryOutputPort: ExpensePaymentRepositoryOutputPort,
+    private val movementRepositoryOutputPort: MovementRepositoryOutputPort,
 ) : UpdateExpenseInputPort {
     object Constants {
         const val INVENTORY_ITEM_CATEGORY = "item de estoque"
@@ -203,12 +210,14 @@ class UpdateExpenseUseCaseImplementation(
         )
 
         if (valueDifference.compareTo(ZERO) != 0) {
+            val isIncrease = valueDifference > ZERO
+
             expensePaymentRepositoryOutputPort.save(
                 ExpensePayment(
                     expenseId = savedExpense.id,
                     amount = valueDifference.abs(),
                     type =
-                        if (valueDifference > ZERO) {
+                        if (isIncrease) {
                             VALUE_ADJUSTMENT_INCREASE
                         } else {
                             VALUE_ADJUSTMENT_DECREASE
@@ -216,20 +225,79 @@ class UpdateExpenseUseCaseImplementation(
                     paidAt = updatedAt,
                 ),
             )
+
+            movementRepositoryOutputPort.save(
+                Movement(
+                    id = UUID.randomUUID(),
+                    originId = savedExpense.id,
+                    origin = MovementOrigin.EXPENSE,
+                    operation =
+                        if (isIncrease) {
+                            MovementOperation.VALUE_ADJUSTMENT_INCREASE
+                        } else {
+                            MovementOperation.VALUE_ADJUSTMENT_DECREASE
+                        },
+                    direction = null,
+                    status = savedExpense.status.name,
+                    previousValue = currentExpense.value,
+                    currentValue = savedExpense.value,
+                    amount = valueDifference.abs(),
+                    description =
+                        if (isIncrease) {
+                            "Aumento do valor total da despesa."
+                        } else {
+                            "Redução do valor total da despesa."
+                        },
+                    createdAt = updatedAt,
+                ),
+            )
         }
 
         if (paymentDifference.compareTo(ZERO) != 0) {
+            val isPayment = paymentDifference > ZERO
+
             expensePaymentRepositoryOutputPort.save(
                 ExpensePayment(
                     expenseId = savedExpense.id,
                     amount = paymentDifference.abs(),
                     type =
-                        if (paymentDifference > ZERO) {
+                        if (isPayment) {
                             PAYMENT
                         } else {
                             REFUND
                         },
                     paidAt = updatedAt,
+                ),
+            )
+
+            movementRepositoryOutputPort.save(
+                Movement(
+                    id = UUID.randomUUID(),
+                    originId = savedExpense.id,
+                    origin = MovementOrigin.EXPENSE,
+                    operation =
+                        if (isPayment) {
+                            MovementOperation.PAYMENT
+                        } else {
+                            MovementOperation.REFUND
+                        },
+                    direction =
+                        if (isPayment) {
+                            OUT
+                        } else {
+                            IN
+                        },
+                    status = savedExpense.status.name,
+                    previousValue = currentExpense.paidAmount,
+                    currentValue = savedExpense.paidAmount,
+                    amount = paymentDifference.abs(),
+                    description =
+                        if (isPayment) {
+                            "Pagamento registrado na despesa."
+                        } else {
+                            "Estorno registrado na despesa."
+                        },
+                    createdAt = updatedAt,
                 ),
             )
         }
@@ -260,6 +328,22 @@ class UpdateExpenseUseCaseImplementation(
                 amount = cancelledExpense.value,
                 type = ExpensePaymentType.CANCELLED,
                 paidAt = cancelledAt,
+            ),
+        )
+
+        movementRepositoryOutputPort.save(
+            Movement(
+                id = UUID.randomUUID(),
+                originId = cancelledExpense.id,
+                origin = MovementOrigin.EXPENSE,
+                operation = MovementOperation.CANCELLED,
+                direction = null,
+                status = cancelledExpense.status.name,
+                previousValue = currentExpense.value,
+                currentValue = cancelledExpense.value,
+                amount = cancelledExpense.value,
+                description = "Despesa cancelada.",
+                createdAt = cancelledAt,
             ),
         )
 

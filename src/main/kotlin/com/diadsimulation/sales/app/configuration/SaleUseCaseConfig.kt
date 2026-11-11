@@ -2,6 +2,7 @@ package com.diadsimulation.sales.app.configuration
 
 import com.diadsimulation.auth.core.port.output.UserRepositoryOutputPort
 import com.diadsimulation.inventory.core.ports.output.InventoryRepositoryOutputPort
+import com.diadsimulation.movements.core.ports.output.MovementRepositoryOutputPort
 import com.diadsimulation.products.core.port.output.ProductRepositoryOutputPort
 import com.diadsimulation.sales.core.ports.input.CreateSaleInputPort
 import com.diadsimulation.sales.core.ports.input.DeleteSaleInputPort
@@ -30,6 +31,7 @@ class SaleUseCaseConfig {
         productRepositoryOutputPort: ProductRepositoryOutputPort,
         inventoryRepositoryOutputPort: InventoryRepositoryOutputPort,
         salePaymentRepositoryOutputPort: SalePaymentRepositoryOutputPort,
+        movementRepositoryOutputPort: MovementRepositoryOutputPort,
     ): CreateSaleInputPort =
         CreateSaleUseCaseImplementation(
             createSaleOutputPort = createSaleOutputPort,
@@ -37,6 +39,7 @@ class SaleUseCaseConfig {
             productRepositoryOutputPort = productRepositoryOutputPort,
             inventoryRepositoryOutputPort = inventoryRepositoryOutputPort,
             salePaymentRepositoryOutputPort = salePaymentRepositoryOutputPort,
+            movementRepositoryOutputPort = movementRepositoryOutputPort,
         )
 
     @Bean
@@ -48,13 +51,14 @@ class SaleUseCaseConfig {
         FindSaleByIdUseCaseImplementation(findSaleByIdOutputPort)
 
     @Bean
-    fun updateSaleUseCase(
+    fun updateSaleUseCaseImplementation(
         findSaleByIdInputPort: FindSaleByIdInputPort,
         updateSaleOutputPort: UpdateSaleOutputPort,
         userRepositoryOutputPort: UserRepositoryOutputPort,
         productRepositoryOutputPort: ProductRepositoryOutputPort,
         inventoryRepositoryOutputPort: InventoryRepositoryOutputPort,
         salePaymentRepositoryOutputPort: SalePaymentRepositoryOutputPort,
+        movementRepositoryOutputPort: MovementRepositoryOutputPort,
     ): UpdateSaleInputPort =
         UpdateSaleUseCaseImplementation(
             findSaleByIdInputPort = findSaleByIdInputPort,
@@ -63,6 +67,7 @@ class SaleUseCaseConfig {
             productRepositoryOutputPort = productRepositoryOutputPort,
             inventoryRepositoryOutputPort = inventoryRepositoryOutputPort,
             salePaymentRepositoryOutputPort = salePaymentRepositoryOutputPort,
+            movementRepositoryOutputPort = movementRepositoryOutputPort,
         )
 
     @Bean
