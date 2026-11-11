@@ -22,7 +22,7 @@ class SalePaymentEntity(
     @Column(name = "amount", nullable = false, precision = 12, scale = 2)
     val amount: BigDecimal,
     @Enumerated(STRING)
-    @Column(name = "type", nullable = false, length = 20)
+    @Column(name = "type", nullable = false, length = 30)
     val type: SalePaymentType,
     @Column(name = "paid_at", nullable = false)
     val paidAt: OffsetDateTime,

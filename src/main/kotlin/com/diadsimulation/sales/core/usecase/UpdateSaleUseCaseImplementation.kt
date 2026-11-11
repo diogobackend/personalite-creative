@@ -5,6 +5,8 @@ import com.diadsimulation.inventory.core.ports.output.InventoryRepositoryOutputP
 import com.diadsimulation.products.core.port.output.ProductRepositoryOutputPort
 import com.diadsimulation.sales.core.domain.enums.SalePaymentType.RECEIPT
 import com.diadsimulation.sales.core.domain.enums.SalePaymentType.REFUND
+import com.diadsimulation.sales.core.domain.enums.SalePaymentType.VALUE_ADJUSTMENT_DECREASE
+import com.diadsimulation.sales.core.domain.enums.SalePaymentType.VALUE_ADJUSTMENT_INCREASE
 import com.diadsimulation.sales.core.domain.model.Sale
 import com.diadsimulation.sales.core.domain.model.SalePayment
 import com.diadsimulation.sales.core.domain.model.SaleUpdate
@@ -16,6 +18,7 @@ import com.diadsimulation.sales.core.ports.output.UpdateSaleOutputPort
 import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
 import java.math.BigDecimal.ZERO
+import java.math.RoundingMode.HALF_UP
 import java.time.OffsetDateTime
 import java.util.NoSuchElementException
 import java.util.UUID
@@ -89,15 +92,56 @@ open class UpdateSaleUseCaseImplementation(
         val downPaymentPercentage =
             update.downPaymentPercentage ?: currentSale.downPaymentPercentage
 
-        val paidPercentage =
-            update.paidPercentage ?: currentSale.paidPercentage
-
         require(downPaymentPercentage in ZERO..HUNDRED) {
             "A porcentagem de entrada deve estar entre 0 e 100."
         }
 
-        require(paidPercentage in ZERO..HUNDRED) {
-            "A porcentagem paga deve estar entre 0 e 100."
+        val financialOperation = update.financialOperation
+
+        require(
+            financialOperation == null ||
+                financialOperation == RECEIPT ||
+                financialOperation == REFUND,
+        ) {
+            "A operação financeira deve ser RECEIPT ou REFUND."
+        }
+
+        require(update.receivedAmount == null || financialOperation != null) {
+            "Informe RECEIPT ou REFUND para alterar o valor recebido."
+        }
+
+        val receivedAmount =
+            update.receivedAmount ?: currentSale.receivedAmount
+
+        require(receivedAmount >= ZERO) {
+            "O valor recebido não pode ser negativo."
+        }
+
+        require(receivedAmount <= totalAmount) {
+            "O valor recebido não pode ultrapassar o total da venda."
+        }
+
+        require(receivedAmount.scale() <= 2) {
+            "O valor recebido deve possuir no máximo duas casas decimais."
+        }
+
+        val financialDifference =
+            receivedAmount.subtract(currentSale.receivedAmount)
+
+        if (financialOperation != null) {
+            require(financialDifference.compareTo(ZERO) != 0) {
+                "A operação financeira deve alterar o valor recebido."
+            }
+
+            require(
+                when (financialOperation) {
+                    RECEIPT -> financialDifference > ZERO
+                    REFUND -> financialDifference < ZERO
+                    else -> false
+                },
+            ) {
+                "A operação financeira não corresponde à alteração do valor recebido."
+            }
         }
 
         val updatedAt = OffsetDateTime.now()
@@ -108,7 +152,7 @@ open class UpdateSaleUseCaseImplementation(
                 items = items,
                 totalAmount = totalAmount,
                 downPaymentPercentage = downPaymentPercentage,
-                paidPercentage = paidPercentage,
+                receivedAmount = receivedAmount,
                 paymentMethod = update.paymentMethod ?: currentSale.paymentMethod,
                 updatedAt = updatedAt,
                 deliveryDeadline =
@@ -129,26 +173,33 @@ open class UpdateSaleUseCaseImplementation(
                     },
             )
 
-        val previousReceivedAmount = currentSale.receivedAmount
-        val updatedReceivedAmount = updatedSale.receivedAmount
-
-        val difference = updatedReceivedAmount.subtract(previousReceivedAmount)
+        val totalDifference =
+            updatedSale.totalAmount.subtract(currentSale.totalAmount)
 
         val savedSale = updateSaleOutputPort.update(updatedSale)
 
-        if (difference.compareTo(ZERO) != 0) {
-            val type =
-                if (difference > ZERO) {
-                    RECEIPT
-                } else {
-                    REFUND
-                }
-
+        if (totalDifference.compareTo(ZERO) != 0) {
             salePaymentRepositoryOutputPort.save(
                 SalePayment(
                     saleId = savedSale.id,
-                    amount = difference.abs(),
-                    type = type,
+                    amount = totalDifference.abs(),
+                    type =
+                        if (totalDifference > ZERO) {
+                            VALUE_ADJUSTMENT_INCREASE
+                        } else {
+                            VALUE_ADJUSTMENT_DECREASE
+                        },
+                    paidAt = updatedAt,
+                ),
+            )
+        }
+
+        if (financialDifference.compareTo(ZERO) != 0) {
+            salePaymentRepositoryOutputPort.save(
+                SalePayment(
+                    saleId = savedSale.id,
+                    amount = financialDifference.abs(),
+                    type = requireNotNull(financialOperation),
                     paidAt = updatedAt,
                 ),
             )

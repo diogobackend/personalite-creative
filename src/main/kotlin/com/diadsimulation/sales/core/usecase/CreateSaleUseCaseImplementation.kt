@@ -38,8 +38,8 @@ open class CreateSaleUseCaseImplementation(
             require(item.unitPrice > ZERO) {
                 "O preço unitário do produto deve ser maior que zero."
             }
-            require(item.totalPrice >= ZERO) {
-                "O valor final do produto não pode ser negativo."
+            require(item.totalPrice > ZERO) {
+                "O produto precisa ser vendido com um valor positivo."
             }
         }
 
@@ -80,10 +80,6 @@ open class CreateSaleUseCaseImplementation(
 
         require(sale.downPaymentPercentage in ZERO..HUNDRED) {
             "A porcentagem de entrada deve estar entre 0 e 100."
-        }
-
-        require(sale.paidPercentage in ZERO..HUNDRED) {
-            "A porcentagem paga deve estar entre 0 e 100."
         }
 
         val savedSale = createSaleOutputPort.save(sale)

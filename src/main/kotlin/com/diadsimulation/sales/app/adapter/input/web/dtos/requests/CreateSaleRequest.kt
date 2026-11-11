@@ -10,7 +10,7 @@ data class CreateSaleRequest(
     val deliveryDeadline: LocalDate? = null,
     val totalAmount: BigDecimal,
     val downPaymentPercentage: BigDecimal,
-    val paidPercentage: BigDecimal,
+    val receivedAmount: BigDecimal,
     val paymentMethod: PaymentMethod,
     val observation: String? = null,
     val items: List<CreateSaleItemRequest>,

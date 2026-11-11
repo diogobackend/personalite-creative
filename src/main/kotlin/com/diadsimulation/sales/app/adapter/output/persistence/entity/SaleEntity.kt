@@ -25,6 +25,8 @@ class SaleEntity(
     val downPaymentPercentage: BigDecimal,
     @Column(name = "paid_percentage", nullable = false, precision = 5, scale = 2)
     val paidPercentage: BigDecimal,
+    @Column(name = "received_amount", nullable = false, precision = 12, scale = 2)
+    val receivedAmount: BigDecimal,
     @Column(name = "payment_method", nullable = false, length = 30)
     val paymentMethod: String,
     @Column(name = "observation", columnDefinition = "TEXT")
