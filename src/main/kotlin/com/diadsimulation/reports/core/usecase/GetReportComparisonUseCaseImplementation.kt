@@ -43,34 +43,34 @@ class GetReportComparisonUseCaseImplementation(
                 ReportComparisonPeriod(
                     startDate = startDate,
                     endDate = endDate,
-                    revenue = current.expectedRevenue,
-                    expenses = current.expectedExpenses,
-                    profit = current.expectedProfit,
+                    revenue = current.receivedRevenue,
+                    expenses = current.paidExpenses,
+                    profit = current.realizedProfit,
                 ),
             previousPeriod =
                 ReportComparisonPeriod(
                     startDate = previousStartDate,
                     endDate = previousEndDate,
-                    revenue = previous.expectedRevenue,
-                    expenses = previous.expectedExpenses,
-                    profit = previous.expectedProfit,
+                    revenue = previous.receivedRevenue,
+                    expenses = previous.paidExpenses,
+                    profit = previous.realizedProfit,
                 ),
             variations =
                 ReportComparisonVariations(
                     revenuePercentage =
                         calculateVariation(
-                            current.expectedRevenue,
-                            previous.expectedRevenue,
+                            current.receivedRevenue,
+                            previous.receivedRevenue,
                         ),
                     expensesPercentage =
                         calculateVariation(
-                            current.expectedExpenses,
-                            previous.expectedExpenses,
+                            current.paidExpenses,
+                            previous.paidExpenses,
                         ),
                     profitPercentage =
                         calculateVariation(
-                            current.expectedProfit,
-                            previous.expectedProfit,
+                            current.realizedProfit,
+                            previous.realizedProfit,
                         ),
                 ),
         )

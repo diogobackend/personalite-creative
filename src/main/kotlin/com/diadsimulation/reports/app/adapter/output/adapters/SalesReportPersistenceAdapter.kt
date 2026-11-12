@@ -1,5 +1,11 @@
 package com.diadsimulation.reports.app.adapter.output.adapters
 
+import com.diadsimulation.movements.core.domain.enums.MovementDirection
+import com.diadsimulation.movements.core.domain.enums.MovementDirection.IN
+import com.diadsimulation.movements.core.domain.enums.MovementDirection.OUT
+import com.diadsimulation.movements.core.domain.enums.MovementOperation.PAYMENT
+import com.diadsimulation.movements.core.domain.enums.MovementOperation.REFUND
+import com.diadsimulation.movements.core.domain.enums.MovementOrigin.SALE
 import com.diadsimulation.reports.core.domain.models.SalesReport
 import com.diadsimulation.reports.core.ports.output.GetSalesReportOutputPort
 import jakarta.persistence.EntityManager
@@ -16,49 +22,64 @@ class SalesReportPersistenceAdapter(
         startDate: LocalDate,
         endDate: LocalDate,
     ): SalesReport {
-        val zoneId = ZoneId.of("America/Sao_Paulo")
-
-        val start = startDate.atStartOfDay(zoneId).toOffsetDateTime()
-        val end = endDate.plusDays(1).atStartOfDay(zoneId).toOffsetDateTime()
+        val zone = ZoneId.of("America/Sao_Paulo")
+        val start = startDate.atStartOfDay(zone).toOffsetDateTime()
+        val endExclusive = endDate.plusDays(1).atStartOfDay(zone).toOffsetDateTime()
 
         val sales =
             entityManager
                 .createQuery(
                     """
-                    SELECT s.totalAmount, s.paidPercentage
+                    SELECT
+                        COUNT(s.id),
+                        COALESCE(SUM(s.totalAmount), 0),
+                        COALESCE(SUM(s.totalAmount - s.receivedAmount), 0)
                     FROM SaleEntity s
                     WHERE s.createdAt >= :start
                       AND s.createdAt < :end
                     """.trimIndent(),
                     Array<Any>::class.java,
                 ).setParameter("start", start)
-                .setParameter("end", end)
+                .setParameter("end", endExclusive)
+                .singleResult
+
+        val movements =
+            entityManager
+                .createQuery(
+                    """
+                    SELECT m.direction, COALESCE(SUM(m.amount), 0)
+                    FROM MovementEntity m
+                    WHERE m.origin = :origin
+                      AND m.operation IN :operations
+                      AND m.createdAt >= :start
+                      AND m.createdAt < :end
+                      AND m.direction IS NOT NULL
+                    GROUP BY m.direction
+                    """.trimIndent(),
+                    Array<Any>::class.java,
+                ).setParameter("origin", SALE)
+                .setParameter(
+                    "operations",
+                    listOf(PAYMENT, REFUND),
+                ).setParameter("start", start)
+                .setParameter("end", endExclusive)
                 .resultList
 
-        val totalSales = sales.size.toLong()
+        fun total(direction: MovementDirection): BigDecimal =
+            movements
+                .filter { it[0] == direction }
+                .fold(ZERO) { sum, row ->
+                    sum.add(row[1] as BigDecimal)
+                }
 
-        var totalRevenue = ZERO
-        var receivedAmount = ZERO
+        val totalSales = (sales[0] as Number).toLong()
+        val totalRevenue = (sales[1] as BigDecimal).setScale(2, HALF_UP)
+        val outstandingAmount = (sales[2] as BigDecimal).setScale(2, HALF_UP)
 
-        sales.forEach { sale ->
-            val amount = sale[0] as BigDecimal
-            val paidPercentage = sale[1] as BigDecimal
-
-            totalRevenue = totalRevenue.add(amount)
-
-            receivedAmount =
-                receivedAmount.add(
-                    amount
-                        .multiply(paidPercentage)
-                        .divide(
-                            BigDecimal("100"),
-                            2,
-                            HALF_UP,
-                        ),
-                )
-        }
-
-        val outstandingAmount = totalRevenue.subtract(receivedAmount)
+        val receivedAmount =
+            total(IN)
+                .subtract(total(OUT))
+                .setScale(2, HALF_UP)
 
         val averageTicket =
             if (totalSales > 0) {
@@ -68,20 +89,16 @@ class SalesReportPersistenceAdapter(
                     HALF_UP,
                 )
             } else {
-                ZERO
+                ZERO.setScale(2, HALF_UP)
             }
 
         val receivedPercentage =
-            if (totalRevenue.compareTo(ZERO) > 0) {
+            if (totalRevenue > ZERO) {
                 receivedAmount
                     .multiply(BigDecimal("100"))
-                    .divide(
-                        totalRevenue,
-                        2,
-                        HALF_UP,
-                    )
+                    .divide(totalRevenue, 2, HALF_UP)
             } else {
-                ZERO
+                ZERO.setScale(2, HALF_UP)
             }
 
         return SalesReport(

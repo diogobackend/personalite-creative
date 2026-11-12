@@ -44,7 +44,7 @@ class GetReportRevenueEvolutionUseCaseImplementation(
 
                     ReportRevenueEvolutionMonth(
                         month = month,
-                        revenue = overview.expectedRevenue,
+                        revenue = overview.receivedRevenue,
                     )
                 }.toList()
 

@@ -1,4 +1,3 @@
-
 package com.diadsimulation.reports.app.adapter.output.adapters
 
 import com.diadsimulation.expenses.core.ports.input.ReportCashFlowInputPort

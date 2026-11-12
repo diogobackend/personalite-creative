@@ -1,14 +1,20 @@
 package com.diadsimulation.reports.app.adapter.output.adapters
 
-import com.diadsimulation.expenses.app.adapter.output.persistence.entities.ExpenseEntity
 import com.diadsimulation.expenses.core.ports.output.GetReportTransactionsOutputPort
+import com.diadsimulation.movements.app.adapter.output.persistence.entities.MovementEntity
+import com.diadsimulation.movements.core.domain.enums.MovementDirection.IN
+import com.diadsimulation.movements.core.domain.enums.MovementDirection.OUT
+import com.diadsimulation.movements.core.domain.enums.MovementOperation.PAYMENT
+import com.diadsimulation.movements.core.domain.enums.MovementOperation.REFUND
+import com.diadsimulation.movements.core.domain.enums.MovementOrigin
+import com.diadsimulation.movements.core.domain.enums.MovementOrigin.EXPENSE
+import com.diadsimulation.movements.core.domain.enums.MovementOrigin.SALE
 import com.diadsimulation.reports.core.domain.enums.ReportTransactionType.ENTRY
 import com.diadsimulation.reports.core.domain.enums.ReportTransactionType.EXIT
 import com.diadsimulation.reports.core.domain.models.ReportTransaction
 import com.diadsimulation.reports.core.domain.models.ReportTransactions
-import com.diadsimulation.sales.app.adapter.output.persistence.entity.SaleEntity
 import jakarta.persistence.EntityManager
-import java.math.BigDecimal
+import java.math.BigDecimal.ZERO
 import java.math.RoundingMode.HALF_UP
 import java.time.LocalDate
 import java.time.ZoneId
@@ -24,77 +30,63 @@ class ReportTransactionsPersistenceAdapter(
         val start = startDate.atStartOfDay(zone).toOffsetDateTime()
         val endExclusive = endDate.plusDays(1).atStartOfDay(zone).toOffsetDateTime()
 
-        val sales =
+        val movements =
             entityManager
                 .createQuery(
                     """
-                    SELECT s
-                    FROM SaleEntity s
-                    WHERE s.createdAt >= :start
-                      AND s.createdAt < :end
+                    SELECT m
+                    FROM MovementEntity m
+                    WHERE m.createdAt >= :start
+                      AND m.createdAt < :end
+                      AND m.operation IN :operations
+                      AND m.direction IS NOT NULL
+                    ORDER BY m.createdAt DESC, m.id
                     """.trimIndent(),
-                    SaleEntity::class.java,
+                    MovementEntity::class.java,
                 ).setParameter("start", start)
                 .setParameter("end", endExclusive)
-                .resultList
+                .setParameter(
+                    "operations",
+                    listOf(PAYMENT, REFUND),
+                ).resultList
 
-        val expenses =
-            entityManager
-                .createQuery(
-                    """
-                    SELECT e
-                    FROM ExpenseEntity e
-                    WHERE e.expenseDate BETWEEN :startDate AND :endDate
-                      AND e.paidAmount > 0
-                    """.trimIndent(),
-                    ExpenseEntity::class.java,
-                ).setParameter("startDate", startDate)
-                .setParameter("endDate", endDate)
-                .resultList
+        val transactions =
+            movements.map { movement ->
+                val type =
+                    when (movement.direction) {
+                        IN -> ENTRY
+                        OUT -> EXIT
+                        null -> error("Movimentação sem direção financeira.")
+                    }
 
-        val entries =
-            sales
-                .map { sale ->
-                    val amount =
-                        sale.totalAmount
-                            .multiply(sale.paidPercentage)
-                            .divide(HUNDRED, 2, HALF_UP)
-
-                    ReportTransaction(
-                        id = sale.id,
-                        type = ENTRY,
-                        description = "Recebimento de venda",
-                        referenceDate = sale.createdAt.atZoneSameInstant(zone).toLocalDate(),
-                        amount = amount,
-                    )
-                }.filter { it.amount > BigDecimal.ZERO }
-
-        val exits =
-            expenses.map { expense ->
                 ReportTransaction(
-                    id = expense.id,
-                    type = EXIT,
-                    description = expense.name,
-                    referenceDate = expense.expenseDate,
-                    amount = expense.paidAmount,
+                    id = movement.id,
+                    type = type,
+                    description =
+                        movement.description
+                            ?: when (movement.origin) {
+                                SALE -> "Movimentação de venda"
+                                EXPENSE -> "Movimentação de despesa"
+                            },
+                    referenceDate =
+                        movement.createdAt
+                            .atZoneSameInstant(zone)
+                            .toLocalDate(),
+                    amount = movement.amount,
                 )
             }
 
-        val transactions =
-            (entries + exits).sortedWith(
-                compareByDescending<ReportTransaction> { it.referenceDate }
-                    .thenBy { it.id },
-            )
-
         val totalEntries =
-            entries
-                .fold(BigDecimal.ZERO) { total, transaction ->
+            transactions
+                .filter { it.type == ENTRY }
+                .fold(ZERO) { total, transaction ->
                     total.add(transaction.amount)
                 }.setScale(2, HALF_UP)
 
         val totalExits =
-            exits
-                .fold(BigDecimal.ZERO) { total, transaction ->
+            transactions
+                .filter { it.type == EXIT }
+                .fold(ZERO) { total, transaction ->
                     total.add(transaction.amount)
                 }.setScale(2, HALF_UP)
 
@@ -104,9 +96,5 @@ class ReportTransactionsPersistenceAdapter(
             balance = totalEntries.subtract(totalExits),
             transactions = transactions,
         )
-    }
-
-    private companion object {
-        val HUNDRED = BigDecimal("100")
     }
 }
