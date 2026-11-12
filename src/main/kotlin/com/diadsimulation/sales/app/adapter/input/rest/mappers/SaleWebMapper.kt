@@ -9,6 +9,7 @@ import com.diadsimulation.sales.core.domain.model.SaleItem
 import com.diadsimulation.sales.core.domain.model.SaleUpdate
 import com.diadsimulation.sales.core.domain.utils.UpdateField
 import org.springframework.stereotype.Component
+import java.math.BigDecimal
 
 @Component
 class SaleWebMapper {
@@ -18,7 +19,10 @@ class SaleWebMapper {
             deliveryDeadline = request.deliveryDeadline,
             totalAmount = request.totalAmount,
             downPaymentPercentage = request.downPaymentPercentage,
-            receivedAmount = request.receivedAmount,
+            receivedAmount =
+                request.totalAmount
+                    .multiply(request.paidPercentage)
+                    .divide(BigDecimal("100")),
             paymentMethod = request.paymentMethod,
             observation = request.observation,
             items =
