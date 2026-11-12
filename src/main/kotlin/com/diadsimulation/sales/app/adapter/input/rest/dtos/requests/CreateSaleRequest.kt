@@ -1,0 +1,17 @@
+package com.diadsimulation.sales.app.adapter.input.rest.dtos.requests
+
+import com.diadsimulation.sales.core.domain.enums.PaymentMethod
+import java.math.BigDecimal
+import java.time.LocalDate
+import java.util.UUID
+
+data class CreateSaleRequest(
+    val customerId: UUID,
+    val deliveryDeadline: LocalDate? = null,
+    val totalAmount: BigDecimal,
+    val downPaymentPercentage: BigDecimal,
+    val receivedAmount: BigDecimal,
+    val paymentMethod: PaymentMethod,
+    val observation: String? = null,
+    val items: List<CreateSaleItemRequest>,
+)

@@ -1,0 +1,58 @@
+package com.diadsimulation.inventory.app.config
+
+import com.diadsimulation.inventory.core.ports.input.DeleteInventoryInputPort
+import com.diadsimulation.inventory.core.ports.input.GetInventoryByIdInputPort
+import com.diadsimulation.inventory.core.ports.input.GetInventoryInputPort
+import com.diadsimulation.inventory.core.ports.input.RegisterInventoryInputPort
+import com.diadsimulation.inventory.core.ports.input.UpdateInventoryInputPort
+import com.diadsimulation.inventory.core.ports.output.InventoryCategoryOutputPort
+import com.diadsimulation.inventory.core.ports.output.InventoryMovementRepositoryOutputPort
+import com.diadsimulation.inventory.core.ports.output.InventoryRepositoryOutputPort
+import com.diadsimulation.inventory.core.usecase.DeleteInventoryUseCaseImplementation
+import com.diadsimulation.inventory.core.usecase.GetInventoryByIdUseCaseImplementation
+import com.diadsimulation.inventory.core.usecase.GetInventoryUseCaseImplementation
+import com.diadsimulation.inventory.core.usecase.RegisterInventoryUseCaseImplementation
+import com.diadsimulation.inventory.core.usecase.UpdateInventoryUseCaseImplementation
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
+
+@Configuration
+class InventoryUseCaseConfiguration {
+    @Bean
+    fun registerInventoryUseCase(
+        inventoryRepositoryOutputPort: InventoryRepositoryOutputPort,
+        inventoryMovementRepositoryOutputPort: InventoryMovementRepositoryOutputPort,
+        inventoryCategoryOutputPort: InventoryCategoryOutputPort,
+    ): RegisterInventoryInputPort =
+        RegisterInventoryUseCaseImplementation(
+            inventoryRepositoryOutputPort,
+            inventoryMovementRepositoryOutputPort,
+            inventoryCategoryOutputPort,
+        )
+
+    @Bean
+    fun getInventoryUseCase(inventoryRepositoryOutputPort: InventoryRepositoryOutputPort): GetInventoryInputPort =
+        GetInventoryUseCaseImplementation(
+            inventoryRepositoryOutputPort,
+        )
+
+    @Bean
+    fun getInventoryByIdUseCase(inventoryRepositoryOutputPort: InventoryRepositoryOutputPort): GetInventoryByIdInputPort =
+        GetInventoryByIdUseCaseImplementation(
+            inventoryRepositoryOutputPort,
+        )
+
+    @Bean
+    fun updateInventoryUseCase(
+        inventoryRepositoryOutputPort: InventoryRepositoryOutputPort,
+        inventoryCategoryOutputPort: InventoryCategoryOutputPort,
+    ): UpdateInventoryInputPort =
+        UpdateInventoryUseCaseImplementation(
+            inventoryRepositoryOutputPort,
+            inventoryCategoryOutputPort,
+        )
+
+    @Bean
+    fun deleteInventoryUseCase(inventoryRepositoryOutputPort: InventoryRepositoryOutputPort): DeleteInventoryInputPort =
+        DeleteInventoryUseCaseImplementation(inventoryRepositoryOutputPort)
+}

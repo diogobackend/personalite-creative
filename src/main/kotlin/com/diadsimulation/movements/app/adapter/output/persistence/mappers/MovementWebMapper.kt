@@ -1,7 +1,7 @@
 package com.diadsimulation.movements.app.adapter.output.persistence.mappers
 
-import com.diadsimulation.movements.app.adapter.input.web.dtos.responses.MovementResponse
-import com.diadsimulation.movements.app.adapter.input.web.dtos.responses.MovementsPageResponse
+import com.diadsimulation.movements.app.adapter.input.rest.dtos.responses.MovementResponse
+import com.diadsimulation.movements.app.adapter.input.rest.dtos.responses.MovementsPageResponse
 import com.diadsimulation.movements.core.domain.models.Movement
 import com.diadsimulation.movements.core.domain.models.MovementPage
 import org.springframework.stereotype.Component

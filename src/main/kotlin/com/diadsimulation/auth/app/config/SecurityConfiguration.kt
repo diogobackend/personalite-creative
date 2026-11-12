@@ -1,0 +1,133 @@
+package com.diadsimulation.auth.app.config
+
+import com.diadsimulation.auth.app.adapter.input.rest.exception.JwtAccessDeniedHandler
+import com.diadsimulation.auth.app.adapter.input.rest.exception.JwtAuthenticationEntryPoint
+import com.diadsimulation.auth.app.adapter.input.rest.security.JwtAuthenticationFilter
+import com.diadsimulation.auth.core.domain.enums.UserRole.CANDIDATE
+import com.diadsimulation.auth.core.domain.enums.UserRole.PLATFORM_ADMIN
+import com.diadsimulation.auth.core.domain.enums.UserRole.SCHOOL_ADMIN
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
+import org.springframework.http.HttpMethod.GET
+import org.springframework.http.HttpMethod.PATCH
+import org.springframework.http.HttpMethod.POST
+import org.springframework.security.config.annotation.web.builders.HttpSecurity
+import org.springframework.security.config.http.SessionCreationPolicy.STATELESS
+import org.springframework.security.web.SecurityFilterChain
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
+import org.springframework.web.cors.CorsConfiguration
+import org.springframework.web.cors.CorsConfigurationSource
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource
+
+@Configuration
+class SecurityConfiguration(
+    private val jwtAuthenticationFilter: JwtAuthenticationFilter,
+    private val jwtAuthenticationEntryPoint: JwtAuthenticationEntryPoint,
+    private val jwtAccessDeniedHandler: JwtAccessDeniedHandler,
+) {
+    @Bean
+    fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
+        http
+            .cors { }
+            .csrf { it.disable() }
+            .sessionManagement {
+                it.sessionCreationPolicy(STATELESS)
+            }.exceptionHandling {
+                it
+                    .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                    .accessDeniedHandler(jwtAccessDeniedHandler)
+            }.authorizeHttpRequests {
+                it
+                    .requestMatchers(
+                        "/swagger-ui/**",
+                        "/swagger-ui.html",
+                        "/v3/api-docs/**",
+                        "/actuator/health",
+                    ).permitAll()
+                    // Autenticação e cadastro
+                    .requestMatchers(POST, "/login", "/users")
+                    .permitAll()
+                    // Usuários
+                    .requestMatchers(PATCH, "/users/*/access")
+                    .hasRole(PLATFORM_ADMIN.name)
+                    .requestMatchers(GET, "/users/id")
+                    .hasAnyRole(
+                        CANDIDATE.name,
+                        SCHOOL_ADMIN.name,
+                        PLATFORM_ADMIN.name,
+                    ).requestMatchers(PATCH, "/users/*")
+                    .hasAnyRole(
+                        CANDIDATE.name,
+                        SCHOOL_ADMIN.name,
+                        PLATFORM_ADMIN.name,
+                    ).requestMatchers("/users/**")
+                    .hasAnyRole(
+                        SCHOOL_ADMIN.name,
+                        PLATFORM_ADMIN.name,
+                    )
+                    // Categorias
+                    .requestMatchers("/categories", "/categories/**")
+                    .hasAnyRole(
+                        SCHOOL_ADMIN.name,
+                        PLATFORM_ADMIN.name,
+                    )
+                    // Produtos
+                    .requestMatchers("/products", "/products/**")
+                    .hasAnyRole(
+                        SCHOOL_ADMIN.name,
+                        PLATFORM_ADMIN.name,
+                    )
+                    // Despesas
+                    .requestMatchers("/expenses", "/expenses/**")
+                    .hasAnyRole(
+                        SCHOOL_ADMIN.name,
+                        PLATFORM_ADMIN.name,
+                    )
+                    // Estoque
+                    .requestMatchers("/inventory", "/inventory/**")
+                    .hasAnyRole(
+                        SCHOOL_ADMIN.name,
+                        PLATFORM_ADMIN.name,
+                    )
+                    // Vendas
+                    .requestMatchers(POST, "/sales")
+                    .hasAnyRole(
+                        SCHOOL_ADMIN.name,
+                        PLATFORM_ADMIN.name,
+                    )
+                    // Relatórios
+                    .requestMatchers("/reports", "/reports/**")
+                    .hasAnyRole(
+                        SCHOOL_ADMIN.name,
+                        PLATFORM_ADMIN.name,
+                    )
+                    // Demais endpoints
+                    .anyRequest()
+                    .hasRole(PLATFORM_ADMIN.name)
+            }.addFilterBefore(
+                jwtAuthenticationFilter,
+                UsernamePasswordAuthenticationFilter::class.java,
+            )
+
+        return http.build()
+    }
+
+    @Bean
+    fun corsConfigurationSource(): CorsConfigurationSource {
+        val configuration =
+            CorsConfiguration().apply {
+                allowedOrigins =
+                    listOf(
+                        "http://localhost:3000",
+                        "https://personalite-creative-web.vercel.app",
+                    )
+
+                allowedMethods = listOf("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
+                allowedHeaders = listOf("*")
+            }
+
+        return UrlBasedCorsConfigurationSource().apply {
+            registerCorsConfiguration("/**", configuration)
+        }
+    }
+}

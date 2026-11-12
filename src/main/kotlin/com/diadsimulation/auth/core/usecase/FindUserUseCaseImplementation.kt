@@ -1,6 +1,6 @@
 package com.diadsimulation.auth.core.usecase
 
-import com.diadsimulation.auth.app.adapter.input.web.security.UserAccessAuthorization
+import com.diadsimulation.auth.app.adapter.input.rest.security.UserAccessAuthorization
 import com.diadsimulation.auth.core.common.Messages.USER_NOT_FOUND
 import com.diadsimulation.auth.core.domain.model.User
 import com.diadsimulation.auth.core.port.input.FindUserInputPort
